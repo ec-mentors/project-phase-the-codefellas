@@ -41,6 +41,10 @@ public class UserService {
         return userRepository.findOneByUsername(username).map(user -> mapper.toUserPublicDTO(user));
     }
 
+    public Optional<UserPrivateDTO> viewIndividualProfileData(String username) {
+        return getUserByUsername(username).map(mapper::toUserPrivateDTO);
+    }
+
 
 
 }
