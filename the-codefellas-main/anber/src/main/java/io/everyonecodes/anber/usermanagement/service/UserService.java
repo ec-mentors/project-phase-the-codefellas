@@ -6,9 +6,11 @@ import io.everyonecodes.anber.usermanagement.data.UserPrivateDTO;
 import io.everyonecodes.anber.usermanagement.data.UserPublicDTO;
 import io.everyonecodes.anber.usermanagement.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
+@Service
 public class UserService {
 
     private final UserRepository userRepository;
@@ -44,7 +46,5 @@ public class UserService {
     public Optional<UserPrivateDTO> viewIndividualProfileData(String username) {
         return getUserByUsername(username).map(mapper::toUserPrivateDTO);
     }
-
-
-
+    
 }

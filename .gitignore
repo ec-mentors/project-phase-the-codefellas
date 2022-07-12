@@ -400,7 +400,11 @@ gradle-app.setting
 # User-specific files
 *.rsuser
 *.suo
+<<<<<<< .merge_file_a10088
 *.userProfile
+=======
+*.user
+>>>>>>> .merge_file_a11716
 *.userosscache
 *.sln.docstates
 
@@ -523,7 +527,11 @@ $tf/
 # ReSharper is a .NET coding add-in
 _ReSharper*/
 *.[Rr]e[Ss]harper
+<<<<<<< .merge_file_a10088
 *.DotSettings.userProfile
+=======
+*.DotSettings.user
+>>>>>>> .merge_file_a11716
 
 # TeamCity is a build add-in
 _TeamCity*
