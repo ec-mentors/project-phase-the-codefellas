@@ -1,0 +1,30 @@
+spring:
+  datasource:
+    profiles:
+      url: jdbc:mysql://localhost/profile?useSSL=false
+      username: root
+      password: root
+    users:
+      url: jdbc:mysql://localhost/user?useSSL=false
+      username: root
+      password: root
+    home:
+      url: jdbc:mysql://localhost/home?useSSL=false
+      username: root
+      password: root
+    jpa:
+      hibernate:
+        ddl-auto: update
+
+data:
+  boolean:
+    true: true
+    false: false
+  user-profile:
+    profile-options:
+      - email
+      - password
+      - name
+      - country
+      - homes
+      - notificationsEnabled
