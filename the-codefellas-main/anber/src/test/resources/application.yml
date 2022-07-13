@@ -1,0 +1,26 @@
+spring:
+  datasource:
+    url: jdbc:mysql://localhost/user-profile?useSSL=false
+    username: root
+    password: root
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+data:
+  profile-options:
+    - email
+    - password
+    - name
+    - country
+    - homes
+    - notificationsEnabled
+
+testvalues:
+  login-endpoint-url: "/login"
+  username: "test"
+  password: "testing123"
+  role: "ROLE_ADMIN"
+  email: "test@tester.org"
+  user-endpoint-url: "/users"
+  user-endpoint-postUser-url: "/register"

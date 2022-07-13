@@ -17,6 +17,7 @@ spring:
         ddl-auto: update
 
 data:
+<<<<<<< HEAD
   boolean:
     true: true
     false: false
@@ -28,3 +29,12 @@ data:
       - country
       - homes
       - notificationsEnabled
+=======
+  profile-options:
+    - email
+    - password
+    - name
+    - country
+    - homes
+    - notificationsEnabled
+>>>>>>> 31b2cb83443b21a5af50cb466f1b86f4073e3c39

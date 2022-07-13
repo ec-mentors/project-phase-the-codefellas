@@ -22,7 +22,7 @@ public class UserEndpoint {
     }
 
     @PostMapping("/register")
-    User registerUser(@Valid @RequestBody User user){
+    User registerUser(@Valid @RequestBody User user) {
         try {
             return userService.saveUser(user);
         } catch (IllegalArgumentException e) {

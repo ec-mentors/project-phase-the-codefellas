@@ -24,7 +24,8 @@ public class UserService {
     }
 
     public User saveUser(User user) throws IllegalArgumentException {
-        if (!user.getPassword().matches("(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[!?@#$^&+=/_-])(?=\\S+$).{6,100}")) throw new IllegalArgumentException();
+        if (!user.getPassword().matches("(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[!?@#$^&+=/_-])(?=\\S+$).{6,100}"))
+            throw new IllegalArgumentException();
         String encodedPassword = passwordEncoder.encode(user.getPassword());
         user.setPassword(encodedPassword);
         user.setRole("ROLE_INDIVIDUAL");
@@ -49,5 +50,5 @@ public class UserService {
     public Optional<UserPrivateDTO> viewIndividualProfileData(String username) {
         return getUserByUsername(username).map(mapper::toUserPrivateDTO);
     }
-    
+
 }
