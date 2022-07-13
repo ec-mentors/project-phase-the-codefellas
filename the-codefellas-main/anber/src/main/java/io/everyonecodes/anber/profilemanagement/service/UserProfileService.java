@@ -35,7 +35,7 @@ public class UserProfileService {
 
     public Optional<UserProfile> viewProfile(String username) {
         Optional<User> oUser = userRepository.findOneByUsername(username);
-        if (oUser.isPresent() && verifyUser(username)) {
+        if (oUser.isPresent()) {
             User user = oUser.get();
             return userProfileRepository.findOneByUsername(user.getUsername());
         }

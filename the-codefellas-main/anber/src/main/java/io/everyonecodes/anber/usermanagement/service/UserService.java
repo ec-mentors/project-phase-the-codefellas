@@ -27,6 +27,8 @@ public class UserService {
         if (!user.getPassword().matches("(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[!?@#$^&+=/_-])(?=\\S+$).{6,100}")) throw new IllegalArgumentException();
         String encodedPassword = passwordEncoder.encode(user.getPassword());
         user.setPassword(encodedPassword);
+        user.setRole("ROLE_INDIVIDUAL");
+        user.setUsername(user.getEmail());
         user = userRepository.save(user);
         return user;
     }
@@ -35,12 +37,13 @@ public class UserService {
         return userRepository.findOneByUsername(username);
     }
 
+    // already coded for viewing the profile - tests for it done.
     public Optional<UserPrivateDTO> viewUserPrivateData(String username) {
-        return getUserByUsername(username).map(user -> mapper.toUserPrivateDTO(user));
+        return getUserByUsername(username).map(mapper::toUserPrivateDTO);
     }
 
     public Optional<UserPublicDTO> viewUserPublicData(String username) {
-        return userRepository.findOneByUsername(username).map(user -> mapper.toUserPublicDTO(user));
+        return userRepository.findOneByUsername(username).map(mapper::toUserPublicDTO);
     }
 
     public Optional<UserPrivateDTO> viewIndividualProfileData(String username) {
