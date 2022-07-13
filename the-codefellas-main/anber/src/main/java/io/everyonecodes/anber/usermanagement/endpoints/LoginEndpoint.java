@@ -21,7 +21,7 @@ public class LoginEndpoint {
     @GetMapping
     @Secured({"ROLE_ADMIN", "ROLE_INDIVIDUAL"})
     UserPrivateDTO viewIndividualProfile(Authentication authentication) {
-            return userService.viewIndividualProfileData(authentication.getName()).orElse(null);
+        return userService.viewIndividualProfileData(authentication.getName()).orElse(null);
     }
 
 }

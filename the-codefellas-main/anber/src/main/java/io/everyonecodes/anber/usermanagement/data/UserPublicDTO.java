@@ -9,7 +9,8 @@ public class UserPublicDTO {
 
     private String username;
 
-    public UserPublicDTO() {}
+    public UserPublicDTO() {
+    }
 
     public UserPublicDTO(String username) {
         this.username = username;

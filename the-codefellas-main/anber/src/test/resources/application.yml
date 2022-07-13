@@ -15,3 +15,12 @@ data:
     - country
     - homes
     - notificationsEnabled
+
+testvalues:
+  login-endpoint-url: "/login"
+  username: "test"
+  password: "testing123"
+  role: "ROLE_ADMIN"
+  email: "test@tester.org"
+  user-endpoint-url: "/users"
+  user-endpoint-postUser-url: "/register"
