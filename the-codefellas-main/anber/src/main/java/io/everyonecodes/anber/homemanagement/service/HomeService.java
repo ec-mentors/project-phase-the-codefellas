@@ -24,11 +24,12 @@ public class HomeService {
         return homeRepository.findAll();
     }
 
-    public void addHome(Home home, String username) {
+    public List<Home> addHome(Home home, String username) {
         var oProfile = userProfileRepository.findOneByUsername(username);
+        List<Home> homes = new ArrayList<>();
         if (oProfile.isPresent()) {
             UserProfile profile = oProfile.get();
-            var homes = profile.getSavedHomes();
+            homes = profile.getSavedHomes();
             if (!homes.contains(home)) {
                 homes.add(home);
                 homeRepository.save(home);
@@ -36,14 +37,15 @@ public class HomeService {
                 userProfileRepository.save(profile);
             }
         }
-
+        return homes;
     }
 
-    public void removeHome(Home home, String username) {
+    public List<Home> removeHome(Home home, String username) {
         var oProfile = userProfileRepository.findOneByUsername(username);
+        List<Home> homes = new ArrayList<>();
         if (oProfile.isPresent()) {
             UserProfile profile = oProfile.get();
-            var homes = profile.getSavedHomes();
+            homes = profile.getSavedHomes();
 
             if (homes.contains(home)) {
                 homes.remove(home);
@@ -52,6 +54,7 @@ public class HomeService {
                 userProfileRepository.save(profile);
             }
         }
+        return homes;
     }
 
     public void deleteHome(String username) {

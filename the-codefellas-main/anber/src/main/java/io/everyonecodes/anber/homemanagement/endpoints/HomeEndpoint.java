@@ -22,13 +22,13 @@ public class HomeEndpoint {
     }
 
     @PutMapping("/{username}/home/add")
-    void addHome(@PathVariable String username, @RequestBody Home home) {
-        homeService.addHome(home, username);
+    List<Home> addHome(@PathVariable String username, @RequestBody Home home) {
+        return homeService.addHome(home, username);
     }
 
     @PutMapping("/{username}/home/remove")
-    void removeHome(@PathVariable String username, @RequestBody Home home) {
-        homeService.removeHome(home, username);
+    List<Home> removeHome(@PathVariable String username, @RequestBody Home home) {
+        return homeService.removeHome(home, username);
     }
 
     @DeleteMapping("/{username}/homes/delete")

@@ -4,5 +4,5 @@ public enum HomeType {
     HOUSE,
     APARTMENT,
     GARAGE,
-    OFFICEBUILDING;
+    OFFICE_BUILDING;
 }

@@ -79,7 +79,7 @@ public class UserProfileService {
     }
 
 
-    public void overwriteData(String option, UserProfile userProfile, String input) {
+    private void overwriteData(String option, UserProfile userProfile, String input) {
 
         if (profileOptions.contains(option)) {
             if (option.equals(profileOptions.get(0)) && verifyUser(userProfile.getUsername())) {
