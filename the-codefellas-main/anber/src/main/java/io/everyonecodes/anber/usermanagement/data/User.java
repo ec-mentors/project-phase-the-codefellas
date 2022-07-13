@@ -4,8 +4,6 @@ import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 @Entity
@@ -19,14 +17,13 @@ public class User {
     private String username;
 
     @NotEmpty
-    @Size(min = 6, max = 40)
+    @Size(min = 6)
     private String password;
 
     @NotEmpty
-    @Size(min = 6, max = 40, message = "Must have 1-40 characters")
     @Email(message = "must be a valid Email")
     @Column(unique = true)
-    private String emailAddress;
+    private String email;
 
     @NotEmpty
     private String role;
@@ -34,10 +31,10 @@ public class User {
     public User() {
     }
 
-    public User(String username, String password, String emailAddress, String role) {
+    public User(String username, String password, String email, String role) {
         this.username = username;
         this.password = password;
-        this.emailAddress = emailAddress;
+        this.email = email;
         this.role = role;
     }
 
@@ -65,12 +62,12 @@ public class User {
         this.password = password;
     }
 
-    public String getEmailAddress() {
-        return emailAddress;
+    public String getEmail() {
+        return email;
     }
 
-    public void setEmailAddress(String emailAddress) {
-        this.emailAddress = emailAddress;
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getRole() {
@@ -86,12 +83,12 @@ public class User {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         User user = (User) o;
-        return Objects.equals(id, user.id) && Objects.equals(username, user.username) && Objects.equals(password, user.password) && Objects.equals(emailAddress, user.emailAddress) && Objects.equals(role, user.role);
+        return Objects.equals(id, user.id) && Objects.equals(username, user.username) && Objects.equals(password, user.password) && Objects.equals(email, user.email) && Objects.equals(role, user.role);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, username, password, emailAddress, role);
+        return Objects.hash(id, username, password, email, role);
     }
 
     @Override
@@ -100,7 +97,7 @@ public class User {
                 "id=" + id +
                 ", username='" + username + '\'' +
                 ", password='" + password + '\'' +
-                ", emailAddress='" + emailAddress + '\'' +
+                ", emailAddress='" + email + '\'' +
                 ", role='" + role + '\'' +
                 '}';
     }

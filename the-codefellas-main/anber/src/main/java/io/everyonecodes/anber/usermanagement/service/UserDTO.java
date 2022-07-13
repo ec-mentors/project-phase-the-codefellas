@@ -5,10 +5,6 @@ import io.everyonecodes.anber.usermanagement.data.UserPrivateDTO;
 import io.everyonecodes.anber.usermanagement.data.UserPublicDTO;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
-import java.time.Period;
-import java.util.List;
-
 @Service
 public class UserDTO {
 
@@ -17,7 +13,7 @@ public class UserDTO {
         return new UserPrivateDTO(
                 user.getUsername(),
                 user.getRole(),
-                user.getEmailAddress()
+                user.getEmail()
         );
     }
 
