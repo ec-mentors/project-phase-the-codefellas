@@ -17,7 +17,7 @@ public class User {
     private String username;
 
     @NotEmpty
-    @Size(min = 6)
+    @Size(min = 6, message = "must be at least 6 characters long")
     private String password;
 
     @NotEmpty

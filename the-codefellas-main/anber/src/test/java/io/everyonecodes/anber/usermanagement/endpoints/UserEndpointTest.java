@@ -10,7 +10,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.validation.Validator;
+
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
+import java.util.Set;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class UserEndpointTest {
@@ -36,7 +41,8 @@ class UserEndpointTest {
     @Value("${testvalues.password}")
     String password;
 
-    private Validator validator;
+    private final ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory();
+    private final Validator validator = validatorFactory.getValidator();
 
     @Test
     void registerUser_Valid() {
@@ -49,15 +55,21 @@ class UserEndpointTest {
         Mockito.verifyNoMoreInteractions(userService);
     }
 
-//    @Test
-//    void registerUser_NotValid() {
-//        User testUser = new User(username, "123", email, role);
-//        testRestTemplate.postForObject(url, testUser, User[].class);
-//        userService.saveUser(testUser);
-////        Assertions.assertThrows(ResponseStatusException.class, () -> {
-////            userService.saveUser(testUser);
-////        });
-//        Mockito.verify(userService).saveUser(testUser);
-//        Mockito.verifyNoMoreInteractions(userService);
-//    }
+
+
+    @Test
+    void registerUser_NotValid() {
+        User testUser = new User(username, "123", email, role);
+
+        Set<ConstraintViolation<User>> violations = validator.validate(testUser);
+
+        Assertions.assertEquals(violations.size(), 1);
+
+        ConstraintViolation<User> violation = violations.iterator().next();
+
+        Assertions.assertEquals("must be at least 6 characters long", violation.getMessage());
+        Assertions.assertEquals("password", violation.getPropertyPath().toString());
+
+        Assertions.assertEquals("123", violation.getInvalidValue());
+    }
 }

@@ -17,10 +17,10 @@ spring:
         ddl-auto: update
 
 data:
-<<<<<<< HEAD
+#<<<<<<< HEAD
   boolean:
-    true: true
-    false: false
+    t: true
+    f: false
   user-profile:
     profile-options:
       - email
@@ -37,4 +37,4 @@ data:
     - country
     - homes
     - notificationsEnabled
->>>>>>> 31b2cb83443b21a5af50cb466f1b86f4073e3c39
+#>>>>>>> 31b2cb83443b21a5af50cb466f1b86f4073e3c39

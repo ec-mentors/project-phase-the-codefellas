@@ -5,19 +5,19 @@ import io.everyonecodes.anber.usermanagement.data.UserPrivateDTO;
 import io.everyonecodes.anber.usermanagement.data.UserPublicDTO;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-
-import java.time.LocalDate;
-
-import static org.junit.jupiter.api.Assertions.*;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.web.SecurityFilterChain;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
 class UserDTOTest {
 
     @Autowired
     UserDTO userDTO;
+
+    @MockBean
+    SecurityFilterChain filterChain;
 
     @Test
     void toUserPrivateDTO() {

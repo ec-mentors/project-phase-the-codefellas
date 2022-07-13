@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.security.web.SecurityFilterChain;
 
 import java.util.Optional;
 
@@ -33,6 +34,9 @@ class LoginEndpointTest {
 
     @Value("${testvalues.email}")
     String email;
+
+    @MockBean
+    SecurityFilterChain filterChain;
 
     @Test
     void viewIndividualProfile_returnsProfileData() {
