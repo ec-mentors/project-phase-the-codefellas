@@ -82,10 +82,10 @@ public class UserProfileService {
     private void overwriteData(String option, UserProfile userProfile, String input) {
 
         if (profileOptions.contains(option)) {
-            if (option.equals(profileOptions.get(0)) && verifyUser(userProfile.getUsername())) {
+            if (option.equals(profileOptions.get(0))) {
                 userProfile.setEmail(input);
             }
-            if (option.equals(profileOptions.get(1)) && verifyUser(userProfile.getUsername())) {
+            if (option.equals(profileOptions.get(1))) {
                 userProfile.setPassword(input);
             }
             if (option.equals(profileOptions.get(2))) {
@@ -103,15 +103,15 @@ public class UserProfileService {
 
 
 
-    private boolean verifyUser(String username) {
-
-        var oUser = userRepository.findOneByUsername(username);
-        var oProfile = userProfileRepository.findOneByUsername(username);
-
-        if (oUser.isPresent() && oProfile.isPresent()) {
-            return oUser.get().getPassword().equals(oProfile.get().getPassword());
-        }
-
-        return false;
-    }
+//    private boolean verifyUser(String username) {
+//
+//        var oUser = userRepository.findOneByUsername(username);
+//        var oProfile = userProfileRepository.findOneByUsername(username);
+//
+//        if (oUser.isPresent() && oProfile.isPresent()) {
+//            return oUser.get().getPassword().equals(oProfile.get().getPassword());
+//        }
+//
+//        return false;
+//    }
 }

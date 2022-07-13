@@ -1,6 +1,7 @@
 package io.everyonecodes.anber.homemanagement.data;
 
 import javax.persistence.Entity;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.validation.constraints.Max;
@@ -19,6 +20,8 @@ public class Home {
     private String country;
     private String city;
     private String postalCode;
+
+    @Enumerated
     private HomeType type;
     private double sizeInSquareMeters;
 
