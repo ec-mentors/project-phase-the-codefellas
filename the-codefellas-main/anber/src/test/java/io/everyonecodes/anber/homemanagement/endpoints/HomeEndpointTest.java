@@ -27,7 +27,7 @@ class HomeEndpointTest {
     @Value("${testvalues.username}")
     String username;
 
-    //  Throws error regarding the JSON Annotation in UserPublicDTO.class:
+    // dfsdg Throws error regarding the JSON Annotation in UserPublicDTO.class:
     //  JSON parse error: Cannot deserialize value of type `[Lio.everyonecodes.anber.homemanagement.data.Home;` from Object value (token `JsonToken.START_OBJECT`);
     @Test
     void getHomes() {
