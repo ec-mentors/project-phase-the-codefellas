@@ -10,19 +10,14 @@ public class UserDTO {
 
 
     public UserPrivateDTO toUserPrivateDTO(User user) {
-        return new UserPrivateDTO(
-                user.getUsername(),
-                user.getRole(),
-                user.getEmailAddress()
-        );
+        return new UserPrivateDTO(user.getUsername(), user.getRole(), user.getEmailAddress());
     }
 
     public UserPublicDTO toUserPublicDTO(User user) {
         if (user == null) {
             return null;
         }
-        return new UserPublicDTO(
-                user.getUsername());
+        return new UserPublicDTO(user.getUsername());
     }
 
 }

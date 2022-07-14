@@ -49,15 +49,4 @@ class UserEndpointTest {
         Mockito.verifyNoMoreInteractions(userService);
     }
 
-//    @Test
-//    void registerUser_NotValid() {
-//        User testUser = new User(username, "123", email, role);
-//        testRestTemplate.postForObject(url, testUser, User[].class);
-//        userService.saveUser(testUser);
-////        Assertions.assertThrows(ResponseStatusException.class, () -> {
-////            userService.saveUser(testUser);
-////        });
-//        Mockito.verify(userService).saveUser(testUser);
-//        Mockito.verifyNoMoreInteractions(userService);
-//    }
 }
