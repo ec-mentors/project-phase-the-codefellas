@@ -1,26 +1,16 @@
 spring:
   datasource:
-    profiles:
-      url: jdbc:mysql://localhost/profile?useSSL=false
-      username: root
-      password: root
-    users:
-      url: jdbc:mysql://localhost/user?useSSL=false
-      username: root
-      password: root
-    home:
-      url: jdbc:mysql://localhost/home?useSSL=false
-      username: root
-      password: root
-    jpa:
-      hibernate:
-        ddl-auto: update
+    url: jdbc:mysql://localhost/anber?useSSL=false
+    username: root
+    password: root
+  jpa:
+    hibernate:
+      ddl-auto: update
 
 data:
-#<<<<<<< HEAD
   boolean:
-    t: true
-    f: false
+    true: true
+    false: false
   user-profile:
     profile-options:
       - email
@@ -29,12 +19,4 @@ data:
       - country
       - homes
       - notificationsEnabled
-=======
-  profile-options:
-    - email
-    - password
-    - name
-    - country
-    - homes
-    - notificationsEnabled
-#>>>>>>> 31b2cb83443b21a5af50cb466f1b86f4073e3c39
+

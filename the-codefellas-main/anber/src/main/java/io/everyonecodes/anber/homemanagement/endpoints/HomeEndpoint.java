@@ -21,17 +21,17 @@ public class HomeEndpoint {
         return homeService.getHomes();
     }
 
-    @PutMapping("/{username}/home/add")
+    @PutMapping("/{username}/edit/homes/add")
     List<Home> addHome(@PathVariable String username, @RequestBody Home home) {
         return homeService.addHome(home, username);
     }
 
-    @PutMapping("/{username}/home/remove")
+    @PutMapping("/{username}/edit/homes/remove")
     List<Home> removeHome(@PathVariable String username, @RequestBody Home home) {
         return homeService.removeHome(home, username);
     }
 
-    @DeleteMapping("/{username}/homes/delete")
+    @DeleteMapping("/{username}/edit/homes/delete")
     void deleteHomes (@PathVariable String username) {
         homeService.deleteHome(username);
     }

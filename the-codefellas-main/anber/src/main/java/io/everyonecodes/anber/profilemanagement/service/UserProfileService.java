@@ -5,32 +5,26 @@ import io.everyonecodes.anber.profilemanagement.repository.UserProfileRepository
 import io.everyonecodes.anber.usermanagement.data.User;
 import io.everyonecodes.anber.usermanagement.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
 @Service
-@ConfigurationProperties("data.user-profile")
 public class UserProfileService {
 
     private final UserProfileRepository userProfileRepository;
     private final UserRepository userRepository;
-    private List<String> profileOptions;
+    private final List<String> profileOptions;
     private final String boolTrue;
 
     public UserProfileService(UserProfileRepository userProfileRepository, UserRepository userRepository,
-                              @Value("${data.boolean.true}") String boolTrue) {
+                              List<String> profileOptions, @Value("${data.boolean.true}") String boolTrue) {
         this.userProfileRepository = userProfileRepository;
         this.userRepository = userRepository;
+        this.profileOptions = profileOptions;
         this.boolTrue = boolTrue;
     }
-
-    public void setProfileOptions(List<String> profileOptions) {
-        this.profileOptions = profileOptions;
-    }
-
 
 
     public Optional<UserProfile> viewProfile(String username) {
@@ -53,11 +47,15 @@ public class UserProfileService {
         var oUser = userRepository.findOneByUsername(username);
 
         var exists = userProfileRepository.findAll().contains(input);
-        if (!exists) {
+        if (oProfile.isPresent() && oUser.isPresent()) {
+            User user = oUser.get();
+            UserProfile profile = oProfile.get();
+            if (!exists && (user.getPassword().equals(profile.getPassword()))) {
 
-            userProfileRepository.save(input);
+                userProfileRepository.save(input);
 
-            return Optional.of(input);
+                return Optional.of(input);
+            }
         }
         return Optional.empty();
     }
@@ -73,7 +71,7 @@ public class UserProfileService {
 
             overwriteData(option, profile, input);
 
-            return Optional.of(option);
+            return Optional.of(input);
         }
         return Optional.empty();
     }
@@ -101,17 +99,4 @@ public class UserProfileService {
         }
     }
 
-
-
-//    private boolean verifyUser(String username) {
-//
-//        var oUser = userRepository.findOneByUsername(username);
-//        var oProfile = userProfileRepository.findOneByUsername(username);
-//
-//        if (oUser.isPresent() && oProfile.isPresent()) {
-//            return oUser.get().getPassword().equals(oProfile.get().getPassword());
-//        }
-//
-//        return false;
-//    }
 }

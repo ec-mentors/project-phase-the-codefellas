@@ -34,7 +34,7 @@ class UserDTOTest {
     }
 
     @Test
-    void testUserToPrivateUserDTO_nullValues(){
+    void testUserToPrivateUserDTO_nullValues() {
         User user = new User(
                 "username",
                 "password",

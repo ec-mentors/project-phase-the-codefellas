@@ -55,8 +55,6 @@ class UserEndpointTest {
         Mockito.verifyNoMoreInteractions(userService);
     }
 
-
-
     @Test
     void registerUser_NotValid() {
         User testUser = new User(username, "123", email, role);
