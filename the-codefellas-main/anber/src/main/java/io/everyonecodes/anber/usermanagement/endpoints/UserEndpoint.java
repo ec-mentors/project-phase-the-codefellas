@@ -27,7 +27,7 @@ public class UserEndpoint {
             return userService.saveUser(user);
         } catch (IllegalArgumentException e) {
             throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST, "Invalid Password", e
+                    HttpStatus.BAD_REQUEST, "Invalid Password (must be at least 6 characters long, and include lower- and uppercase letters, numbers and special characters)", e
             );
         }
     }

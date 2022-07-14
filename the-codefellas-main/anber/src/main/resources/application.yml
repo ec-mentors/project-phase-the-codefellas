@@ -11,9 +11,16 @@ spring:
       ddl-auto: update
 
 data:
+  admin:
+    username: ADMIN
+    password: admin
+    email: admin@email.com
   boolean:
     true: true
     false: false
+  roles:
+    admin: ROLE_ADMIN
+    user: ROLE_USER
   user-profile:
     profile-options:
       - email

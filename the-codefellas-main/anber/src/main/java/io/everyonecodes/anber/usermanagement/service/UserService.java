@@ -5,6 +5,7 @@ import io.everyonecodes.anber.usermanagement.data.User;
 import io.everyonecodes.anber.usermanagement.data.UserPrivateDTO;
 import io.everyonecodes.anber.usermanagement.data.UserPublicDTO;
 import io.everyonecodes.anber.usermanagement.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -16,11 +17,14 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final UserDTO mapper;
+    private final String roleUser;
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, UserDTO mapper) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, UserDTO mapper,
+                       @Value("${data.roles.user}") String roleUser) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.mapper = mapper;
+        this.roleUser = roleUser;
     }
 
     public User saveUser(User user) throws IllegalArgumentException {
@@ -28,7 +32,7 @@ public class UserService {
             throw new IllegalArgumentException();
         String encodedPassword = passwordEncoder.encode(user.getPassword());
         user.setPassword(encodedPassword);
-        user.setRole("ROLE_INDIVIDUAL");
+        user.setRole(roleUser);
         user.setUsername(user.getEmail());
         user = userRepository.save(user);
         return user;
