@@ -1,4 +1,7 @@
 spring:
+  data:
+    mongodb:
+      uri: mongodb://localhost/anber
   datasource:
     url: jdbc:mysql://localhost/anber?useSSL=false
     username: root
