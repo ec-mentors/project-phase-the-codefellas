@@ -1,20 +1,17 @@
 package io.everyonecodes.anber.homemanagement.data;
 
-import javax.persistence.Entity;
-import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.validation.constraints.Max;
+import javax.persistence.*;
+import javax.validation.constraints.Size;
 import java.util.Objects;
 
 @Entity
 public class Home {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Max(value = 100)
+    @Size(max = 100)
     private String homeName;
 
     private String country;
@@ -24,7 +21,6 @@ public class Home {
     @Enumerated
     private HomeType type;
     private double sizeInSquareMeters;
-
 
 
     public Home() {
@@ -103,30 +99,29 @@ public class Home {
         this.homeName = homeName;
     }
 
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Home home = (Home) o;
-        return Double.compare(home.sizeInSquareMeters, sizeInSquareMeters) == 0 && Objects.equals(id, home.id) && Objects.equals(country, home.country) && Objects.equals(city, home.city) && Objects.equals(postalCode, home.postalCode) && type == home.type && Objects.equals(homeName, home.homeName);
+        return Double.compare(home.sizeInSquareMeters, sizeInSquareMeters) == 0 && Objects.equals(id, home.id) && Objects.equals(homeName, home.homeName) && Objects.equals(country, home.country) && Objects.equals(city, home.city) && Objects.equals(postalCode, home.postalCode) && type == home.type;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, country, city, postalCode, type, sizeInSquareMeters, homeName);
+        return Objects.hash(id, homeName, country, city, postalCode, type, sizeInSquareMeters);
     }
 
     @Override
     public String toString() {
         return "Home{" +
                 "id=" + id +
+                ", homeName='" + homeName + '\'' +
                 ", country='" + country + '\'' +
                 ", city='" + city + '\'' +
                 ", postalCode='" + postalCode + '\'' +
                 ", type=" + type +
                 ", sizeInSquareMeters=" + sizeInSquareMeters +
-                ", homeName='" + homeName + '\'' +
                 '}';
     }
 }

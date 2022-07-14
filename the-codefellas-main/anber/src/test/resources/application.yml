@@ -14,7 +14,7 @@ data:
   profile-options:
     - email
     - password
-    - name
+    - username
     - country
     - homes
     - notificationsEnabled

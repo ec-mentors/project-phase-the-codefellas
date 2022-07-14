@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class HomeService {
@@ -20,48 +21,62 @@ public class HomeService {
         this.userProfileRepository = userProfileRepository;
     }
 
-    public List<Home> getHomes() {
-        return homeRepository.findAll();
+    public List<Home> getHomes(String username) {
+
+        Optional<UserProfile> oProfile = userProfileRepository.findOneByEmail(username);
+        if (oProfile.isPresent()) {
+            UserProfile profile = oProfile.get();
+            return profile.getSavedHomes();
+        }
+        else {
+            return List.of();
+        }
     }
 
     public List<Home> addHome(Home home, String username) {
-        var oProfile = userProfileRepository.findOneByUsername(username);
+        var oProfile = userProfileRepository.findOneByEmail(username);
         List<Home> homes = new ArrayList<>();
         if (oProfile.isPresent()) {
             UserProfile profile = oProfile.get();
             homes = profile.getSavedHomes();
             if (!homes.contains(home)) {
                 homes.add(home);
-                homeRepository.save(home);
                 profile.setSavedHomes(homes);
+                homeRepository.save(home);
                 userProfileRepository.save(profile);
             }
         }
         return homes;
     }
 
-    public List<Home> removeHome(Home home, String username) {
-        var oProfile = userProfileRepository.findOneByUsername(username);
+
+    public List<Home> removeHome(Long id, String username) {
+        var oProfile = userProfileRepository.findOneByEmail(username);
         List<Home> homes = new ArrayList<>();
         if (oProfile.isPresent()) {
             UserProfile profile = oProfile.get();
             homes = profile.getSavedHomes();
 
-            if (homes.contains(home)) {
-                homes.remove(home);
-                homeRepository.save(home);
-                profile.setSavedHomes(homes);
-                userProfileRepository.save(profile);
+            var oHome = homeRepository.findById(id);
+
+            if (oHome.isPresent()) {
+                Home home = oHome.get();
+                if (homes.contains(home)) {
+                    homes.remove(home);
+                    homeRepository.delete(home);
+                    profile.setSavedHomes(homes);
+                    userProfileRepository.save(profile);
+                }
             }
         }
         return homes;
     }
 
-    public void deleteHome(String username) {
+    public void deleteHomes(String username) {
 
         homeRepository.deleteAll();
 
-        var oProfile = userProfileRepository.findOneByUsername(username);
+        var oProfile = userProfileRepository.findOneByEmail(username);
         if (oProfile.isPresent()) {
             UserProfile profile = oProfile.get();
 

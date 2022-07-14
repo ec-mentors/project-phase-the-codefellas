@@ -14,7 +14,7 @@ import java.util.Objects;
 public class UserProfile {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @NotEmpty
@@ -23,10 +23,9 @@ public class UserProfile {
     private String email;
 
     @NotEmpty
-    @Size(min = 6, max = 40)    //max 60?
+    @Size(min = 6, max = 60)
     private String password;
 
-    @NotEmpty
     @Column(unique = true)
     private String username;
 

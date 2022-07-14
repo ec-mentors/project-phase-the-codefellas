@@ -46,19 +46,19 @@ class HomeEndpointTest {
         Mockito.verify(homeService).addHome(testHome, username);
     }
 
-    @Test
-    void removeHome() {
-        Home testHome1 = new Home(
-                "testCountry1", "testCity1", "2600", HomeType.APARTMENT, 25.5);
-        testRestTemplate.put("/" + username + "/home/remove", testHome1, Home[].class);
-        homeService.removeHome(testHome1, username);
-        Mockito.verify(homeService).removeHome(testHome1, username);
-    }
+//    @Test
+//    void removeHome() {
+//        Home testHome1 = new Home(
+//                "testCountry1", "testCity1", "2600", HomeType.APARTMENT, 25.5);
+//        testRestTemplate.put("/" + username + "/home/remove", testHome1, Home[].class);
+//        homeService.removeHome(testHome1, username);
+//        Mockito.verify(homeService).removeHome(testHome1, username);
+//    }
 
     @Test
     void deleteHomes() {
         testRestTemplate.delete("/" + username + "/homes/delete", Home[].class);
-        homeService.deleteHome(username);
-        Mockito.verify(homeService).deleteHome(username);
+        homeService.deleteHomes(username);
+        Mockito.verify(homeService).deleteHomes(username);
     }
 }

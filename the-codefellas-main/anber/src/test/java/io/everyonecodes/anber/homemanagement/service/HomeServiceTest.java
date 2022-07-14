@@ -54,26 +54,26 @@ class HomeServiceTest {
     @Value("${testvalues.sizeInSquareMeters}")
     double sizeInSquareMeters;
 
-    @Test
-    void getHomes_returnsHomes() {
-        Home testHome1 = new Home(country, city, postalCode, HomeType.GARAGE, sizeInSquareMeters);
-        Home testHome2 = new Home(country, city, postalCode, HomeType.APARTMENT, sizeInSquareMeters);
-        Home testHome3 = new Home(country, city, postalCode, HomeType.HOUSE, sizeInSquareMeters);
-        List<Home> homes = List.of(testHome1, testHome2, testHome3);
-        Mockito.when(homeRepository.findAll()).thenReturn(homes);
-        var result = homeService.getHomes();
-        Assertions.assertEquals(homes, result);
-        Mockito.verify(homeRepository).findAll();
-    }
-
-    @Test
-    void getHomes_emptyList() {
-        List<Home> homes = List.of();
-        Mockito.when(homeRepository.findAll()).thenReturn(homes);
-        var result = homeService.getHomes();
-        Assertions.assertEquals(homes, result);
-        Mockito.verify(homeRepository).findAll();
-    }
+//    @Test
+//    void getHomes_returnsHomes() {
+//        Home testHome1 = new Home(country, city, postalCode, HomeType.GARAGE, sizeInSquareMeters);
+//        Home testHome2 = new Home(country, city, postalCode, HomeType.APARTMENT, sizeInSquareMeters);
+//        Home testHome3 = new Home(country, city, postalCode, HomeType.HOUSE, sizeInSquareMeters);
+//        List<Home> homes = List.of(testHome1, testHome2, testHome3);
+//        Mockito.when(homeRepository.findAll()).thenReturn(homes);
+//        var result = homeService.getHomes();
+//        Assertions.assertEquals(homes, result);
+//        Mockito.verify(homeRepository).findAll();
+//    }
+//
+//    @Test
+//    void getHomes_emptyList() {
+//        List<Home> homes = List.of();
+//        Mockito.when(homeRepository.findAll()).thenReturn(homes);
+//        var result = homeService.getHomes();
+//        Assertions.assertEquals(homes, result);
+//        Mockito.verify(homeRepository).findAll();
+//    }
 
     @Test
     void addHome() {
@@ -81,15 +81,15 @@ class HomeServiceTest {
         UserProfile testUserProfile = new UserProfile(
                 email, password, username, country, homes, false);
         Home testHome = new Home(country, city, postalCode, HomeType.GARAGE, sizeInSquareMeters);
-        Mockito.when(userProfileRepository.findOneByUsername(username)).thenReturn(Optional.of(testUserProfile));
-        var response = userProfileRepository.findOneByUsername(username);
+        Mockito.when(userProfileRepository.findOneByEmail(username)).thenReturn(Optional.of(testUserProfile));
+        var response = userProfileRepository.findOneByEmail(username);
         Assertions.assertEquals(0, response.get().getSavedHomes().size());
         homes.add(testHome);
         homeRepository.save(testHome);
         testUserProfile.setSavedHomes(homes);
         var result = userProfileRepository.save(testUserProfile);
         Assertions.assertEquals(1, response.get().getSavedHomes().size());
-        Mockito.verify(userProfileRepository).findOneByUsername(username);
+        Mockito.verify(userProfileRepository).findOneByEmail(username);
         Mockito.verify(homeRepository).save(testHome);
         Mockito.verify(userProfileRepository).save(testUserProfile);
         Mockito.verifyNoMoreInteractions(userProfileRepository);
@@ -102,15 +102,15 @@ class HomeServiceTest {
         List<Home> homes = new ArrayList<>(List.of(testHome));
         UserProfile testUserProfile = new UserProfile(
                 email, password, username, country, homes, false);
-        Mockito.when(userProfileRepository.findOneByUsername(username)).thenReturn(Optional.of(testUserProfile));
-        var response = userProfileRepository.findOneByUsername(username);
+        Mockito.when(userProfileRepository.findOneByEmail(username)).thenReturn(Optional.of(testUserProfile));
+        var response = userProfileRepository.findOneByEmail(username);
         Assertions.assertEquals(1, response.get().getSavedHomes().size());
         homes.remove(testHome);
         homeRepository.save(testHome);
         testUserProfile.setSavedHomes(homes);
         var result = userProfileRepository.save(testUserProfile);
         Assertions.assertEquals(0, response.get().getSavedHomes().size());
-        Mockito.verify(userProfileRepository).findOneByUsername(username);
+        Mockito.verify(userProfileRepository).findOneByEmail(username);
         Mockito.verify(homeRepository).save(testHome);
         Mockito.verify(userProfileRepository).save(testUserProfile);
         Mockito.verifyNoMoreInteractions(userProfileRepository);
@@ -123,14 +123,14 @@ class HomeServiceTest {
         List<Home> homes = new ArrayList<>(List.of(testHome));
         UserProfile testUserProfile = new UserProfile(
                 email, password, username, country, homes, false);
-        Mockito.when(userProfileRepository.findOneByUsername(username)).thenReturn(Optional.of(testUserProfile));
-        var response = userProfileRepository.findOneByUsername(username);
+        Mockito.when(userProfileRepository.findOneByEmail(username)).thenReturn(Optional.of(testUserProfile));
+        var response = userProfileRepository.findOneByEmail(username);
         Assertions.assertEquals(1, response.get().getSavedHomes().size());
         homeRepository.deleteAll();
         testUserProfile.setSavedHomes(new ArrayList<>());
         var result = userProfileRepository.save(testUserProfile);
         Assertions.assertEquals(0, response.get().getSavedHomes().size());
-        Mockito.verify(userProfileRepository).findOneByUsername(username);
+        Mockito.verify(userProfileRepository).findOneByEmail(username);
         Mockito.verify(homeRepository).deleteAll();
         Mockito.verify(userProfileRepository).save(testUserProfile);
         Mockito.verifyNoMoreInteractions(userProfileRepository);

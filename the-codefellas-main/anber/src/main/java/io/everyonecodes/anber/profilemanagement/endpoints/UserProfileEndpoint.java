@@ -5,6 +5,8 @@ import io.everyonecodes.anber.profilemanagement.service.UserProfileService;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/profile")
 public class UserProfileEndpoint {
@@ -15,18 +17,16 @@ public class UserProfileEndpoint {
         this.userProfileService = userProfileService;
     }
 
+    @GetMapping("/all")
+    @Secured("ROLE_ADMIN")
+    List<UserProfile> getAllProfiles() {
+        return userProfileService.viewAll();
+    }
 
     @GetMapping("/{username}")
     @Secured("ROLE_USER")
     UserProfile getFullProfile(@PathVariable String username) {
         return userProfileService.viewProfile(username).orElse(null);
-    }
-
-    @PostMapping("/{username}/edit")
-    @Secured("ROLE_USER")
-    UserProfile addProfileOption(@PathVariable String username,
-                            @RequestBody UserProfile input) {
-        return userProfileService.addData(username, input).orElse(null);
     }
 
     @PutMapping("/{username}/edit/{profileOption}")
