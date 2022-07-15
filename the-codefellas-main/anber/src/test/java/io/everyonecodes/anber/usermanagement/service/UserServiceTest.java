@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
 
 import java.util.Optional;
 
@@ -31,7 +32,10 @@ class UserServiceTest {
     @MockBean
     UserDTO userDTO;
 
-    private final User userTest = new User("name", "", "email", "role");
+    @MockBean
+    SecurityFilterChain filterChain;
+
+    private final User userTest = new User("name", "", "test@email.com", "role");
 
     @ParameterizedTest
     @CsvSource({

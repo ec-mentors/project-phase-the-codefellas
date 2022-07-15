@@ -30,3 +30,14 @@ data:
       - homes
       - notificationsEnabled
 
+testvalues:
+  login-endpoint-url: "/login"
+  username: "test"
+  password: "testing123"
+  role: "ROLE_ADMIN"
+  email: "test@email.com"
+  country: "testCountry"
+  city: "testCity"
+  postalCode: "666"
+  sizeInSquareMeters: 66.66
+  user-endpoint-url: "/users/register"
