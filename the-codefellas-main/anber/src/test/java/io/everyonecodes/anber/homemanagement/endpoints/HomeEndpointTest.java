@@ -24,25 +24,22 @@ class HomeEndpointTest {
     @MockBean
     SecurityFilterChain securityFilterChain;
 
-    @Value("${testvalues.username}")
+    @Value("${testvalues.email}")
     String username;
 
-    // dfsdg Throws error regarding the JSON Annotation in UserPublicDTO.class:
-    //  JSON parse error: Cannot deserialize value of type `[Lio.everyonecodes.anber.homemanagement.data.Home;` from Object value (token `JsonToken.START_OBJECT`);
+
     @Test
     void getHomes() {
-//        testRestTemplate.getForObject("/" + username + "/homes", Home[].class);
-//        homeService.getHomes();
-//        Mockito.verify(homeService).getHomes();
+        testRestTemplate.getForObject("/profile/" + username + "/homes", Home[].class);
+        Mockito.verify(homeService).getHomes(username);
     }
 
     @Test
     void addHome() {
-        Home testHome = new Home(
+        Home testHome = new Home("homeName",
                 "testCountry", "testCity", "2700", HomeType.APARTMENT, 25.5
         );
-        testRestTemplate.put("/" + username + "/home/add", Home[].class);
-        homeService.addHome(testHome, username);
+        testRestTemplate.put("/profile/" + username + "/edit/homes/add", testHome, Home[].class);
         Mockito.verify(homeService).addHome(testHome, username);
     }
 
@@ -55,10 +52,10 @@ class HomeEndpointTest {
 //        Mockito.verify(homeService).removeHome(testHome1, username);
 //    }
 
-    @Test
-    void deleteHomes() {
-        testRestTemplate.delete("/" + username + "/homes/delete", Home[].class);
-        homeService.deleteHomes(username);
-        Mockito.verify(homeService).deleteHomes(username);
-    }
+//    @Test
+//    void deleteHomes() {
+//        testRestTemplate.delete("/profile/" + username + "/homes/delete", Home[].class);
+//        homeService.deleteHomes(username);
+//        Mockito.verify(homeService).deleteHomes(username);
+//    }
 }

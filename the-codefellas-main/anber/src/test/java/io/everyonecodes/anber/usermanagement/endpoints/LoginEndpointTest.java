@@ -1,8 +1,8 @@
 package io.everyonecodes.anber.usermanagement.endpoints;
 
 import io.everyonecodes.anber.usermanagement.data.UserPrivateDTO;
+import io.everyonecodes.anber.usermanagement.service.UserDTO;
 import io.everyonecodes.anber.usermanagement.service.UserService;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,9 +10,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.web.SecurityFilterChain;
-
-import java.util.Optional;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class LoginEndpointTest {
@@ -22,6 +21,9 @@ class LoginEndpointTest {
 
     @MockBean
     UserService userService;
+
+    @MockBean
+    UserDTO userDTO;
 
     @Value("${testvalues.login-endpoint-url}")
     String url;
@@ -38,23 +40,19 @@ class LoginEndpointTest {
     @MockBean
     SecurityFilterChain filterChain;
 
+
     @Test
+    @WithMockUser(username = "ADMIN", password = "admin", authorities = "ROLE_ADMIN")
     void viewIndividualProfile_returnsProfileData() {
-        Optional<UserPrivateDTO> userPrivateDTO = Optional.of(new UserPrivateDTO(username, role, email));
-        testRestTemplate.getForObject(url, UserPrivateDTO[].class);
-        Mockito.when(userService.viewIndividualProfileData(username)).thenReturn(userPrivateDTO);
-        var response = userService.viewIndividualProfileData(username);
-        Assertions.assertEquals(userPrivateDTO, response);
-        Mockito.verify(userService).viewIndividualProfileData(username);
+        testRestTemplate.getForObject(url, UserPrivateDTO.class);
+
+        Mockito.verify(userService).viewIndividualProfileData("ADMIN");
     }
 
     @Test
     void viewIndividualProfile_returnsNull() {
-        testRestTemplate.getForObject(url, UserPrivateDTO[].class);
-        Mockito.when(userService.viewIndividualProfileData(username)).thenReturn(null);
-        var response = userService.viewIndividualProfileData(username);
-        Assertions.assertNull(response);
-        Mockito.verify(userService).viewIndividualProfileData(username);
+        testRestTemplate.getForObject(url, UserPrivateDTO.class);
+        Mockito.verify(userService, Mockito.never()).viewIndividualProfileData(Mockito.any());
     }
 
 }

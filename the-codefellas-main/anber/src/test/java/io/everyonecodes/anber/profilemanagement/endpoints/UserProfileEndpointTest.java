@@ -2,7 +2,6 @@ package io.everyonecodes.anber.profilemanagement.endpoints;
 
 import io.everyonecodes.anber.profilemanagement.data.UserProfile;
 import io.everyonecodes.anber.profilemanagement.service.UserProfileService;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +9,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.security.test.context.support.WithMockUser;
+
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class UserProfileEndpointTest {
@@ -30,48 +31,50 @@ class UserProfileEndpointTest {
     String email;
 
     @Test
+    @WithMockUser(username = "ADMIN", password = "admin", authorities = {"ROLE_ADMIN"})
     void getAllProfiles() {
-        testRestTemplate.getForObject("/all", UserProfile[].class);
-        userProfileService.viewAll();
+
+        testRestTemplate.getForObject("/profile/all", UserProfile[].class);
+//        userProfileService.viewAll();
         Mockito.verify(userProfileService).viewAll();
     }
 
     @Test
     void getFullProfile() {
-        testRestTemplate.getForObject("/" + username, UserProfile[].class);
-        userProfileService.viewProfile(username);
-        Mockito.verify(userProfileService).viewProfile(username);
+        testRestTemplate.getForObject("/profile/" + email, UserProfile.class);
+//        userProfileService.viewProfile(username);
+        Mockito.verify(userProfileService).viewProfile(email);
     }
 
     @Test
     void getFullProfile_returnsNull() {
-        Mockito.when(userProfileService.viewProfile(username)).thenReturn(null);
-        testRestTemplate.getForObject("/" + username, UserProfile[].class);
-        var response = userProfileService.viewProfile(username);
-        Assertions.assertNull(response);
-        Mockito.verify(userProfileService).viewProfile(username);
+//        Mockito.when(userProfileService.viewProfile(email)).thenReturn(null);
+        testRestTemplate.getForObject("/profile/" + email, UserProfile.class);
+//        var response = userProfileService.viewProfile(email);
+//        Assertions.assertNull(response);
+        Mockito.verify(userProfileService).viewProfile(email);
     }
 
     @Test
     void updateProfileOption() {
-        testRestTemplate.put("/" + username + "/edit/" + "email", email, String[].class);
-        userProfileService.editData(username, "email", email);
-        Mockito.verify(userProfileService).editData(username, "email", email);
+        testRestTemplate.put("/profile/" + email + "/edit/" + "email", email, String.class);
+//        userProfileService.editData(username, "email", email);
+        Mockito.verify(userProfileService).editData(email, "email", email);
     }
 
     @Test
     void updateProfileOption_returnsNull() {
-        Mockito.when(userProfileService.editData(username, "email", email)).thenReturn(null);
-        testRestTemplate.put("/" + username + "/edit/" + "email", email, String[].class);
-        var response = userProfileService.editData(username, "email", email);
-        Assertions.assertNull(response);
-        Mockito.verify(userProfileService).editData(username, "email", email);
+//        Mockito.when(userProfileService.editData(email, "email", email)).thenReturn(null);
+        testRestTemplate.put("/profile/" + email + "/edit/" + "email", email, String.class);
+//        var response = userProfileService.editData(email, "email", email);
+//        Assertions.assertNull(response);
+        Mockito.verify(userProfileService).editData(email, "email", email);
     }
 
     @Test
     void deleteProfile() {
-        testRestTemplate.delete("/" + username + "/delete", Void.class);
-        userProfileService.deleteProfile(username);
-        Mockito.verify(userProfileService).deleteProfile(username);
+        testRestTemplate.delete("/profile/" + email + "/delete");
+//        userProfileService.deleteProfile(username);
+        Mockito.verify(userProfileService).deleteProfile(email);
     }
 }

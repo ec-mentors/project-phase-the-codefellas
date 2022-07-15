@@ -35,10 +35,9 @@ testvalues:
   username: "test"
   password: "testing123"
   role: "ROLE_ADMIN"
-  email: "test@tester.org"
+  email: "test@email.com"
   country: "testCountry"
   city: "testCity"
   postalCode: "666"
   sizeInSquareMeters: 66.66
-  user-endpoint-url: "/users"
-  user-endpoint-postUser-url: "/register"
+  user-endpoint-url: "/users/register"

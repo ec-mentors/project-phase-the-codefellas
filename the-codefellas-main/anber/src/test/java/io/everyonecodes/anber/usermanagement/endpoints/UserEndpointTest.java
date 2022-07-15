@@ -26,7 +26,7 @@ class UserEndpointTest {
     @MockBean
     UserService userService;
 
-    @Value("${testvalues.user-endpoint-postUser-url}")
+    @Value("${testvalues.user-endpoint-url}")
     String url;
 
     @Value("${testvalues.username}")
@@ -48,9 +48,6 @@ class UserEndpointTest {
     void registerUser_Valid() {
         User testUser = new User(username, password, email, role);
         testRestTemplate.postForObject(url, testUser, User[].class);
-        Mockito.when(userService.saveUser(testUser)).thenReturn(testUser);
-        var response = userService.saveUser(testUser);
-        Assertions.assertEquals(testUser, response);
         Mockito.verify(userService).saveUser(testUser);
         Mockito.verifyNoMoreInteractions(userService);
     }
