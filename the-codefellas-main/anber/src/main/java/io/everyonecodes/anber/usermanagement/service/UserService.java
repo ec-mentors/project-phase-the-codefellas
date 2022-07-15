@@ -28,7 +28,7 @@ public class UserService {
     }
 
     public User saveUser(User user) throws IllegalArgumentException {
-        if (!user.getPassword().matches("(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[!?@#$^&+=/_-])(?=\\S+$).{6,100}"))
+        if (!user.getPassword().matches("(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[!?@#$^&+=/_-])(?=\\S+$).{6,100}") || (!isEmailValid(user.getEmail())))
             throw new IllegalArgumentException();
         String encodedPassword = passwordEncoder.encode(user.getPassword());
         user.setPassword(encodedPassword);
@@ -53,6 +53,15 @@ public class UserService {
 
     public Optional<UserPrivateDTO> viewIndividualProfileData(String username) {
         return getUserByUsername(username).map(mapper::toUserPrivateDTO);
+    }
+
+    //additional check for valid email
+    private boolean isEmailValid(String email) {
+        if (email == null) return false;
+        int at = email.indexOf("@");
+        if (at < 0) return false;
+        int dot = email.lastIndexOf(".");
+        return at < dot;
     }
 
 }

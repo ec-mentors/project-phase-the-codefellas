@@ -1,4 +1,7 @@
 spring:
+  data:
+    mongodb:
+      uri: mongodb://localhost/anber
   datasource:
     url: jdbc:mysql://localhost/anber?useSSL=false
     username: root
@@ -8,16 +11,24 @@ spring:
       ddl-auto: update
 
 data:
+  admin:
+    username: ADMIN
+    password: admin
+    email: admin@email.com
   boolean:
     true: true
     false: false
-  profile-options:
-    - email
-    - password
-    - username
-    - country
-    - homes
-    - notificationsEnabled
+  roles:
+    admin: ROLE_ADMIN
+    user: ROLE_USER
+  user-profile:
+    profile-options:
+      - email
+      - password
+      - username
+      - country
+      - homes
+      - notificationsEnabled
 
 testvalues:
   login-endpoint-url: "/login"

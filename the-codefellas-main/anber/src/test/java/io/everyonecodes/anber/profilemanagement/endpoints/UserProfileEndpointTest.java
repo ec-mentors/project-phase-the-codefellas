@@ -29,6 +29,12 @@ class UserProfileEndpointTest {
     @Value("${testvalues.email}")
     String email;
 
+    @Test
+    void getAllProfiles() {
+        testRestTemplate.getForObject("/all", UserProfile[].class);
+        userProfileService.viewAll();
+        Mockito.verify(userProfileService).viewAll();
+    }
 
     @Test
     void getFullProfile() {
@@ -45,24 +51,6 @@ class UserProfileEndpointTest {
         Assertions.assertNull(response);
         Mockito.verify(userProfileService).viewProfile(username);
     }
-
-//    @Test
-//    void addProfileOption() {
-//        UserProfile testUserProfile = new UserProfile(email, password);
-//        testRestTemplate.postForObject("/" + username + "/edit", testUserProfile, UserProfile.class);
-//        userProfileService.addData(username, testUserProfile);
-//        Mockito.verify(userProfileService).addData(username, testUserProfile);
-//    }
-//
-//    @Test
-//    void addProfileOption_returnsNull() {
-//        UserProfile testUserProfile = new UserProfile(email, password);
-//        Mockito.when(userProfileService.addData(username, testUserProfile)).thenReturn(null);
-//        testRestTemplate.postForObject("/" + username + "/edit", testUserProfile, UserProfile.class);
-//        var response = userProfileService.addData(username, testUserProfile);
-//        Assertions.assertNull(response);
-//        Mockito.verify(userProfileService).addData(username, testUserProfile);
-//    }
 
     @Test
     void updateProfileOption() {

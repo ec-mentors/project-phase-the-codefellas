@@ -35,7 +35,7 @@ class UserServiceTest {
     @MockBean
     SecurityFilterChain filterChain;
 
-    private final User userTest = new User("name", "", "email", "role");
+    private final User userTest = new User("name", "", "test@email.com", "role");
 
     @ParameterizedTest
     @CsvSource({
