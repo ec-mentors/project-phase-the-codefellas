@@ -21,7 +21,7 @@ public class UserDTO {
         if (user == null) {
             return null;
         }
-        return new UserPublicDTO(user.getUsername());
+        return new UserPublicDTO(user.getEmail());
     }
 
 }
