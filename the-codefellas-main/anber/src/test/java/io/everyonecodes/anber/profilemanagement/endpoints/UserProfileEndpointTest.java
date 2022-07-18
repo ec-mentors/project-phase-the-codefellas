@@ -1,7 +1,7 @@
 package io.everyonecodes.anber.profilemanagement.endpoints;
 
-import io.everyonecodes.anber.profilemanagement.data.UserProfile;
 import io.everyonecodes.anber.profilemanagement.service.UserProfileService;
+import io.everyonecodes.anber.usermanagement.data.User;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,14 +34,14 @@ class UserProfileEndpointTest {
     @WithMockUser(username = "ADMIN", password = "admin", authorities = {"ROLE_ADMIN"})
     void getAllProfiles() {
 
-        testRestTemplate.getForObject("/profile/all", UserProfile[].class);
+        testRestTemplate.getForObject("/profile/all", User[].class);
 //        userProfileService.viewAll();
         Mockito.verify(userProfileService).viewAll();
     }
 
     @Test
     void getFullProfile() {
-        testRestTemplate.getForObject("/profile/" + email, UserProfile.class);
+        testRestTemplate.getForObject("/profile/" + email, User.class);
 //        userProfileService.viewProfile(username);
         Mockito.verify(userProfileService).viewProfile(email);
     }
@@ -49,7 +49,7 @@ class UserProfileEndpointTest {
     @Test
     void getFullProfile_returnsNull() {
 //        Mockito.when(userProfileService.viewProfile(email)).thenReturn(null);
-        testRestTemplate.getForObject("/profile/" + email, UserProfile.class);
+        testRestTemplate.getForObject("/profile/" + email, User.class);
 //        var response = userProfileService.viewProfile(email);
 //        Assertions.assertNull(response);
         Mockito.verify(userProfileService).viewProfile(email);

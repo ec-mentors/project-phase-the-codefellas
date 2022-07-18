@@ -46,7 +46,7 @@ class UserEndpointTest {
 
     @Test
     void registerUser_Valid() {
-        User testUser = new User(username, password, email, role);
+        User testUser = new User(email, password);
         testRestTemplate.postForObject(url, testUser, User[].class);
         Mockito.verify(userService).saveUser(testUser);
         Mockito.verifyNoMoreInteractions(userService);
@@ -54,7 +54,7 @@ class UserEndpointTest {
 
     @Test
     void registerUser_NotValid() {
-        User testUser = new User(username, "123", email, role);
+        User testUser = new User(email, "123");
 
         Set<ConstraintViolation<User>> violations = validator.validate(testUser);
 

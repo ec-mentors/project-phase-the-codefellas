@@ -1,7 +1,7 @@
 package io.everyonecodes.anber.profilemanagement.endpoints;
 
-import io.everyonecodes.anber.profilemanagement.data.UserProfile;
 import io.everyonecodes.anber.profilemanagement.service.UserProfileService;
+import io.everyonecodes.anber.usermanagement.data.User;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,13 +19,13 @@ public class UserProfileEndpoint {
 
     @GetMapping("/all")
     @Secured("ROLE_ADMIN")
-    List<UserProfile> getAllProfiles() {
+    List<User> getAllProfiles() {
         return userProfileService.viewAll();
     }
 
     @GetMapping("/{username}")
     @Secured("ROLE_USER")
-    UserProfile getFullProfile(@PathVariable String username) {
+    User getFullProfile(@PathVariable String username) {
         return userProfileService.viewProfile(username).orElse(null);
     }
 

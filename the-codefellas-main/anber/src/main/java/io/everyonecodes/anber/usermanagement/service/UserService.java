@@ -33,13 +33,13 @@ public class UserService {
         String encodedPassword = passwordEncoder.encode(user.getPassword());
         user.setPassword(encodedPassword);
         user.setRole(roleUser);
-        user.setUsername(user.getEmail());
+//        user.setUsername(user.getEmail());
         user = userRepository.save(user);
         return user;
     }
 
-    public Optional<User> getUserByUsername(String username) {
-        return userRepository.findOneByUsername(username);
+    public Optional<User> getUserByUsername(String email) {
+        return userRepository.findOneByEmail(email);
     }
 
     // already coded for viewing the profile - tests for it done.
@@ -47,8 +47,8 @@ public class UserService {
         return getUserByUsername(username).map(mapper::toUserPrivateDTO);
     }
 
-    public Optional<UserPublicDTO> viewUserPublicData(String username) {
-        return userRepository.findOneByUsername(username).map(mapper::toUserPublicDTO);
+    public Optional<UserPublicDTO> viewUserPublicData(String email) {
+        return userRepository.findOneByEmail(email).map(mapper::toUserPublicDTO);
     }
 
     public Optional<UserPrivateDTO> viewIndividualProfileData(String username) {

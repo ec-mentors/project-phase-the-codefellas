@@ -11,16 +11,13 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @Configuration
 public class InitializationRunner {
 
-    private final String adminName;
     private final String adminPassword;
     private final String adminEmail;
     private final String adminRole;
 
-    public InitializationRunner(@Value("${data.admin.username}") String adminName,
-                                @Value("${data.admin.password}") String adminPassword,
+    public InitializationRunner(@Value("${data.admin.password}") String adminPassword,
                                 @Value("${data.admin.email}") String adminEmail,
                                 @Value("${data.roles.admin}") String adminRole) {
-        this.adminName = adminName;
         this.adminPassword = adminPassword;
         this.adminEmail = adminEmail;
         this.adminRole = adminRole;
@@ -29,9 +26,9 @@ public class InitializationRunner {
     @Bean
     ApplicationRunner initializeAdminAndDB(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         return args -> {
-            if (!userRepository.existsByUsername(adminName)) {
+            if (!userRepository.existsByEmail(adminEmail)) {
                 String password = passwordEncoder.encode(adminPassword);
-                User admin = new User(adminName, password, adminEmail, adminRole);
+                User admin = new User(adminEmail, password, adminRole);
                 userRepository.save(admin);
             }
         };

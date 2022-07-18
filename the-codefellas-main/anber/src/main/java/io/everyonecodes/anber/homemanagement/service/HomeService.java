@@ -2,8 +2,8 @@ package io.everyonecodes.anber.homemanagement.service;
 
 import io.everyonecodes.anber.homemanagement.data.Home;
 import io.everyonecodes.anber.homemanagement.repository.HomeRepository;
-import io.everyonecodes.anber.profilemanagement.data.UserProfile;
-import io.everyonecodes.anber.profilemanagement.repository.UserProfileRepository;
+import io.everyonecodes.anber.usermanagement.data.User;
+import io.everyonecodes.anber.usermanagement.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -14,18 +14,18 @@ import java.util.Optional;
 public class HomeService {
 
     private final HomeRepository homeRepository;
-    private final UserProfileRepository userProfileRepository;
+    private final UserRepository userRepository;
 
-    public HomeService(HomeRepository homeRepository, UserProfileRepository userProfileRepository) {
+    public HomeService(HomeRepository homeRepository, UserRepository userRepository) {
         this.homeRepository = homeRepository;
-        this.userProfileRepository = userProfileRepository;
+        this.userRepository = userRepository;
     }
 
     public List<Home> getHomes(String username) {
 
-        Optional<UserProfile> oProfile = userProfileRepository.findOneByEmail(username);
+        Optional<User> oProfile = userRepository.findOneByEmail(username);
         if (oProfile.isPresent()) {
-            UserProfile profile = oProfile.get();
+            User profile = oProfile.get();
             return profile.getSavedHomes();
         }
         else {
@@ -34,16 +34,16 @@ public class HomeService {
     }
 
     public List<Home> addHome(Home home, String username) {
-        var oProfile = userProfileRepository.findOneByEmail(username);
+        var oProfile = userRepository.findOneByEmail(username);
         List<Home> homes = new ArrayList<>();
         if (oProfile.isPresent()) {
-            UserProfile profile = oProfile.get();
+            User profile = oProfile.get();
             homes = profile.getSavedHomes();
             if (!homes.contains(home)) {
                 homes.add(home);
                 profile.setSavedHomes(homes);
                 homeRepository.save(home);
-                userProfileRepository.save(profile);
+                userRepository.save(profile);
             }
         }
         return homes;
@@ -51,10 +51,10 @@ public class HomeService {
 
 
     public List<Home> removeHome(Long id, String username) {
-        var oProfile = userProfileRepository.findOneByEmail(username);
+        var oProfile = userRepository.findOneByEmail(username);
         List<Home> homes = new ArrayList<>();
         if (oProfile.isPresent()) {
-            UserProfile profile = oProfile.get();
+            User profile = oProfile.get();
             homes = profile.getSavedHomes();
 
             var oHome = homeRepository.findById(id);
@@ -65,7 +65,7 @@ public class HomeService {
                     homes.remove(home);
                     homeRepository.delete(home);
                     profile.setSavedHomes(homes);
-                    userProfileRepository.save(profile);
+                    userRepository.save(profile);
                 }
             }
         }
@@ -76,12 +76,12 @@ public class HomeService {
 
         homeRepository.deleteAll();
 
-        var oProfile = userProfileRepository.findOneByEmail(username);
+        var oProfile = userRepository.findOneByEmail(username);
         if (oProfile.isPresent()) {
-            UserProfile profile = oProfile.get();
+            User profile = oProfile.get();
 
             profile.setSavedHomes(new ArrayList<>());
-            userProfileRepository.save(profile);
+            userRepository.save(profile);
         }
     }
 

@@ -35,7 +35,9 @@ class UserServiceTest {
     @MockBean
     SecurityFilterChain filterChain;
 
-    private final User userTest = new User("name", "", "test@email.com", "role");
+    private final String email = "test@email.com";
+
+    private final User userTest = new User(email, "");
 
     @ParameterizedTest
     @CsvSource({
@@ -70,34 +72,31 @@ class UserServiceTest {
 
     @Test
     void viewUserPrivateData_UserFound() {
-        String username = "username";
-        User user = new User(username, "password", "email", "role");
-        UserPrivateDTO userPrivateDTO = new UserPrivateDTO(username, user.getEmail(), user.getRole());
-        Mockito.when(userRepository.findOneByUsername(username)).thenReturn(Optional.of(user));
+        User user = new User(email, "password");
+        UserPrivateDTO userPrivateDTO = new UserPrivateDTO(email, user.getEmail(), user.getRole());
+        Mockito.when(userRepository.findOneByEmail(email)).thenReturn(Optional.of(user));
         Mockito.when(userDTO.toUserPrivateDTO(user)).thenReturn(userPrivateDTO);
-        var oResult = userService.viewUserPrivateData(username);
+        var oResult = userService.viewUserPrivateData(email);
         Assertions.assertEquals(Optional.of(userPrivateDTO), oResult);
-        Mockito.verify(userRepository, Mockito.times(1)).findOneByUsername(username);
+        Mockito.verify(userRepository, Mockito.times(1)).findOneByEmail(email);
         Mockito.verify(userDTO, Mockito.times(1)).toUserPrivateDTO(user);
     }
 
     @Test
     void viewUserPrivateData_UserNotFound() {
-        String username = "username";
-        Mockito.when(userRepository.findOneByUsername(username)).thenReturn(Optional.empty());
-        var oResult = userService.viewUserPrivateData(username);
+        Mockito.when(userRepository.findOneByEmail(email)).thenReturn(Optional.empty());
+        var oResult = userService.viewUserPrivateData(email);
         Assertions.assertEquals(Optional.empty(), oResult);
-        Mockito.verify(userRepository, Mockito.times(1)).findOneByUsername(username);
+        Mockito.verify(userRepository, Mockito.times(1)).findOneByEmail(email);
         Mockito.verify(userDTO, Mockito.never()).toUserPrivateDTO(Mockito.any(User.class));
     }
 
     @Test
     void viewUserPublicData_UserNotFound() {
-        String username = "username";
-        Mockito.when(userRepository.findOneByUsername(username)).thenReturn(Optional.empty());
-        var oResult = userService.viewUserPublicData(username);
+        Mockito.when(userRepository.findOneByEmail(email)).thenReturn(Optional.empty());
+        var oResult = userService.viewUserPublicData(email);
         Assertions.assertEquals(Optional.empty(), oResult);
-        Mockito.verify(userRepository, Mockito.times(1)).findOneByUsername(username);
+        Mockito.verify(userRepository, Mockito.times(1)).findOneByEmail(email);
         Mockito.verify(userDTO, Mockito.never()).toUserPublicDTO(Mockito.any(User.class));
     }
 }

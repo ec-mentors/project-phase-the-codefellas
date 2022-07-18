@@ -3,8 +3,8 @@ package io.everyonecodes.anber.homemanagement.service;
 import io.everyonecodes.anber.homemanagement.data.Home;
 import io.everyonecodes.anber.homemanagement.data.HomeType;
 import io.everyonecodes.anber.homemanagement.repository.HomeRepository;
-import io.everyonecodes.anber.profilemanagement.data.UserProfile;
-import io.everyonecodes.anber.profilemanagement.repository.UserProfileRepository;
+import io.everyonecodes.anber.usermanagement.data.User;
+import io.everyonecodes.anber.usermanagement.repository.UserRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -25,10 +25,10 @@ class HomeServiceTest {
     HomeService homeService;
 
     @MockBean
-    HomeRepository homeRepository;
+    UserRepository userRepository;
 
     @MockBean
-    UserProfileRepository userProfileRepository;
+    HomeRepository homeRepository;
 
     @MockBean
     SecurityFilterChain securityFilterChain;
@@ -61,41 +61,41 @@ class HomeServiceTest {
         Home testHome3 = new Home("name", country, city, postalCode, HomeType.HOUSE, sizeInSquareMeters);
         List<Home> homes = List.of(testHome1, testHome2, testHome3);
 
-        UserProfile profile = new UserProfile(email, password, username, country, homes, false);
+        User profile = new User(email, password, "role", username, country, homes, false);
 
-        Mockito.when(userProfileRepository.findOneByEmail(email)).thenReturn(Optional.of(profile));
+        Mockito.when(userRepository.findOneByEmail(email)).thenReturn(Optional.of(profile));
         var result = homeService.getHomes(email);
         Assertions.assertEquals(homes, result);
-        Mockito.verify(userProfileRepository).findOneByEmail(email);
+        Mockito.verify(userRepository).findOneByEmail(email);
     }
 
     @Test
     void getHomes_emptyList() {
         List<Home> homes = List.of();
-        Mockito.when(userProfileRepository.findOneByEmail(email)).thenReturn(Optional.empty());
+        Mockito.when(userRepository.findOneByEmail(email)).thenReturn(Optional.empty());
         var result = homeService.getHomes(email);
         Assertions.assertEquals(homes, result);
-        Mockito.verify(userProfileRepository).findOneByEmail(email);
+        Mockito.verify(userRepository).findOneByEmail(email);
     }
 
     @Test
     void addHome() {
         List<Home> homes = new ArrayList<>();
-        UserProfile testUserProfile = new UserProfile(
-                email, password, username, country, homes, false);
+        User testUserProfile = new User(
+                email, password, "role", username, country, homes, false);
         Home testHome = new Home(country, city, postalCode, HomeType.GARAGE, sizeInSquareMeters);
-        Mockito.when(userProfileRepository.findOneByEmail(username)).thenReturn(Optional.of(testUserProfile));
-        var response = userProfileRepository.findOneByEmail(username);
+        Mockito.when(userRepository.findOneByEmail(username)).thenReturn(Optional.of(testUserProfile));
+        var response = userRepository.findOneByEmail(username);
         Assertions.assertEquals(0, response.get().getSavedHomes().size());
         homes.add(testHome);
         homeRepository.save(testHome);
         testUserProfile.setSavedHomes(homes);
-        var result = userProfileRepository.save(testUserProfile);
+        var result = userRepository.save(testUserProfile);
         Assertions.assertEquals(1, response.get().getSavedHomes().size());
-        Mockito.verify(userProfileRepository).findOneByEmail(username);
+        Mockito.verify(userRepository).findOneByEmail(username);
         Mockito.verify(homeRepository).save(testHome);
-        Mockito.verify(userProfileRepository).save(testUserProfile);
-        Mockito.verifyNoMoreInteractions(userProfileRepository);
+        Mockito.verify(userRepository).save(testUserProfile);
+        Mockito.verifyNoMoreInteractions(userRepository);
         Mockito.verifyNoMoreInteractions(homeRepository);
     }
 

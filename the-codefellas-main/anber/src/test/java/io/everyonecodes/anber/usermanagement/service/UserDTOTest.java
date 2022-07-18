@@ -19,13 +19,13 @@ class UserDTOTest {
     @MockBean
     SecurityFilterChain filterChain;
 
+    private final String email = "test@email.com";
+
     @Test
     void toUserPrivateDTO() {
         User user = new User(
-                "username",
-                "password",
-                "email",
-                "role");
+                "test@email.com",
+                "password");
         UserPrivateDTO result = userDTO.toUserPrivateDTO(user);
         UserPrivateDTO expected = new UserPrivateDTO("username",
                 "role",
@@ -36,10 +36,8 @@ class UserDTOTest {
     @Test
     void testUserToPrivateUserDTO_nullValues() {
         User user = new User(
-                "username",
-                "password",
                 null,
-                "role");
+                "password");
         UserPrivateDTO result = userDTO.toUserPrivateDTO(user);
         UserPrivateDTO expected = new UserPrivateDTO("username",
                 "role",
@@ -49,20 +47,18 @@ class UserDTOTest {
 
     @Test
     void toUserPublicDTO() {
-        String username = "username";
-        User user = new User(username, "password", "email", "role");
+        User user = new User(email, "password");
         UserPublicDTO result = userDTO.toUserPublicDTO(user);
-        UserPublicDTO expected = new UserPublicDTO(username);
+        UserPublicDTO expected = new UserPublicDTO(email);
         Assertions.assertEquals(expected, result);
 
     }
 
     @Test
     void toUserPublicDTO_nullValues() {
-        String username = "username";
-        User user = new User(username, "password", null, "role");
+        User user = new User(email, "password");
         UserPublicDTO result = userDTO.toUserPublicDTO(user);
-        UserPublicDTO expected = new UserPublicDTO(username);
+        UserPublicDTO expected = new UserPublicDTO(email);
         Assertions.assertEquals(expected, result);
     }
 
