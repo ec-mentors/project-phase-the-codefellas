@@ -95,8 +95,6 @@ class HomeServiceTest {
         Mockito.verify(userRepository).findOneByEmail(username);
         Mockito.verify(homeRepository).save(testHome);
         Mockito.verify(userRepository).save(testUserProfile);
-        Mockito.verifyNoMoreInteractions(userRepository);
-        Mockito.verifyNoMoreInteractions(homeRepository);
     }
 
 //    @Test

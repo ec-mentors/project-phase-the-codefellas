@@ -95,7 +95,7 @@ class UserProfileServiceTest {
     void viewProfile_ProfileNotExist() {
         User newProfile = new User(user.getEmail(), encoder.encode(user.getPassword()));
 
-        Mockito.when(userRepository.findOneByEmail(user.getEmail())).thenReturn(Optional.of(user));
+        Mockito.when(userRepository.findOneByEmail(user.getEmail())).thenReturn(Optional.of(newProfile));
 //        Mockito.when(userProfileRepository.findOneByEmail(profile.getEmail())).thenReturn(Optional.empty());
 //        Mockito.when(userProfileRepository.save(newProfile)).thenReturn((newProfile));
 
