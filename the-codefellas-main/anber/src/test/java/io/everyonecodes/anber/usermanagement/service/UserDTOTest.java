@@ -23,25 +23,22 @@ class UserDTOTest {
 
     @Test
     void toUserPrivateDTO() {
-        User user = new User(
-                "test@email.com",
-                "password");
+        User user = new User("email@email.com", "Coding12#", "role");
         UserPrivateDTO result = userDTO.toUserPrivateDTO(user);
-        UserPrivateDTO expected = new UserPrivateDTO("username",
+        UserPrivateDTO expected = new UserPrivateDTO(null,
                 "role",
-                "email");
+                "email@email.com");
         Assertions.assertEquals(expected, result);
     }
 
     @Test
     void testUserToPrivateUserDTO_nullValues() {
-        User user = new User(
-                null,
+        User user = new User(email,
                 "password");
         UserPrivateDTO result = userDTO.toUserPrivateDTO(user);
-        UserPrivateDTO expected = new UserPrivateDTO("username",
-                "role",
-                null);
+        UserPrivateDTO expected = new UserPrivateDTO(null,
+                null,
+                email);
         Assertions.assertEquals(expected, result);
     }
 

@@ -62,7 +62,7 @@ class UserEndpointTest {
 
         ConstraintViolation<User> violation = violations.iterator().next();
 
-        Assertions.assertEquals("must be at least 6 characters long", violation.getMessage());
+        Assertions.assertEquals("must be at least 6 characters long.", violation.getMessage());
         Assertions.assertEquals("password", violation.getPropertyPath().toString());
 
         Assertions.assertEquals("123", violation.getInvalidValue());
