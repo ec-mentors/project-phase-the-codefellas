@@ -1,8 +1,6 @@
 package io.everyonecodes.anber.usermanagement.service;
 
 
-import io.everyonecodes.anber.pwrecovery.GenericResponse;
-import io.everyonecodes.anber.pwrecovery.PasswordTokenRepository;
 import io.everyonecodes.anber.usermanagement.data.User;
 import io.everyonecodes.anber.usermanagement.data.UserPrivateDTO;
 import io.everyonecodes.anber.usermanagement.data.UserPublicDTO;
@@ -20,17 +18,13 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final UserDTO mapper;
     private final String roleUser;
-    private final PasswordTokenRepository passwordTokenRepository;
-    private final GenericResponse genericResponse;
 
     public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, UserDTO mapper,
-                       @Value("${data.roles.user}") String roleUser, PasswordTokenRepository passwordTokenRepository, GenericResponse genericResponse) {
+                       @Value("${data.roles.user}") String roleUser) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.mapper = mapper;
         this.roleUser = roleUser;
-        this.passwordTokenRepository = passwordTokenRepository;
-        this.genericResponse = genericResponse;
     }
 
     public User saveUser(User user) throws IllegalArgumentException {
@@ -69,30 +63,4 @@ public class UserService {
         int dot = email.lastIndexOf(".");
         return at < dot;
     }
-
-    ////////////////////////////////////////////////////////////////////////////////////////
-    // PW Recovery Stuff starts here!
-//
-//    public void createPasswordResetTokenForUser(User user, String token) {
-//        PasswordResetToken myToken = new PasswordResetToken(token, user);
-//        passwordTokenRepository.save(myToken);
-//    }
-//
-//    private SimpleMailMessage constructResetTokenEmail(
-//            String contextPath, Locale locale, String token, User user) {
-//        String url = contextPath + "/user/changePassword?token=" + token;
-//        String message = messages.getMessage("message.resetPassword",
-//                null, locale);
-//        return constructEmail("Reset Password", message + " \r\n" + url, user);
-//    }
-//
-//    private SimpleMailMessage constructEmail(String subject, String body,
-//                                             User user) {
-//        SimpleMailMessage email = new SimpleMailMessage();
-//        email.setSubject(subject);
-//        email.setText(body);
-//        email.setTo(user.getEmail());
-//        email.setFrom(env.getProperty("support.email"));
-//        return email;
-//    }
 }

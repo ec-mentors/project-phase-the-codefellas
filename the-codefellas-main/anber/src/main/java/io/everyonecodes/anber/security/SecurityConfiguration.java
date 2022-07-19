@@ -22,6 +22,8 @@ public class SecurityConfiguration {
         http.cors().and().csrf().disable()
                 .authorizeRequests()
                 .antMatchers(HttpMethod.POST, "/users/register").permitAll()
+                .antMatchers(HttpMethod.GET,"/users/passwordreset/**").permitAll()
+                .antMatchers(HttpMethod.POST,"/users/passwordreset/**").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .formLogin()

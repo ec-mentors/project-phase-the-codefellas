@@ -1,4 +1,15 @@
 spring:
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: anber.project@gmail.com
+    password: sonne135
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
   data:
     mongodb:
       uri: mongodb://localhost/anber
@@ -29,4 +40,3 @@ data:
       - country
       - homes
       - notificationsEnabled
-
