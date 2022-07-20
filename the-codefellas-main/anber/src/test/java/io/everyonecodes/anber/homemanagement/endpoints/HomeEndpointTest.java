@@ -58,4 +58,14 @@ class HomeEndpointTest {
 //        homeService.deleteHomes(username);
 //        Mockito.verify(homeService).deleteHomes(username);
 //    }
+
+
+//    @Test
+//    void editHome() {
+//        Home testHome = new Home("homeName", "testCountry", "testCity", "2700", HomeType.APARTMENT, 25.5);
+//        String property = "country";
+//        testRestTemplate.put("/profile/" + username + "/edit/homes", testHome, Home[].class);
+//        Mockito.verify(homeService).editHome("userName", 1L, property, "newTestCountry");
+//    }
+
 }

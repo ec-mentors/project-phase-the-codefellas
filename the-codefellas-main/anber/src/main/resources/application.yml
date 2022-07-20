@@ -29,4 +29,11 @@ data:
       - country
       - homes
       - notificationsEnabled
-
+  home:
+    home-properties:
+      - homeName
+      - country
+      - city
+      - postalCode
+      - type
+      - sizeInSquareMeters
