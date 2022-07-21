@@ -31,4 +31,11 @@ data:
       - country
       - homes
       - notificationsEnabled
-
+  search-engine:
+    search-properties:
+      - "cn=country"
+      - "pt=provider type"
+      - "pn=provider name"
+      - "tn=tariff name"
+      - "br=basic rate"
+      - "pm=price model"
