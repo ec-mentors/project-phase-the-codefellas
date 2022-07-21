@@ -41,3 +41,6 @@ testvalues:
   postalCode: "666"
   sizeInSquareMeters: 66.66
   user-endpoint-url: "/users/register"
+  pw-reset-endpoint-url: "/pwreset"
+  test-mail-email: "test@gmail.com"
+

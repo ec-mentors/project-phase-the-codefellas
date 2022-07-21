@@ -45,7 +45,7 @@ class LoginEndpointTest {
     @WithMockUser(username = "ADMIN", password = "admin", authorities = "ROLE_ADMIN")
     void viewIndividualProfile_returnsProfileData() {
         testRestTemplate.getForObject(url, UserPrivateDTO.class);
-
+        userService.viewIndividualProfileData("ADMIN");
         Mockito.verify(userService).viewIndividualProfileData("ADMIN");
     }
 

@@ -5,6 +5,8 @@ import io.everyonecodes.anber.usermanagement.data.User;
 import io.everyonecodes.anber.usermanagement.data.UserPrivateDTO;
 import io.everyonecodes.anber.usermanagement.repository.UserRepository;
 import io.everyonecodes.anber.usermanagement.service.UserDTO;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -19,7 +21,6 @@ import javax.mail.Session;
 import javax.mail.internet.MimeMessage;
 import java.io.File;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 @EnableScheduling
@@ -135,49 +136,6 @@ public class EmailService {
         props.put("mail.smtp.starttls.enable", "true");
         props.put("mail.smtp.host", host);
         props.put("mail.smtp.port", "587");
-        Session session = Session.getInstance(props,
-                new javax.mail.Authenticator() {
-                    protected PasswordAuthentication getPasswordAuthentication() {
-                        return new PasswordAuthentication(username, password);
-                    }
-                });
-        try {
-            MimeMessage message = new MimeMessage(session);
-            MimeMessageHelper helper = new MimeMessageHelper(message, true, "utf-8");
-            helper.setTo(to);
-            String body = "<h3><font color=black>Your Email notification is working!</font></h3><br>";
-            body += "<font color=black><p><i>Here are your notifications:</i><br><br>";
-            List<Notification> notifications = new ArrayList<>();
-            String notificationsAsString = notifications.stream()
-                    .map(this::toEmailStringHTML)
-                    .collect(Collectors.joining("<br>"));
-            body += notificationsAsString;
-            body += "<br><br>" + "Click on Link to unsubscribe: "
-                    + "http://localhost:8080/users/notifications/email/unsubscribe/" + usernameInput + "</p></font>";
-            helper.setText(body, true);
-            helper.setSubject("Test Notifications from Anber");
-            helper.setFrom(from);
-            File file = new File("C:\\Users\\nteff\\IdeaProjects\\module-backend\\project-phase\\the-codefellas-main\\anber\\src\\main\\resources\\AnberLogo.png");
-            helper.addAttachment("AnberLogo.png", file);
-            javaMailSender.send(message);
-        } catch (MessagingException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void sendPwResetHTMLEmail(String usernameInput) {
-        Optional<User> oUser = userRepository.findOneByEmail(usernameInput);
-        if (oUser.isEmpty()) return;
-        String to = oUser.get().getEmail();
-        String from = "anber.project@gmail.com";
-        final String username = from;
-        final String password = "cttkgbdglsmgdttf";
-        String host = "smtp.gmail.com";
-        Properties props = new Properties();
-        props.put("mail.smtp.auth", "true");
-        props.put("mail.smtp.starttls.enable", "true");
-        props.put("mail.smtp.host", host);
-        props.put("mail.smtp.port", "587");
         var uuid = UUID.randomUUID().toString();
         Session session = Session.getInstance(props,
                 new javax.mail.Authenticator() {
@@ -198,12 +156,65 @@ public class EmailService {
 //                    .map(this::toEmailStringHTML)
 //                    .collect(Collectors.joining("<br>"));
 //            body += notificationsAsString;
-            body += "<h3>" + "https://localhost:8080/pwreset/passwordreset/" + uuid + "</h3></p></font>";
+            body += "<h3>" + "https://localhost:8080/pwreset/passwordreset/" + uuid + "</h3></p></font>"
+                    + "<html><body><img src='cid:identifier1234'></body></html>";
             helper.setText(body, true);
+            Resource res = new FileSystemResource(new File("C:\\Users\\nteff\\IdeaProjects\\module-backend\\project-phase\\the-codefellas-main\\anber\\src\\main\\resources\\AnberLogoEmail.png"));
+            helper.addInline("identifier1234", res);
             helper.setSubject("Password Reset Confirmation from Anber-project");
             helper.setFrom(from);
-            File file = new File("C:\\Users\\nteff\\IdeaProjects\\module-backend\\project-phase\\the-codefellas-main\\anber\\src\\main\\resources\\AnberLogo.png");
-            helper.addAttachment("AnberLogo.png", file);
+            File file = new File("C:\\Users\\nteff\\IdeaProjects\\module-backend\\project-phase\\the-codefellas-main\\anber\\src\\main\\resources\\AnberLogoEmail.png");
+//            helper.addAttachment("AnberLogo.png", file); // - leave this here in case we need it for other attachments
+            javaMailSender.send(message);
+        } catch (MessagingException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void sendPwResetHTMLEmail(String usernameInput) {
+        Optional<User> oUser = userRepository.findOneByEmail(usernameInput);
+        if (oUser.isEmpty()) throw new IllegalArgumentException();
+        var uuid = UUID.randomUUID().toString();
+        // add the user and the uuid to map that allows password change
+        allowedUsers.put(oUser.get().getUsername(), uuid);
+        String to = oUser.get().getEmail();
+        String from = "anber.project@gmail.com";
+        final String username = from;
+        final String password = "cttkgbdglsmgdttf";
+        String host = "smtp.gmail.com";
+        Properties props = new Properties();
+        props.put("mail.smtp.auth", "true");
+        props.put("mail.smtp.starttls.enable", "true");
+        props.put("mail.smtp.host", host);
+        props.put("mail.smtp.port", "587");
+        Session session = Session.getInstance(props,
+                new javax.mail.Authenticator() {
+                    protected PasswordAuthentication getPasswordAuthentication() {
+                        return new PasswordAuthentication(username, password);
+                    }
+                });
+        try {
+            MimeMessage message = new MimeMessage(session);
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "utf-8");
+            helper.setTo(to);
+            String body = "<h3><font color=black>Dear " + oUser.get().getEmail() + ",\n" +
+                    "<br><br><br><br>Click here to reset your password:\n</font></h3><br>";
+            body += "<font color=black><p><i></i>";
+            /// Notification part of email goes here if needed
+//            List<Notification> notifications = new ArrayList<>();
+//            String notificationsAsString = notifications.stream()
+//                    .map(this::toEmailStringHTML)
+//                    .collect(Collectors.joining("<br>"));
+//            body += notificationsAsString;
+            body += "<h3>" + "https://localhost:8080/pwreset/passwordreset/" + uuid + "</h3></p></font>"
+                    + "<html><body><img src='cid:identifier1234'></body></html>";
+            helper.setText(body, true);
+            Resource res = new FileSystemResource(new File("C:\\Users\\nteff\\IdeaProjects\\module-backend\\project-phase\\the-codefellas-main\\anber\\src\\main\\resources\\AnberLogoEmail.png"));
+            helper.addInline("identifier1234", res);
+            helper.setSubject("Password Reset Confirmation from Anber-project");
+            helper.setFrom(from);
+            File file = new File("C:\\Users\\nteff\\IdeaProjects\\module-backend\\project-phase\\the-codefellas-main\\anber\\src\\main\\resources\\AnberLogoEmail.png");
+//            helper.addAttachment("AnberLogo.png", file); // - leave this here in case we need it for other attachments
             javaMailSender.send(message);
         } catch (MessagingException e) {
             e.printStackTrace();
