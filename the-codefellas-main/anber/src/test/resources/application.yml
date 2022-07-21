@@ -41,3 +41,4 @@ testvalues:
   postalCode: "666"
   sizeInSquareMeters: 66.66
   user-endpoint-url: "/users/register"
+

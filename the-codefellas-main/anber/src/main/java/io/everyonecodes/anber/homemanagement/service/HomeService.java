@@ -8,8 +8,10 @@ import io.everyonecodes.anber.usermanagement.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class HomeService {
@@ -72,18 +74,21 @@ public class HomeService {
         Optional<User> oUser = userRepository.findOneByEmail(username);
         if (oUser.isPresent()){
             User user = oUser.get();
-            Home homeToEdit = user.getSavedHomes().stream()
+            Optional<Home> oHomeToEdit = user.getSavedHomes().stream()
                     .filter(home -> home.getId().equals(id))
-                    .findFirst().orElse(null);
+                    .findFirst();
 
-            overwriteData(property, homeToEdit, input);
-            List<Home> userHomes = user.getSavedHomes();
+            if (oHomeToEdit.isPresent()){
+                Home homeToEdit = oHomeToEdit.get();
+                overwriteData(property, homeToEdit, input);
+                List<Home> userHomes = user.getSavedHomes();
 
-            int indexHome = userHomes.indexOf(homeToEdit);
+                int indexHome = userHomes.indexOf(homeToEdit);
 
-            userHomes.set(indexHome, homeToEdit);
-            userRepository.save(user);
-            return Optional.of(homeToEdit);
+                userHomes.set(indexHome, homeToEdit);
+                userRepository.save(user);
+                return Optional.of(homeToEdit);
+            }
         }
         return Optional.empty();
     }
@@ -101,6 +106,8 @@ public class HomeService {
 
             userHomes.remove(homeToRemove);
             userRepository.save(user);
+            Long homeId = homeToRemove.getId();
+            homeRepository.deleteById(homeId);
         }
     }
 
@@ -114,6 +121,11 @@ public class HomeService {
             userHomes.clear();
 
             userRepository.save(user);
+
+            List<Long> ids = userHomes.stream()
+                    .map(Home::getId)
+                    .collect(Collectors.toList());
+            homeRepository.deleteAllById(ids);
         }
     }
 

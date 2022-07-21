@@ -45,5 +45,5 @@ public class HomeEndpoint {
     void deleteAll(@PathVariable String username) {
         homeService.deleteAllHomes(username);
     }
-    
+
 }
