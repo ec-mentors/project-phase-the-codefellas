@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -70,8 +71,23 @@ public class SearchService {
                         .collect(Collectors.toList());
             }
             if (i == 4) {
+                String operator = String.valueOf(filter.charAt(0));
+                double value = Double.parseDouble(filter.substring(1));
+
+                if (operator.equals("<")) {
+                    providerList = providerList.stream()
+                            .filter(prov -> prov.getBasicRate() < (value))
+                            .collect(Collectors.toList());
+                }
+                else {
+                    providerList = providerList.stream()
+                            .filter(prov -> prov.getBasicRate() > (value))
+                            .collect(Collectors.toList());
+                }
+
+
                 providerList = providerList.stream()
-                        .filter(prov -> prov.getBasicRate() <= (Double.parseDouble(filter)))
+                        .filter(prov -> prov.getBasicRate() <= (value))
                         .collect(Collectors.toList());
             }
             if (i == 5) {
@@ -116,8 +132,16 @@ public class SearchService {
                 String tariffName = filter.substring(3);
                 sortedFilters.set(3, tariffName);
             }
+            if (filter.startsWith("br<")) {
+                String basicRate = filter.substring(2);
+                sortedFilters.set(4, basicRate);
+            }
+            if (filter.startsWith("br>")) {
+                String basicRate = filter.substring(2);
+                sortedFilters.set(4, basicRate);
+            }
             if (filter.startsWith("br=")) {
-                String basicRate = filter.substring(3);
+                String basicRate = filter.substring(2);
                 sortedFilters.set(4, basicRate);
             }
             if (filter.startsWith("pm=")) {
@@ -150,5 +174,22 @@ public class SearchService {
 
     private static String[] getEnumNames(Class<? extends Enum<?>> e) {
         return Arrays.stream(e.getEnumConstants()).map(Enum::name).toArray(String[]::new);
+    }
+
+
+
+
+    public List<Provider> sortByRate(String way, String filters) {
+
+        var providers = manageFilters(filters);
+
+        if (way.equalsIgnoreCase("asc")) {
+            providers.sort(Comparator.comparing(Provider::getBasicRate));
+        }
+        if (way.equalsIgnoreCase("desc")) {
+            providers.sort(Comparator.comparing(Provider::getBasicRate).reversed());
+        }
+
+        return providers;
     }
 }
