@@ -3,6 +3,7 @@ package io.everyonecodes.anber.searchmanagement.data;
 import org.hibernate.validator.constraints.Range;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 @Entity
 @Table(name = "provider")
@@ -124,5 +125,34 @@ public class ProviderDTO {
 
     public void setRating(double rating) {
         this.rating = rating;
+    }
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ProviderDTO that = (ProviderDTO) o;
+        return Double.compare(that.basicRate, basicRate) == 0 && Double.compare(that.rating, rating) == 0 && Objects.equals(id, that.id) && Objects.equals(countryName, that.countryName) && providerType == that.providerType && Objects.equals(providerName, that.providerName) && Objects.equals(tariffName, that.tariffName) && contractType == that.contractType && priceModel == that.priceModel;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, countryName, providerType, providerName, tariffName, basicRate, contractType, priceModel, rating);
+    }
+
+    @Override
+    public String toString() {
+        return "ProviderDTO{" +
+                "id=" + id +
+                ", countryName='" + countryName + '\'' +
+                ", providerType=" + providerType +
+                ", providerName='" + providerName + '\'' +
+                ", tariffName='" + tariffName + '\'' +
+                ", basicRate=" + basicRate +
+                ", contractType=" + contractType +
+                ", priceModel=" + priceModel +
+                ", rating=" + rating +
+                '}';
     }
 }

@@ -5,6 +5,7 @@ import io.everyonecodes.anber.searchmanagement.data.Provider;
 import io.everyonecodes.anber.searchmanagement.data.ProviderDTO;
 import io.everyonecodes.anber.searchmanagement.data.ProviderType;
 import io.everyonecodes.anber.searchmanagement.repository.ProviderRepository;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -19,18 +20,24 @@ public class SearchService {
     private final ProviderRepository providerRepository;
     private final ProviderTranslator translator;
     private final List<String> searchProperties;
+    private final String sortAscending;
+    private final String sortDescending;
 
-    public SearchService(ProviderRepository providerRepository, ProviderTranslator translator, List<String> searchProperties) {
+    public SearchService(ProviderRepository providerRepository, ProviderTranslator translator, List<String> searchProperties,
+                         @Value("${data.search-engine.sort.asc}") String sortAscending,
+                         @Value("${data.search-engine.sort.desc}") String sortDescending) {
         this.providerRepository = providerRepository;
         this.translator = translator;
         this.searchProperties = searchProperties;
+        this.sortAscending = sortAscending;
+        this.sortDescending = sortDescending;
     }
 
     public List<ProviderDTO> getAll() {
         return providerRepository.findAll();
     }
 
-    public List<String> getProperties() {
+    private List<String> getProperties() {
         return searchProperties;
     }
 
@@ -52,44 +59,45 @@ public class SearchService {
             if (filter.isEmpty()) {
                 continue;
             }
+            //country
             if (i == 0) {
                 providerList = providerRepository.findByCountryName(filter);
             }
+            //provider type
             if (i == 1) {
                 providerList = providerList.stream()
                         .filter(prov -> prov.getProviderType().equals(ProviderType.valueOf(filter.toUpperCase())))
                         .collect(Collectors.toList());
             }
+            //provider name
             if (i == 2) {
                 providerList = providerList.stream()
                         .filter(prov -> prov.getProviderName().equals(filter))
                         .collect(Collectors.toList());
             }
+            //tariff name
             if (i == 3) {
                 providerList = providerList.stream()
                         .filter(prov -> prov.getTariffName().equals(filter))
                         .collect(Collectors.toList());
             }
+            //basic rate
             if (i == 4) {
                 String operator = String.valueOf(filter.charAt(0));
                 double value = Double.parseDouble(filter.substring(1));
 
-                if (operator.equals("<")) {
+                if (operator.equals(">")) {
+                    providerList = providerList.stream()
+                            .filter(prov -> prov.getBasicRate() > (value))
+                            .collect(Collectors.toList());
+                } else {
                     providerList = providerList.stream()
                             .filter(prov -> prov.getBasicRate() < (value))
                             .collect(Collectors.toList());
                 }
-                else {
-                    providerList = providerList.stream()
-                            .filter(prov -> prov.getBasicRate() > (value))
-                            .collect(Collectors.toList());
-                }
 
-
-                providerList = providerList.stream()
-                        .filter(prov -> prov.getBasicRate() <= (value))
-                        .collect(Collectors.toList());
             }
+            //price model
             if (i == 5) {
                 providerList = providerList.stream()
                         .filter(prov -> prov.getPriceModel().equals(PriceModelType.valueOf(filter.toUpperCase())))
@@ -100,6 +108,7 @@ public class SearchService {
         return translateList(providerList);
     }
 
+
     private List<String> checkForFilter(List<String> filters) {
 
         List<String> sortedFilters = new ArrayList<>();
@@ -109,11 +118,14 @@ public class SearchService {
         }
 
         for (String filter : filters) {
-            if (filter.startsWith("cn=")) {
+
+            //country
+            if (filter.startsWith(searchProperties.get(0).substring(0,3))) {
                 String country = filter.substring(3);
                 sortedFilters.set(0, country);
             }
-            if (filter.startsWith("pt=")) {
+            //provider type
+            if (filter.startsWith(searchProperties.get(1).substring(0,3))) {
                 String type = filter.substring(3).toUpperCase();
 
                 var providerTypes = Arrays.stream(getEnumNames(ProviderType.class)).toList();
@@ -124,27 +136,33 @@ public class SearchService {
 
                 sortedFilters.set(1, type);
             }
-            if (filter.startsWith("pn=")) {
+            //provider name
+            if (filter.startsWith(searchProperties.get(2).substring(0,3))) {
                 String providerName = filter.substring(3);
                 sortedFilters.set(2, providerName);
             }
-            if (filter.startsWith("tn=")) {
+            //tariff name
+            if (filter.startsWith(searchProperties.get(3).substring(0,3))) {
                 String tariffName = filter.substring(3);
                 sortedFilters.set(3, tariffName);
             }
-            if (filter.startsWith("br<")) {
+            //basic rate < filter
+            if (filter.startsWith(searchProperties.get(4).substring(0,2) +"<")) {
                 String basicRate = filter.substring(2);
                 sortedFilters.set(4, basicRate);
             }
-            if (filter.startsWith("br>")) {
+            //basic rate > filter
+            if (filter.startsWith(searchProperties.get(4).substring(0,2) +">")) {
                 String basicRate = filter.substring(2);
                 sortedFilters.set(4, basicRate);
             }
-            if (filter.startsWith("br=")) {
+            //basic rate = filter
+            if (filter.startsWith(searchProperties.get(4).substring(0,3))) {
                 String basicRate = filter.substring(2);
                 sortedFilters.set(4, basicRate);
             }
-            if (filter.startsWith("pm=")) {
+            //price model
+            if (filter.startsWith(searchProperties.get(5).substring(0,3))) {
                 String priceModel = filter.substring(3).toUpperCase();
 
                 var priceModelTypes = Arrays.stream(getEnumNames(PriceModelType.class)).toList();
@@ -177,16 +195,14 @@ public class SearchService {
     }
 
 
-
-
-    public List<Provider> sortByRate(String way, String filters) {
+    public List<Provider> sortByRate(String operator, String filters) {
 
         var providers = manageFilters(filters);
 
-        if (way.equalsIgnoreCase("asc")) {
+        if (operator.equalsIgnoreCase(sortAscending)) {
             providers.sort(Comparator.comparing(Provider::getBasicRate));
         }
-        if (way.equalsIgnoreCase("desc")) {
+        if (operator.equalsIgnoreCase(sortDescending)) {
             providers.sort(Comparator.comparing(Provider::getBasicRate).reversed());
         }
 

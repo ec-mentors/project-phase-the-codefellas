@@ -20,10 +20,6 @@ public class SearchEndpoint {
         this.searchService = searchService;
     }
 
-    @GetMapping
-    List<String> getProperties() {
-        return searchService.getProperties();
-    }
 
     @GetMapping("/get/all")
     List<ProviderDTO> getAll() {
@@ -35,9 +31,9 @@ public class SearchEndpoint {
     return searchService.manageFilters(filters);
     }
 
-    @GetMapping("/sorted/{way}/{filters}")
-    List<Provider> getProvidersWithOptionalFilters(@PathVariable String way, @PathVariable String filters) {
-        return searchService.sortByRate(way, filters);
+    @GetMapping("/sorted/{operator}/{filters}")
+    List<Provider> getSortedProvidersWithOptionalFilters(@PathVariable String operator, @PathVariable String filters) {
+        return searchService.sortByRate(operator, filters);
     }
 
 

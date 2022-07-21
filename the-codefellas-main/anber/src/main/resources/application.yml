@@ -32,6 +32,9 @@ data:
       - homes
       - notificationsEnabled
   search-engine:
+    sort:
+      asc: asc
+      desc: desc
     search-properties:
       - "cn=country"
       - "pt=provider type"
@@ -39,3 +42,11 @@ data:
       - "tn=tariff name"
       - "br=basic rate"
       - "pm=price model"
+  home:
+    home-properties:
+      - homeName
+      - country
+      - city
+      - postalCode
+      - type
+      - sizeInSquareMeters

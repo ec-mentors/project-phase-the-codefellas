@@ -62,6 +62,17 @@ public class User {
         this.role = role;
     }
 
+    public User(Long id, String email, String password, String role, String username, String country, List<Home> savedHomes, boolean notificationsEnabled) {
+        this.id = id;
+        this.email = email;
+        this.password = password;
+        this.role = role;
+        this.username = username;
+        this.country = country;
+        this.savedHomes = savedHomes;
+        this.notificationsEnabled = notificationsEnabled;
+    }
+
     public Long getId() {
         return id;
     }

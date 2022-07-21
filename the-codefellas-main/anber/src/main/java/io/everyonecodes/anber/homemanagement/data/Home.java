@@ -34,6 +34,16 @@ public class Home {
         this.sizeInSquareMeters = sizeInSquareMeters;
     }
 
+    public Home(Long id, String homeName, String country, String city, String postalCode, HomeType type, double sizeInSquareMeters) {
+        this.id = id;
+        this.homeName = homeName;
+        this.country = country;
+        this.city = city;
+        this.postalCode = postalCode;
+        this.type = type;
+        this.sizeInSquareMeters = sizeInSquareMeters;
+    }
+
     public Home(String homeName, String country, String city, String postalCode, HomeType type, double sizeInSquareMeters) {
         this.homeName = homeName;
         this.country = country;
