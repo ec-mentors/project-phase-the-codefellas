@@ -29,16 +29,21 @@ public class HomeEndpoint {
         return homeService.addHome(home, username);
     }
 
-    @PutMapping("/{username}/edit/homes/remove/{id}")
-    List<Home> removeHome(@PathVariable String username, @PathVariable Long id) {
-        return homeService.removeHome(id, username);
+
+    @PutMapping("/{username}/edit/homes/{id}/{property}")
+    Home editHome(@PathVariable String username, @PathVariable Long id, @PathVariable String property, @RequestBody String input) {
+
+        return homeService.editHome(username, id, property, input).orElse(null);
+    }
+
+    @DeleteMapping("/{username}/edit/homes/{id}")
+    void removeHome(@PathVariable String username, @PathVariable Long id) {
+        homeService.removeHome(username, id);
     }
 
     @DeleteMapping("/{username}/edit/homes/delete")
-    void deleteHomes (@PathVariable String username) {
-        homeService.deleteHomes(username);
+    void deleteAll(@PathVariable String username) {
+        homeService.deleteAllHomes(username);
     }
-
-
 
 }

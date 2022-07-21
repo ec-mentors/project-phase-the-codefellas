@@ -7,6 +7,9 @@ import io.everyonecodes.anber.usermanagement.data.User;
 import io.everyonecodes.anber.usermanagement.repository.UserRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,6 +20,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
 class HomeServiceTest {
@@ -99,44 +103,39 @@ class HomeServiceTest {
         Mockito.verifyNoMoreInteractions(homeRepository);
     }
 
-//    @Test
-//    void removeHome() {
-//        Home testHome = new Home(country, city, postalCode, HomeType.GARAGE, sizeInSquareMeters);
-//        List<Home> homes = new ArrayList<>(List.of(testHome));
-//        UserProfile testUserProfile = new UserProfile(
-//                email, password, username, country, homes, false);
-//        Mockito.when(userProfileRepository.findOneByEmail(username)).thenReturn(Optional.of(testUserProfile));
-//        var response = userProfileRepository.findOneByEmail(username);
-//        Assertions.assertEquals(1, response.get().getSavedHomes().size());
-//        homes.remove(testHome);
-//        homeRepository.save(testHome);
-//        testUserProfile.setSavedHomes(homes);
-//        var result = userProfileRepository.save(testUserProfile);
-//        Assertions.assertEquals(0, response.get().getSavedHomes().size());
-//        Mockito.verify(userProfileRepository).findOneByEmail(username);
-//        Mockito.verify(homeRepository).save(testHome);
-//        Mockito.verify(userProfileRepository).save(testUserProfile);
-//        Mockito.verifyNoMoreInteractions(userProfileRepository);
-//        Mockito.verifyNoMoreInteractions(homeRepository);
-//    }
-//
-//    @Test
-//    void deleteHome() {
-//        Home testHome = new Home(country, city, postalCode, HomeType.GARAGE, sizeInSquareMeters);
-//        List<Home> homes = new ArrayList<>(List.of(testHome));
-//        UserProfile testUserProfile = new UserProfile(
-//                email, password, username, country, homes, false);
-//        Mockito.when(userProfileRepository.findOneByEmail(username)).thenReturn(Optional.of(testUserProfile));
-//        var response = userProfileRepository.findOneByEmail(username);
-//        Assertions.assertEquals(1, response.get().getSavedHomes().size());
-//        homeRepository.deleteAll();
-//        testUserProfile.setSavedHomes(new ArrayList<>());
-//        var result = userProfileRepository.save(testUserProfile);
-//        Assertions.assertEquals(0, response.get().getSavedHomes().size());
-//        Mockito.verify(userProfileRepository).findOneByEmail(username);
-//        Mockito.verify(homeRepository).deleteAll();
-//        Mockito.verify(userProfileRepository).save(testUserProfile);
-//        Mockito.verifyNoMoreInteractions(userProfileRepository);
-//        Mockito.verifyNoMoreInteractions(homeRepository);
-//    }
+    @ParameterizedTest
+    @MethodSource("parameters")
+    void editHome(String property, String input, Optional<Home> expected) {
+
+        Home testHome1 = new Home(1L,"name", country, city, postalCode, HomeType.GARAGE, sizeInSquareMeters);
+        Home testHome2 = new Home(2L,"name", country, city, postalCode, HomeType.APARTMENT, sizeInSquareMeters);
+        List<Home> homes =  new ArrayList<>(List.of(testHome1,testHome2));
+
+
+
+
+        User testUserProfile = new User(
+                1L, email, password, "role", username, country, homes, false);
+        Mockito.when(userRepository.findOneByEmail(testUserProfile.getEmail())).thenReturn(Optional.of(testUserProfile));
+        Optional<Home> result = homeService.editHome(testUserProfile.getEmail(), testUserProfile.getId(), property,input);
+        Assertions.assertEquals(expected,result);
+        Mockito.verify(userRepository).findOneByEmail(testUserProfile.getEmail());
+    }
+
+
+    private static Stream<Arguments> parameters() {
+        Home testHome1 = new Home("name", "country", "city", "postalCode", HomeType.GARAGE, 300.5);
+
+
+        return Stream.of(
+                Arguments.of("name", "otherName", Optional.of(testHome1)),
+                Arguments.of("country", "France", Optional.of(testHome1)),
+                Arguments.of("city", "Paris", Optional.of(testHome1)),
+                Arguments.of("postalCode", "123", Optional.of(testHome1)),
+                Arguments.of("homeType", "garage", Optional.of(testHome1)),
+                Arguments.of("homeType", "GARAGE", Optional.of(testHome1)),
+                Arguments.of("sizeInSquareMeters", "300.5", Optional.of(testHome1))
+        );
+    }
+
 }
