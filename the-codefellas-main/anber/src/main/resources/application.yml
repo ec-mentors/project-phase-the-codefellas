@@ -1,15 +1,16 @@
 spring:
   mail:
+    default-encoding: UTF-8
     host: smtp.gmail.com
-    port: 587
     username: anber.project@gmail.com
-    password: sonne135
-    properties:
-      mail:
-        smtp:
-          auth: true
-          starttls:
-            enable: true
+    password: cttkgbdglsmgdttf
+    port: 587
+    properties.mail.smtp:
+      auth: true
+      starttls.enable: true
+    protocol: smtp
+    test-connection: false
+    ssl.trust: smtp.gmail.com
   data:
     mongodb:
       uri: mongodb://localhost/anber

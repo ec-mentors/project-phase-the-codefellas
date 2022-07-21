@@ -4,6 +4,7 @@ import io.everyonecodes.anber.email.service.EmailService;
 import io.everyonecodes.anber.email.service.NotificationService;
 import io.everyonecodes.anber.usermanagement.data.UserPrivateDTO;
 import io.everyonecodes.anber.usermanagement.service.UserService;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -25,7 +26,7 @@ public class EmailEndpoint {
     // Get Method for resetting Password
     @GetMapping("/passwordreset/{email}")
     void forgotPassword(@PathVariable String email) {
-        emailService.sendMail(email);
+        emailService.sendPwResetHTMLEmail(email);
     }
 
     // PostMapping for new Password
@@ -34,10 +35,10 @@ public class EmailEndpoint {
         return emailService.savePassword(email, uuid, password);
     }
 
-    //endpoint only for review
-//    @Secured({"ROLE_ADMIN"})
-//    @GetMapping("/notifications/email/test/{username}")
-//    void sendTestHtmlEmail(@PathVariable String username) {
-//        emailService.sendTestHTMLEmail(username);
-//    }
+    // endpoint only for review
+    @Secured({"ROLE_ADMIN"})
+    @GetMapping("/notifications/email/test/{username}")
+    void sendTestHtmlEmail(@PathVariable String username) {
+        emailService.sendTestHTMLEmail(username);
+    }
 }

@@ -51,7 +51,7 @@ public class EmailService {
         allowedUsers.put(oUser.get().getUsername(), uuid);
 
         var subject = "Reset your Password";
-        var message = "Please use this dummy link to create a new password:\n https://localhost:8080/passwordreset/" + uuid;
+        var message = "Please use this dummy link to create a new password:\n https://localhost:8080/pwreset/passwordreset/" + uuid;
 
         var mailMessage = new SimpleMailMessage();
 
@@ -128,7 +128,7 @@ public class EmailService {
         String to = oUser.get().getEmail();
         String from = "anber.project@gmail.com";
         final String username = from;
-        final String password = "AAAaaa1#";
+        final String password = "cttkgbdglsmgdttf";
         String host = "smtp.gmail.com";
         Properties props = new Properties();
         props.put("mail.smtp.auth", "true");
@@ -157,7 +157,52 @@ public class EmailService {
             helper.setText(body, true);
             helper.setSubject("Test Notifications from Anber");
             helper.setFrom(from);
-            File file = new File("the-codefellas-main/anber/src/main/resources/AnberLogo.png");
+            File file = new File("C:\\Users\\nteff\\IdeaProjects\\module-backend\\project-phase\\the-codefellas-main\\anber\\src\\main\\resources\\AnberLogo.png");
+            helper.addAttachment("AnberLogo.png", file);
+            javaMailSender.send(message);
+        } catch (MessagingException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void sendPwResetHTMLEmail(String usernameInput) {
+        Optional<User> oUser = userRepository.findOneByEmail(usernameInput);
+        if (oUser.isEmpty()) return;
+        String to = oUser.get().getEmail();
+        String from = "anber.project@gmail.com";
+        final String username = from;
+        final String password = "cttkgbdglsmgdttf";
+        String host = "smtp.gmail.com";
+        Properties props = new Properties();
+        props.put("mail.smtp.auth", "true");
+        props.put("mail.smtp.starttls.enable", "true");
+        props.put("mail.smtp.host", host);
+        props.put("mail.smtp.port", "587");
+        var uuid = UUID.randomUUID().toString();
+        Session session = Session.getInstance(props,
+                new javax.mail.Authenticator() {
+                    protected PasswordAuthentication getPasswordAuthentication() {
+                        return new PasswordAuthentication(username, password);
+                    }
+                });
+        try {
+            MimeMessage message = new MimeMessage(session);
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "utf-8");
+            helper.setTo(to);
+            String body = "<h3><font color=black>Dear " + oUser.get().getEmail() + ",\n" +
+                    "<br><br><br><br>Click here to reset your password:\n</font></h3><br>";
+            body += "<font color=black><p><i></i>";
+            /// Notification part of email goes here if needed
+//            List<Notification> notifications = new ArrayList<>();
+//            String notificationsAsString = notifications.stream()
+//                    .map(this::toEmailStringHTML)
+//                    .collect(Collectors.joining("<br>"));
+//            body += notificationsAsString;
+            body += "<h3>" + "https://localhost:8080/pwreset/passwordreset/" + uuid + "</h3></p></font>";
+            helper.setText(body, true);
+            helper.setSubject("Password Reset Confirmation from Anber-project");
+            helper.setFrom(from);
+            File file = new File("C:\\Users\\nteff\\IdeaProjects\\module-backend\\project-phase\\the-codefellas-main\\anber\\src\\main\\resources\\AnberLogo.png");
             helper.addAttachment("AnberLogo.png", file);
             javaMailSender.send(message);
         } catch (MessagingException e) {

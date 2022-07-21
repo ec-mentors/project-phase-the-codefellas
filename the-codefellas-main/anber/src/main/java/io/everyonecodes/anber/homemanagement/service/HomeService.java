@@ -27,8 +27,7 @@ public class HomeService {
         if (oProfile.isPresent()) {
             User profile = oProfile.get();
             return profile.getSavedHomes();
-        }
-        else {
+        } else {
             return List.of();
         }
     }
@@ -73,9 +72,6 @@ public class HomeService {
     }
 
     public void deleteHomes(String username) {
-
-        homeRepository.deleteAll();
-
         var oProfile = userRepository.findOneByEmail(username);
         if (oProfile.isPresent()) {
             User profile = oProfile.get();
