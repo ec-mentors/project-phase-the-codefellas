@@ -108,11 +108,11 @@ public class HomeService {
                     .map(Home::getId)
                     .collect(Collectors.toList());
 
-            homeRepository.deleteAllById(ids);
-
             userHomes.clear();
 
             userRepository.save(user);
+            homeRepository.deleteAllByIdInBatch(ids);
+
         }
     }
 

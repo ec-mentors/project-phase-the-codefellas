@@ -8,10 +8,7 @@ import io.everyonecodes.anber.searchmanagement.repository.ProviderRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -61,25 +58,22 @@ public class SearchService {
             }
             //country
             if (i == 0) {
-                providerList = providerRepository.findByCountryName(filter);
+                providerList = new ArrayList<>(providerRepository.findByCountryName(filter));
             }
             //provider type
             if (i == 1) {
-                providerList = providerList.stream()
-                        .filter(prov -> prov.getProviderType().equals(ProviderType.valueOf(filter.toUpperCase())))
-                        .collect(Collectors.toList());
+                var providerListPt = new ArrayList<>(providerRepository.findByProviderType(ProviderType.valueOf(filter.toUpperCase())));
+                providerList.retainAll(providerListPt);
             }
             //provider name
             if (i == 2) {
-                providerList = providerList.stream()
-                        .filter(prov -> prov.getProviderName().equals(filter))
-                        .collect(Collectors.toList());
+                var providerListPn = new ArrayList<>(providerRepository.findByProviderName(filter));
+                providerList.retainAll(providerListPn);
             }
             //tariff name
             if (i == 3) {
-                providerList = providerList.stream()
-                        .filter(prov -> prov.getTariffName().equals(filter))
-                        .collect(Collectors.toList());
+                var providerListTn = new ArrayList<>(providerRepository.findByTariffName(filter));
+                providerList.retainAll(providerListTn);
             }
             //basic rate
             if (i == 4) {
@@ -87,21 +81,24 @@ public class SearchService {
                 double value = Double.parseDouble(filter.substring(1));
 
                 if (operator.equals(">")) {
-                    providerList = providerList.stream()
+                    var providerListBr1 =
+                             providerList.stream()
                             .filter(prov -> prov.getBasicRate() > (value))
-                            .collect(Collectors.toList());
+                            .collect(Collectors.toCollection(ArrayList::new));
+                    providerList.retainAll(providerListBr1);
                 } else {
-                    providerList = providerList.stream()
+                    var providerListBr2 =
+                             providerList.stream()
                             .filter(prov -> prov.getBasicRate() < (value))
-                            .collect(Collectors.toList());
+                            .collect(Collectors.toCollection(ArrayList::new));
+                    providerList.retainAll(providerListBr2);
                 }
 
             }
             //price model
             if (i == 5) {
-                providerList = providerList.stream()
-                        .filter(prov -> prov.getPriceModel().equals(PriceModelType.valueOf(filter.toUpperCase())))
-                        .collect(Collectors.toList());
+                var providerListPm = new ArrayList<>(providerRepository.findByPriceModel(PriceModelType.valueOf(filter.toUpperCase())));
+                providerList.retainAll(providerListPm);
             }
         }
 
@@ -121,7 +118,7 @@ public class SearchService {
 
             //country
             if (filter.startsWith(searchProperties.get(0).substring(0,3))) {
-                String country = filter.substring(3);
+                String country = filter.substring(3).replace("_", " ");
                 sortedFilters.set(0, country);
             }
             //provider type
@@ -195,7 +192,7 @@ public class SearchService {
     }
 
 
-    public List<Provider> sortByRate(String operator, String filters) {
+    public List<Provider> sortByBasicRate(String operator, String filters) {
 
         var providers = manageFilters(filters);
 

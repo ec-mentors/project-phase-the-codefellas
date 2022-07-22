@@ -41,6 +41,6 @@ class SearchEndpointTest {
         String filters = "test";
         String operator = "foo";
         testRestTemplate.getForObject("/provider/sorted/" + operator + "/" + filters, Provider[].class);
-        Mockito.verify(searchService).sortByRate(operator, filters);
+        Mockito.verify(searchService).sortByBasicRate(operator, filters);
     }
 }

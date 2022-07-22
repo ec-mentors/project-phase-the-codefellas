@@ -176,7 +176,7 @@ class HomeServiceTest {
 
         Assertions.assertEquals(0, testUserProfile.getSavedHomes().size());
 
-        Mockito.verify(homeRepository).deleteAllById(List.of(testHome1.getId(), testHome2.getId()));
+        Mockito.verify(homeRepository).deleteAllByIdInBatch(List.of(testHome1.getId(), testHome2.getId()));
         Mockito.verify(userRepository).save(testUserProfile);
     }
 

@@ -33,7 +33,7 @@ public class SearchEndpoint {
 
     @GetMapping("/sorted/{operator}/{filters}")
     List<Provider> getSortedProvidersWithOptionalFilters(@PathVariable String operator, @PathVariable String filters) {
-        return searchService.sortByRate(operator, filters);
+        return searchService.sortByBasicRate(operator, filters);
     }
 
 
