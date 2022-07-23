@@ -14,13 +14,16 @@ public class InitializationRunner {
     private final String adminPassword;
     private final String adminEmail;
     private final String adminRole;
+    private final DatabaseInitializer dbInitializer;
 
     public InitializationRunner(@Value("${data.admin.password}") String adminPassword,
                                 @Value("${data.admin.email}") String adminEmail,
-                                @Value("${data.roles.admin}") String adminRole) {
+                                @Value("${data.roles.admin}") String adminRole,
+                                DatabaseInitializer dbInitializer) {
         this.adminPassword = adminPassword;
         this.adminEmail = adminEmail;
         this.adminRole = adminRole;
+        this.dbInitializer = dbInitializer;
     }
 
     @Bean
@@ -31,6 +34,8 @@ public class InitializationRunner {
                 User admin = new User(adminEmail, password, adminRole);
                 userRepository.save(admin);
             }
+
+            dbInitializer.createDummyDatabase();
         };
     }
 

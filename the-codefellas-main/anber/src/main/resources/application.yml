@@ -9,6 +9,8 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
 
 data:
   admin:
@@ -29,6 +31,18 @@ data:
       - country
       - homes
       - notificationsEnabled
+
+  search-engine:
+    sort:
+      asc: asc
+      desc: desc
+    search-properties:
+      - "cn=country"
+      - "pt=provider type"
+      - "pn=provider name"
+      - "tn=tariff name"
+      - "br=basic rate"
+      - "pm=price model"
   home:
     home-properties:
       - homeName

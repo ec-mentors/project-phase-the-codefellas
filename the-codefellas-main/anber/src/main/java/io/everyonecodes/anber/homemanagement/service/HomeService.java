@@ -53,22 +53,6 @@ public class HomeService {
         return homes;
     }
 
-
-
-    public void deleteHomes(String username) {
-
-        homeRepository.deleteAll();
-
-        var oProfile = userRepository.findOneByEmail(username);
-        if (oProfile.isPresent()) {
-            User profile = oProfile.get();
-
-            profile.setSavedHomes(new ArrayList<>());
-            userRepository.save(profile);
-        }
-    }
-
-
     public Optional<Home> editHome(String username,  Long id, String property,String input) {
 
         Optional<User> oUser = userRepository.findOneByEmail(username);
@@ -103,7 +87,6 @@ public class HomeService {
                     .findFirst().orElse(null);
 
             List<Home> userHomes = user.getSavedHomes();
-
             userHomes.remove(homeToRemove);
             userRepository.save(user);
             Long homeId = homeToRemove.getId();
@@ -118,14 +101,16 @@ public class HomeService {
             User user = oUser.get();
 
             List<Home> userHomes = user.getSavedHomes();
-            userHomes.clear();
-
-            userRepository.save(user);
 
             List<Long> ids = userHomes.stream()
                     .map(Home::getId)
                     .collect(Collectors.toList());
-            homeRepository.deleteAllById(ids);
+
+            userHomes.clear();
+
+            userRepository.save(user);
+            homeRepository.deleteAllByIdInBatch(ids);
+
         }
     }
 

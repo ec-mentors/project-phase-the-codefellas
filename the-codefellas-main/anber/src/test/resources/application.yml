@@ -29,6 +29,17 @@ data:
       - country
       - homes
       - notificationsEnabled
+  search-engine:
+    sort:
+      asc: asc
+      desc: desc
+    search-properties:
+      - "cn=country"
+      - "pt=provider type"
+      - "pn=provider name"
+      - "tn=tariff name"
+      - "br=basic rate"
+      - "pm=price model"
 
 testvalues:
   login-endpoint-url: "/login"
