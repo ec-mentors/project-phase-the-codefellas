@@ -36,6 +36,7 @@ public class HomeEndpoint {
         return homeService.editHome(username, id, property, input).orElse(null);
     }
 
+
     @DeleteMapping("/{username}/edit/homes/remove/{id}")
     void removeHome(@PathVariable String username, @PathVariable Long id) {
         homeService.removeHome(username, id);

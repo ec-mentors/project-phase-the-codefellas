@@ -8,6 +8,7 @@ import io.everyonecodes.anber.usermanagement.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -52,8 +53,6 @@ public class HomeService {
         return homes;
     }
 
-
-
     public Optional<Home> editHome(String username,  Long id, String property,String input) {
 
         Optional<User> oUser = userRepository.findOneByEmail(username);
@@ -88,7 +87,6 @@ public class HomeService {
                     .findFirst().orElse(null);
 
             List<Home> userHomes = user.getSavedHomes();
-
             userHomes.remove(homeToRemove);
             userRepository.save(user);
             Long homeId = homeToRemove.getId();

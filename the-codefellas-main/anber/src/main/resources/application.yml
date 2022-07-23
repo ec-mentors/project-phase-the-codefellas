@@ -31,6 +31,7 @@ data:
       - country
       - homes
       - notificationsEnabled
+
   search-engine:
     sort:
       asc: asc

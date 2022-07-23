@@ -5,6 +5,9 @@ import io.everyonecodes.anber.homemanagement.data.HomeType;
 import io.everyonecodes.anber.homemanagement.service.HomeService;
 import io.everyonecodes.anber.usermanagement.data.User;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,6 +18,7 @@ import org.springframework.security.web.SecurityFilterChain;
 
 import java.util.ArrayList;
 import java.util.List;
+
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class HomeEndpointTest {
@@ -104,7 +108,6 @@ class HomeEndpointTest {
         Mockito.verify(homeService).deleteAllHomes(testUserProfile.getEmail());
 
     }
-
 }
 
 
