@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>AnBer-Login-Page</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/main.css}">
+    <link th:href="@{/css/main.css}" rel="stylesheet" href="css/main.css" />
+</head>
+
+<body>
+<header>
+    <div class="containernav">
+        <div class="pre-nav">
+            <div>
+                <a href="/" class="logo">
+                    <img id="logo" src="../images/AnBerLogo.jpg" alt="AnBerLogo" width="60%" height="60%"/>
+                </a>
+            </div>
+            <nav>
+                <ul id="MenuItems">
+                    <li class="navlist-item"><a href="/">Home</a></li>
+                    <li class="navlist-item"><a href="#">Electricity</a></li>
+                    <li class="navlist-item"><a href="#">Gas</a></li>
+                    <li class="navlist-item"><a href="#">Contact</a></li>
+                    <li class="navlist-item"><a href="/login">Login</a></li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</header>
+<main>
+    <div>
+        <span> Here should be your Profile, if I could learn html/css faster </span>
+    </div>
+    <form th:action="@{/delete}" th:object="${user}" method="post">
+        <button type="submit">Delete</button>
+    </form>
+</main>
+</body>
+</html>
+

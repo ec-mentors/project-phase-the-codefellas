@@ -28,7 +28,7 @@ public class SearchEndpoint {
 
     @GetMapping("/{filters}")
     List<Provider> getProvidersWithOptionalFilters(@PathVariable String filters) {
-    return searchService.manageFilters(filters);
+        return searchService.manageFilters(filters);
     }
 
     @GetMapping("/sorted/{operator}/{filters}")

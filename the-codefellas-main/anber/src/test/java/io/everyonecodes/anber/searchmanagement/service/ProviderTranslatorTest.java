@@ -4,6 +4,8 @@ import io.everyonecodes.anber.searchmanagement.data.*;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 class ProviderTranslatorTest {
 
     ProviderTranslator providerTranslator = new ProviderTranslator();
