@@ -8,7 +8,10 @@ import io.everyonecodes.anber.searchmanagement.repository.ProviderRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
@@ -82,15 +85,15 @@ public class SearchService {
 
                 if (operator.equals(">")) {
                     var providerListBr1 =
-                             providerList.stream()
-                            .filter(prov -> prov.getBasicRate() > (value))
-                            .collect(Collectors.toCollection(ArrayList::new));
+                            providerList.stream()
+                                    .filter(prov -> prov.getBasicRate() > (value))
+                                    .collect(Collectors.toCollection(ArrayList::new));
                     providerList.retainAll(providerListBr1);
                 } else {
                     var providerListBr2 =
-                             providerList.stream()
-                            .filter(prov -> prov.getBasicRate() < (value))
-                            .collect(Collectors.toCollection(ArrayList::new));
+                            providerList.stream()
+                                    .filter(prov -> prov.getBasicRate() < (value))
+                                    .collect(Collectors.toCollection(ArrayList::new));
                     providerList.retainAll(providerListBr2);
                 }
 
