@@ -60,6 +60,7 @@ public class UserServiceImp implements UserService {
         if (!user.getPassword().matches("(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[!?@#$^&+=/_-])(?=\\S+$).{6,100}"))
             throw new IllegalArgumentException();
         user.setPassword(encoder.encode(user.getPassword()));
+        user.setAccountNonLocked(true);
         Role userRole = roleRepository.findByRole(roleName);
         if (userRole == null) {
             userRole = new Role(roleName, roleDescription);

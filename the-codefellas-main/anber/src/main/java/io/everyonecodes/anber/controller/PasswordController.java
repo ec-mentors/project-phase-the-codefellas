@@ -59,7 +59,7 @@ public class PasswordController {
             mailMessage.setSubject("Complete Password Reset!");
             mailMessage.setFrom("anber.project@gmail.com");
             mailMessage.setText("To complete the password reset process, please click here: "
-                    + "http://localhost:9200/confirm-reset?token=" + confirmationToken.getToken());
+                    + "http://localhost:8080/confirm-reset?token=" + confirmationToken.getToken());
 
             emailSenderService.sendEmail(mailMessage);
 

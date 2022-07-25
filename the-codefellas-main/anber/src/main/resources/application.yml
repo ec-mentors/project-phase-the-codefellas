@@ -53,7 +53,7 @@ messages:
         warningText: "Someone is trying to log into your Account on AnBer! Please reset your password with the following link: http://localhost:9200/forgot-password"
     verification:
         encoding: "utf-8"
-        link: "http://localhost:9200/confirm?token="
+        link: "http://localhost:8080/confirm?token="
         datePattern: "yyyy-MM-dd HH:mm"
         confirmTitle: Confirm your email
         confirmText: "Please confirm your email by clicking on the following link: http://localhost:9200/confirm?token="
