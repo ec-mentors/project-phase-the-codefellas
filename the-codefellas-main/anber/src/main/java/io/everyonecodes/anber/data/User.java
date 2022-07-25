@@ -16,8 +16,12 @@ public class User {
     private Long id;
 
     @NotBlank(message = "Name must not be empty")
-    @Column(name = "name")
-    private String name;
+    @Column(name = "firstName")
+    private String firstName;
+
+    @NotBlank(message = "Name must not be empty")
+    @Column(name = "lastName")
+    private String lastName;
 
     @NotBlank(message = "Email must not be empty")
     @Email(message = "Must be a valid Email!")
@@ -83,15 +87,17 @@ public class User {
         this.password = password;
     }
 
-    public User(String name, String email, boolean accountNonLocked, String password) {
-        this.name = name;
+    public User(String firstName, String lastName, String email, boolean accountNonLocked, String password) {
+        this.firstName = firstName;
+        this.lastName = lastName;
         this.email = email;
         this.accountNonLocked = accountNonLocked;
         this.password = password;
     }
 
-    public User(String name, String email, String password, String username, String country, Set<Role> roles, List<Home> savedHomes, boolean notificationsEnabled) {
-        this.name = name;
+    public User(String firstName, String lastName, String email, String password, String username, String country, Set<Role> roles, List<Home> savedHomes, boolean notificationsEnabled) {
+        this.firstName = firstName;
+        this.lastName = lastName;
         this.email = email;
         this.password = password;
         this.username = username;
@@ -123,8 +129,9 @@ public class User {
     }
 
 
-    public User(String name, String email, String password) {
-        this.name = name;
+    public User(String firstName, String lastName, String email, String password) {
+        this.firstName = firstName;
+        this.lastName = lastName;
         this.email = email;
         this.password = password;
     }
@@ -135,9 +142,10 @@ public class User {
         this.roles = roles;
     }
 
-    public User(Long id, String name, String email) {
+    public User(Long id, String firstName, String lastName, String email) {
         this.id = id;
-        this.name = name;
+        this.firstName = firstName;
+        this.lastName = lastName;
         this.email = email;
     }
 
@@ -181,12 +189,20 @@ public class User {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
+    public String getFirstName() {
+        return firstName;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
     }
 
     public int getLoginAttempts() {
@@ -233,19 +249,20 @@ public class User {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         User user = (User) o;
-        return loginAttempts == user.loginAttempts && accountNonLocked == user.accountNonLocked && notificationsEnabled == user.notificationsEnabled && isVerified == user.isVerified && Objects.equals(id, user.id) && Objects.equals(name, user.name) && Objects.equals(email, user.email) && Objects.equals(resetToken, user.resetToken) && Objects.equals(lockTime, user.lockTime) && Objects.equals(password, user.password) && Objects.equals(username, user.username) && Objects.equals(country, user.country) && Objects.equals(roles, user.roles) && Objects.equals(savedHomes, user.savedHomes);
+        return loginAttempts == user.loginAttempts && accountNonLocked == user.accountNonLocked && notificationsEnabled == user.notificationsEnabled && isVerified == user.isVerified && Objects.equals(id, user.id) && Objects.equals(firstName, user.firstName) && Objects.equals(lastName, user.lastName) && Objects.equals(email, user.email) && Objects.equals(resetToken, user.resetToken) && Objects.equals(lockTime, user.lockTime) && Objects.equals(password, user.password) && Objects.equals(username, user.username) && Objects.equals(country, user.country) && Objects.equals(roles, user.roles) && Objects.equals(savedHomes, user.savedHomes);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, email, resetToken, loginAttempts, accountNonLocked, lockTime, password, username, country, roles, savedHomes, notificationsEnabled, isVerified);
+        return Objects.hash(id, firstName, lastName, email, resetToken, loginAttempts, accountNonLocked, lockTime, password, username, country, roles, savedHomes, notificationsEnabled, isVerified);
     }
 
     @Override
     public String toString() {
         return "User{" +
                 "id=" + id +
-                ", name='" + name + '\'' +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
                 ", email='" + email + '\'' +
                 ", resetToken='" + resetToken + '\'' +
                 ", loginAttempts=" + loginAttempts +

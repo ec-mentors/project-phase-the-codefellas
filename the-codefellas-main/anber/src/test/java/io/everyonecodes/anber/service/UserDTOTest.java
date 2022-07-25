@@ -28,7 +28,7 @@ class UserDTOTest {
 
     @Test
     void toUserPrivateDTO() {
-        User user = new User("name", "email@email.com", true, "Coding12#");
+        User user = new User("firstName", "lastName", "email@email.com", true, "Coding12#");
         UserPrivateDTO result = userDTO.toUserPrivateDTO(user);
         UserPrivateDTO expected = new UserPrivateDTO(null,
                 null,

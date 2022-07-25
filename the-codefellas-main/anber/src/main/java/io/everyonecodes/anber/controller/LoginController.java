@@ -26,7 +26,7 @@ public class LoginController {
     String login(HttpServletRequest request, Model model) {
         var oUser = userService.findUserByEmail("admin@gmail.com");
         if (oUser.isEmpty()){
-            userService.saveAdmin(new User("admin","admin@gmail.com",true, "Password1!"));
+            userService.saveAdmin(new User("firstAdmin", "lastAdmin","admin@gmail.com",true, "Password1!"));
         }
         HttpSession session = request.getSession(false);
         String errorMessage = null;
