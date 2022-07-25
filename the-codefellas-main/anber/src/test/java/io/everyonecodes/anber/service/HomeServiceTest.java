@@ -21,8 +21,6 @@ import org.springframework.security.web.SecurityFilterChain;
 import java.util.*;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
 class HomeServiceTest {
 
@@ -117,7 +115,7 @@ class HomeServiceTest {
 
         Mockito.when(userRepository.findOneByEmail(testUserProfile.getEmail())).thenReturn(Optional.of(testUserProfile));
 
-        Optional<Home> result = homeService.editHome(testUserProfile.getEmail(), testUserProfile.getId(), property,input);
+        Optional<Home> result = homeService.editHome(testUserProfile.getEmail(), testHome2.getId(), property,input);
 
         Assertions.assertEquals(expected,result);
 
@@ -126,16 +124,14 @@ class HomeServiceTest {
 
 
     private static Stream<Arguments> parameters() {
-        Home testHome1 = new Home(1L,"name", "testCountry", "testCity", "666", HomeType.GARAGE, 66.66);
-
         return Stream.of(
-                Arguments.of("name", "otherName", Optional.of(testHome1)),
-                Arguments.of("country", "France", Optional.of(testHome1)),
-                Arguments.of("city", "Paris", Optional.of(testHome1)),
-                Arguments.of("postalCode", "123", Optional.of(testHome1)),
-                Arguments.of("homeType", "garage", Optional.of(testHome1)),
-                Arguments.of("homeType", "GARAGE", Optional.of(testHome1)),
-                Arguments.of("sizeInSquareMeters", "300.5", Optional.of(testHome1))
+                Arguments.of("homeName", "otherName", Optional.of(new Home(2L,"otherName", "testCountry", "testCity", "666", HomeType.APARTMENT, 66.66))),
+                Arguments.of("country", "France", Optional.of(new Home(2L,"name", "France", "testCity", "666", HomeType.APARTMENT, 66.66))),
+                Arguments.of("city", "Paris", Optional.of(new Home(2L,"name", "testCountry", "Paris", "666", HomeType.APARTMENT, 66.66))),
+                Arguments.of("postalCode", "123", Optional.of(new Home(2L,"name", "testCountry", "testCity", "123", HomeType.APARTMENT, 66.66))),
+                Arguments.of("type", "garage", Optional.of(new Home(2L,"name", "testCountry", "testCity", "666", HomeType.GARAGE, 66.66))),
+                Arguments.of("type", "GARAGE", Optional.of(new Home(2L,"name", "testCountry", "testCity", "666", HomeType.GARAGE, 66.66))),
+                Arguments.of("sizeInSquareMeters", "300.5", Optional.of(new Home(2L,"name", "testCountry", "testCity", "666", HomeType.APARTMENT, 300.5)))
         );
     }
 
