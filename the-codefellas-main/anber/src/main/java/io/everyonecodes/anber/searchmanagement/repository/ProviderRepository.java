@@ -18,3 +18,4 @@ public interface ProviderRepository
     List<ProviderDTO> findByBasicRate(Double basicRate);
     List<ProviderDTO> findByPriceModel(PriceModelType priceModel);
 }
+

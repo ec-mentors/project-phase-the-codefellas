@@ -52,14 +52,14 @@ class SearchServiceTest {
     @MethodSource("parametersC")
     void manageFiltersCorrect(String input, List<Provider> expected) {
 
-        ProviderDTO dto = new ProviderDTO(1L, "united kingdom", ProviderType.GAS, "providerName", "tariffName", 0.5, ContractType.SIX_MONTHS, PriceModelType.FIXED, 4.5);
+        ProviderDTO dto = new ProviderDTO(1L, "united kingdom", ProviderType.GAS, "providerName", "tariffName", 0.5, ContractType.SIX_MONTHS, PriceModelType.FIXED, new Rating(List.of(), 4.5));
 
-        ProviderDTO dto1 = new ProviderDTO(2L, "united kingdom", ProviderType.INTERNET, "providerName1", "tariffName6", 0.4, ContractType.SIX_MONTHS, PriceModelType.FIXED, 4.5);
-        ProviderDTO dto2 = new ProviderDTO(3L, "united kingdom", ProviderType.INTERNET, "providerName2", "tariffName5", 0.7, ContractType.SIX_MONTHS, PriceModelType.PER_CONSUMPTION, 4.5);
-        ProviderDTO dto3 = new ProviderDTO(4L, "united kingdom", ProviderType.GAS, "providerName3", "tariffName4", 0.3, ContractType.SIX_MONTHS, PriceModelType.FIXED, 4.5);
-        ProviderDTO dto4 = new ProviderDTO(5L, "united kingdom", ProviderType.ELECTRICITY, "providerName4", "tariffName3", 0.2, ContractType.SIX_MONTHS, PriceModelType.PER_CONSUMPTION, 4.5);
-        ProviderDTO dto5 = new ProviderDTO(6L, "united kingdom", ProviderType.ELECTRICITY, "providerName5", "tariffName2", 0.1, ContractType.SIX_MONTHS, PriceModelType.FIXED, 4.5);
-        ProviderDTO dto6 = new ProviderDTO(7L, "austria", ProviderType.ELECTRICITY, "providerName6", "tariffName1", 0.5, ContractType.SIX_MONTHS, PriceModelType.PER_CONSUMPTION, 4.5);
+        ProviderDTO dto1 = new ProviderDTO(2L, "united kingdom", ProviderType.INTERNET, "providerName1", "tariffName6", 0.4, ContractType.SIX_MONTHS, PriceModelType.FIXED, new Rating(List.of(), 4.5));
+        ProviderDTO dto2 = new ProviderDTO(3L, "united kingdom", ProviderType.INTERNET, "providerName2", "tariffName5", 0.7, ContractType.SIX_MONTHS, PriceModelType.PER_CONSUMPTION, new Rating(List.of(), 4.5));
+        ProviderDTO dto3 = new ProviderDTO(4L, "united kingdom", ProviderType.GAS, "providerName3", "tariffName4", 0.3, ContractType.SIX_MONTHS, PriceModelType.FIXED, new Rating(List.of(), 4.5));
+        ProviderDTO dto4 = new ProviderDTO(5L, "united kingdom", ProviderType.ELECTRICITY, "providerName4", "tariffName3", 0.2, ContractType.SIX_MONTHS, PriceModelType.PER_CONSUMPTION, new Rating(List.of(), 4.5));
+        ProviderDTO dto5 = new ProviderDTO(6L, "united kingdom", ProviderType.ELECTRICITY, "providerName5", "tariffName2", 0.1, ContractType.SIX_MONTHS, PriceModelType.FIXED, new Rating(List.of(), 4.5));
+        ProviderDTO dto6 = new ProviderDTO(7L, "austria", ProviderType.ELECTRICITY, "providerName6", "tariffName1", 0.5, ContractType.SIX_MONTHS, PriceModelType.PER_CONSUMPTION, new Rating(List.of(), 4.5));
 
         Provider provider = new Provider(dto.getProviderName(), dto.getTariffName(), dto.getBasicRate(), dto.getContractType(), dto.getPriceModel());
         Provider provider1 = new Provider(dto1.getProviderName(), dto1.getTariffName(), dto1.getBasicRate(), dto1.getContractType(), dto1.getPriceModel());
@@ -92,8 +92,8 @@ class SearchServiceTest {
     }
     private static Stream<Arguments> parametersC() {
 
-        ProviderDTO dto = new ProviderDTO(1L, "united kingdom", ProviderType.GAS, "providerName", "tariffName", 0.5, ContractType.SIX_MONTHS, PriceModelType.FIXED, 4.5);
-        ProviderDTO dto3 = new ProviderDTO(4L, "united kingdom", ProviderType.GAS, "providerName3", "tariffName4", 0.3, ContractType.SIX_MONTHS, PriceModelType.FIXED, 4.5);
+        ProviderDTO dto = new ProviderDTO(1L, "united kingdom", ProviderType.GAS, "providerName", "tariffName", 0.5, ContractType.SIX_MONTHS, PriceModelType.FIXED, new Rating(List.of(), 4.5));
+        ProviderDTO dto3 = new ProviderDTO(4L, "united kingdom", ProviderType.GAS, "providerName3", "tariffName4", 0.3, ContractType.SIX_MONTHS, PriceModelType.FIXED, new Rating(List.of(), 4.5));
 
         Provider provider = new Provider(dto.getProviderName(), dto.getTariffName(), dto.getBasicRate(), dto.getContractType(), dto.getPriceModel());
         Provider provider3 = new Provider(dto3.getProviderName(), dto3.getTariffName(), dto3.getBasicRate(), dto3.getContractType(), dto3.getPriceModel());
@@ -112,7 +112,7 @@ class SearchServiceTest {
     @MethodSource("parametersI")
     void manageFiltersIncorrect(String input, List<Provider> expected) {
 
-        ProviderDTO dto = new ProviderDTO(1L, "austria", ProviderType.INTERNET, "providerName", "tariffName", 0.5, ContractType.SIX_MONTHS, PriceModelType.PER_CONSUMPTION, 4.5);
+        ProviderDTO dto = new ProviderDTO(1L, "austria", ProviderType.INTERNET, "providerName", "tariffName", 0.5, ContractType.SIX_MONTHS, PriceModelType.PER_CONSUMPTION, new Rating(List.of(), 4.5));
 
         Provider provider = new Provider(dto.getProviderName(), dto.getTariffName(), dto.getBasicRate(), dto.getContractType(), dto.getPriceModel());
 
@@ -140,11 +140,11 @@ class SearchServiceTest {
     @Test
     void sortByBasicRate() {
 
-        ProviderDTO dto1 = new ProviderDTO(1L, "austria", ProviderType.GAS, "providerName", "tariffName", 0.3, ContractType.SIX_MONTHS, PriceModelType.FIXED, 4.5);
+        ProviderDTO dto1 = new ProviderDTO(1L, "austria", ProviderType.GAS, "providerName", "tariffName", 0.3, ContractType.SIX_MONTHS, PriceModelType.FIXED, new Rating(List.of(), 4.5));
 
-        ProviderDTO dto2 = new ProviderDTO(1L, "austria", ProviderType.GAS, "providerName", "tariffName", 0.5, ContractType.SIX_MONTHS, PriceModelType.FIXED, 4.5);
+        ProviderDTO dto2 = new ProviderDTO(1L, "austria", ProviderType.GAS, "providerName", "tariffName", 0.5, ContractType.SIX_MONTHS, PriceModelType.FIXED, new Rating(List.of(), 4.5));
 
-        ProviderDTO dto3 = new ProviderDTO(1L, "austria", ProviderType.GAS, "providerName", "tariffName", 0.4, ContractType.SIX_MONTHS, PriceModelType.FIXED, 4.5);
+        ProviderDTO dto3 = new ProviderDTO(1L, "austria", ProviderType.GAS, "providerName", "tariffName", 0.4, ContractType.SIX_MONTHS, PriceModelType.FIXED, new Rating(List.of(), 4.5));
 
         Provider prov1 = new Provider(dto1.getProviderName(), dto1.getTariffName(), dto1.getBasicRate(), dto1.getContractType(), dto1.getPriceModel());
 

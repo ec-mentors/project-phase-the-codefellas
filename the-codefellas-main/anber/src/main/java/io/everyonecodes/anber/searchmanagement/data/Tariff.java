@@ -1,33 +1,52 @@
 package io.everyonecodes.anber.searchmanagement.data;
 
+import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.util.Objects;
 
-public class Provider {
+@Entity
+@Table(name = "tariff")
+public class Tariff {
 
-    private String providerName;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @NotNull
     private String tariffName;
+    @NotNull
     private double basicRate;
+    @NotNull
+    @Enumerated(EnumType.STRING)
     private ContractType contractType;
+    @NotNull
+    @Enumerated(EnumType.STRING)
     private PriceModelType priceModel;
 
-
-    public Provider() {
+    public Tariff() {
     }
 
-    public Provider(String providerName, String tariffName, double basicRate, ContractType contractType, PriceModelType priceModel) {
-        this.providerName = providerName;
+    public Tariff(String tariffName, double basicRate, ContractType contractType, PriceModelType priceModel) {
         this.tariffName = tariffName;
         this.basicRate = basicRate;
         this.contractType = contractType;
         this.priceModel = priceModel;
     }
 
-    public String getProviderName() {
-        return providerName;
+    public Tariff(Long id, String tariffName, double basicRate, ContractType contractType, PriceModelType priceModel) {
+        this.id = id;
+        this.tariffName = tariffName;
+        this.basicRate = basicRate;
+        this.contractType = contractType;
+        this.priceModel = priceModel;
     }
 
-    public void setProviderName(String providerName) {
-        this.providerName = providerName;
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getTariffName() {
@@ -66,19 +85,19 @@ public class Provider {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Provider provider = (Provider) o;
-        return Double.compare(provider.basicRate, basicRate) == 0 && Objects.equals(providerName, provider.providerName) && Objects.equals(tariffName, provider.tariffName) && contractType == provider.contractType && priceModel == provider.priceModel;
+        Tariff tariff = (Tariff) o;
+        return Double.compare(tariff.basicRate, basicRate) == 0 && Objects.equals(id, tariff.id) && Objects.equals(tariffName, tariff.tariffName) && contractType == tariff.contractType && priceModel == tariff.priceModel;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(providerName, tariffName, basicRate, contractType, priceModel);
+        return Objects.hash(id, tariffName, basicRate, contractType, priceModel);
     }
 
     @Override
     public String toString() {
-        return "Provider{" +
-                "providerName='" + providerName + '\'' +
+        return "Tariff{" +
+                "id=" + id +
                 ", tariffName='" + tariffName + '\'' +
                 ", basicRate=" + basicRate +
                 ", contractType=" + contractType +
@@ -86,4 +105,3 @@ public class Provider {
                 '}';
     }
 }
-
