@@ -11,7 +11,7 @@ import java.util.Objects;
 public class UnverifiedAccount {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+//    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @NotNull
     @Column(unique = true)
@@ -23,12 +23,12 @@ public class UnverifiedAccount {
 
     @Valid
 //    @NotNull
-    @OneToMany
+    @OneToMany(fetch = FetchType.EAGER)
     private List<Tariff> tariffs = new ArrayList<>();
 
 //    @NotNull
     @Valid
-    @OneToOne
+    @OneToOne(fetch = FetchType.EAGER)
     private Rating rating;
 
     public UnverifiedAccount() {

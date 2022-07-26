@@ -62,7 +62,7 @@ messages:
     userRole:
       name: "ROLE_USER"
       description: "This user has access to site, after login - normal user"
-  verified: "☑"
+  verified: " [*]"
 
 data:
   admin:

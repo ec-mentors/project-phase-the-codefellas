@@ -58,7 +58,7 @@ public class AccountService {
                 UnverifiedAccount account = translator.DtoToUnverifiedAccount(dto);
 
                 account.setTariffs(List.of());
-                account.setRating(new Rating(List.of("No Ratings Yet"), 0.0));
+                account.setRating(new Rating(account.getId(), List.of("No Ratings Yet"), 0.0));
                 ratingRepository.save(account.getRating());
                 unverifiedAccountRepository.save(account);
 
@@ -75,11 +75,11 @@ public class AccountService {
         if (oAccount.isPresent()) {
             UnverifiedAccount account = oAccount.get();
 
-            ProviderDTO dto = providerRepository.findByProviderName(account.getProviderName()).stream()
+            ProviderDTO dto = providerRepository.findById(account.getId()).stream()
                     .findFirst().orElse(null);
 
             var accountVerified = translator.unverifiedToVerifiedAccount(account, dto);
-            accountVerified.setProviderName(accountVerified.getProviderName() + " [*]");
+            accountVerified.setProviderName(accountVerified.getProviderName() + verificationMark);
 
             if (dto != null) {
                 dto.setVerified(true);
@@ -87,6 +87,7 @@ public class AccountService {
             }
 
             accountVerified.setRating(account.getRating());
+            accountVerified.setId(account.getId());
             verifiedAccountRepository.save(accountVerified);
             unverifiedAccountRepository.deleteById(account.getId());
             return Optional.of(accountVerified);
@@ -100,18 +101,19 @@ public class AccountService {
         if (oAccount.isPresent()) {
             VerifiedAccount account = oAccount.get();
 
-            ProviderDTO dto = providerRepository.findByProviderName(account.getProviderName()).stream()
+            ProviderDTO dto = providerRepository.findById(account.getId()).stream()
                     .findFirst().orElse(null);
 
-            var accountUnverified = translator.verifiedToUnverifiedAccount(account, dto);
-            accountUnverified.setProviderName(accountUnverified.getProviderName());
+            var accountUnverified = translator.verifiedToUnverifiedAccount(account);
+            accountUnverified.setProviderName(account.getProviderName().replace(verificationMark, ""));
 
             if (dto != null) {
-                dto.setVerified(true);
+                dto.setVerified(false);
                 providerRepository.save(dto);
             }
 
             accountUnverified.setRating(account.getRating());
+            accountUnverified.setId(account.getId());
             unverifiedAccountRepository.save(accountUnverified);
             verifiedAccountRepository.deleteById(account.getId());
             return Optional.of(accountUnverified);
@@ -174,6 +176,7 @@ public class AccountService {
                         .map(Tariff::getId)
                         .collect(Collectors.toList());
                 tariffRepository.deleteAllByIdInBatch(ids);
+                ratingRepository.deleteById(id);
                 verifiedAccountRepository.deleteById(id);
 
             }

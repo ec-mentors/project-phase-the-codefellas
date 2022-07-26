@@ -11,7 +11,7 @@ import java.util.Objects;
 public class VerifiedAccount  {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+//    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @NotNull
     @Column(unique = true)
@@ -27,12 +27,12 @@ public class VerifiedAccount  {
 
     @Valid
 //    @NotNull
-    @OneToMany
+    @OneToMany(fetch = FetchType.EAGER)
     private List<Tariff> tariffs = new ArrayList<>();
 
 //    @NotNull
     @Valid
-    @OneToOne
+    @OneToOne(fetch = FetchType.EAGER)
     private Rating rating;
 
     public VerifiedAccount() {
@@ -53,6 +53,17 @@ public class VerifiedAccount  {
         this.website = website;
         this.email = email;
         this.phoneNumber = phoneNumber;
+        this.tariffs = tariffs;
+        this.rating = rating;
+    }
+
+    public VerifiedAccount(Long id, String providerName, String website, String email, String phoneNumber, boolean verified, List<Tariff> tariffs, Rating rating) {
+        this.id = id;
+        this.providerName = providerName;
+        this.website = website;
+        this.email = email;
+        this.phoneNumber = phoneNumber;
+        this.verified = verified;
         this.tariffs = tariffs;
         this.rating = rating;
     }

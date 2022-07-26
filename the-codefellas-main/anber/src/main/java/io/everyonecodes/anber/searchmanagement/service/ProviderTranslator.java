@@ -11,11 +11,11 @@ public class ProviderTranslator {
     }
 
     public VerifiedAccount DtoToVerifiedAccount(ProviderDTO dto) {
-        return new VerifiedAccount(dto.getProviderName(), dto.getWebsite(), dto.getEmail(), dto.getPhoneNumber(), true, dto.getTariffs(), dto.getRating());
+        return new VerifiedAccount(dto.getId(), dto.getProviderName(), dto.getWebsite(), dto.getEmail(), dto.getPhoneNumber(), true, dto.getTariffs(), dto.getRating());
     }
 
     public UnverifiedAccount DtoToUnverifiedAccount(ProviderDTO dto) {
-        return new UnverifiedAccount(dto.getProviderName(),dto.getWebsite(), false, dto.getTariffs(), dto.getRating());
+        return new UnverifiedAccount(dto.getId(), dto.getProviderName(),dto.getWebsite(), false, dto.getTariffs(), dto.getRating());
     }
 
     public VerifiedAccount unverifiedToVerifiedAccount(UnverifiedAccount privateAccount, ProviderDTO dto) {
@@ -24,10 +24,11 @@ public class ProviderTranslator {
     return publicAccount;
     }
 
-    public UnverifiedAccount verifiedToUnverifiedAccount(VerifiedAccount publicAccount, ProviderDTO dto) {
-        var privateAccount = DtoToUnverifiedAccount(dto);
-        privateAccount.setId(publicAccount.getId());
-        return privateAccount;
+    public UnverifiedAccount verifiedToUnverifiedAccount(VerifiedAccount account) {
+        return new UnverifiedAccount(account.getId(), account.getProviderName(), account.getWebsite(), false, account.getTariffs(), account.getRating());
+//        var privateAccount = DtoToUnverifiedAccount(dto);
+//        privateAccount.setId(publicAccount.getId());
+//        return privateAccount;
     }
 
     public Tariff DtoToTariff(ProviderDTO dto) {
