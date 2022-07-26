@@ -18,10 +18,16 @@ public class AccountEndpoint {
         this.accountService = accountService;
     }
 
-    @GetMapping("/all")
+    @GetMapping("/all/v")
     @Secured("ROLE_ADMIN")
-    List<VerifiedAccount> getAll() {
-        return accountService.getAll();
+    List<VerifiedAccount> getAllV() {
+        return accountService.getAllVerified();
+    }
+
+    @GetMapping("/all/u")
+    @Secured("ROLE_ADMIN")
+    List<UnverifiedAccount> getAllU() {
+        return accountService.getAllUnverified();
     }
 
     @PostMapping("/{id}/create")

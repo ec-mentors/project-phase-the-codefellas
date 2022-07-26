@@ -26,16 +26,16 @@ public class VerifiedAccount  {
     private boolean verified = true;
 
     @Valid
-    @NotNull
+//    @NotNull
     @OneToMany
     private List<Tariff> tariffs = new ArrayList<>();
 
-    @NotNull
+//    @NotNull
     @Valid
     @OneToOne
-    private Rating rating = new Rating();
+    private Rating rating;
 
-        public VerifiedAccount() {
+    public VerifiedAccount() {
     }
 
     public VerifiedAccount(String providerName, String website, String email, String phoneNumber, boolean verified, List<Tariff> tariffs, Rating rating) {

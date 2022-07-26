@@ -1,10 +1,7 @@
 package io.everyonecodes.anber.searchmanagement.service;
 
 import io.everyonecodes.anber.searchmanagement.data.*;
-import io.everyonecodes.anber.searchmanagement.repository.UnverifiedAccountRepository;
-import io.everyonecodes.anber.searchmanagement.repository.VerifiedAccountRepository;
-import io.everyonecodes.anber.searchmanagement.repository.ProviderRepository;
-import io.everyonecodes.anber.searchmanagement.repository.TariffRepository;
+import io.everyonecodes.anber.searchmanagement.repository.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +17,7 @@ public class AccountService {
     private final TariffRepository tariffRepository;
     private final VerifiedAccountRepository verifiedAccountRepository;
     private final UnverifiedAccountRepository unverifiedAccountRepository;
+    private final RatingRepository ratingRepository;
     private final String verificationMark;
     private final List<String> accountProperties;
     private final ProviderTranslator translator;
@@ -27,19 +25,27 @@ public class AccountService {
     public AccountService(ProviderRepository providerRepository,
                           TariffRepository tariffRepository,
                           VerifiedAccountRepository verifiedAccountRepository,
-                          UnverifiedAccountRepository unverifiedAccountRepository, @Value("${messages.verified}") String verificationMark,
+                          UnverifiedAccountRepository unverifiedAccountRepository,
+                          RatingRepository ratingRepository,
+                          @Value("${messages.verified}") String verificationMark,
                           List<String> accountProperties,
                           ProviderTranslator translator) {
         this.providerRepository = providerRepository;
         this.tariffRepository = tariffRepository;
         this.verifiedAccountRepository = verifiedAccountRepository;
         this.unverifiedAccountRepository = unverifiedAccountRepository;
+        this.ratingRepository = ratingRepository;
         this.verificationMark = verificationMark;
         this.accountProperties = accountProperties;
         this.translator = translator;
     }
 
-    public List<VerifiedAccount> getAll() {
+
+    public List<UnverifiedAccount> getAllUnverified() {
+        return unverifiedAccountRepository.findAll();
+    }
+
+    public List<VerifiedAccount> getAllVerified() {
         return verifiedAccountRepository.findAll();
     }
 
@@ -51,6 +57,9 @@ public class AccountService {
             if (!unverifiedAccountRepository.existsByProviderName(dto.getProviderName())) {
                 UnverifiedAccount account = translator.DtoToUnverifiedAccount(dto);
 
+                account.setTariffs(List.of());
+                account.setRating(new Rating(List.of("No Ratings Yet"), 0.0));
+                ratingRepository.save(account.getRating());
                 unverifiedAccountRepository.save(account);
 
                 return Optional.of(account);
@@ -70,13 +79,14 @@ public class AccountService {
                     .findFirst().orElse(null);
 
             var accountVerified = translator.unverifiedToVerifiedAccount(account, dto);
-            accountVerified.setProviderName(accountVerified.getProviderName() + verificationMark);
+            accountVerified.setProviderName(accountVerified.getProviderName() + " [*]");
 
             if (dto != null) {
                 dto.setVerified(true);
                 providerRepository.save(dto);
             }
 
+            accountVerified.setRating(account.getRating());
             verifiedAccountRepository.save(accountVerified);
             unverifiedAccountRepository.deleteById(account.getId());
             return Optional.of(accountVerified);
@@ -101,6 +111,7 @@ public class AccountService {
                 providerRepository.save(dto);
             }
 
+            accountUnverified.setRating(account.getRating());
             unverifiedAccountRepository.save(accountUnverified);
             verifiedAccountRepository.deleteById(account.getId());
             return Optional.of(accountUnverified);

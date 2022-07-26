@@ -22,14 +22,14 @@ public class UnverifiedAccount {
     private boolean verified = false;
 
     @Valid
-    @NotNull
+//    @NotNull
     @OneToMany
     private List<Tariff> tariffs = new ArrayList<>();
 
-    @NotNull
+//    @NotNull
     @Valid
     @OneToOne
-    private Rating rating = new Rating();
+    private Rating rating;
 
     public UnverifiedAccount() {
     }
