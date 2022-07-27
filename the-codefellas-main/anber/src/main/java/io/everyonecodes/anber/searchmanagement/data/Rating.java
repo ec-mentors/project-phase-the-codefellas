@@ -1,9 +1,7 @@
 package io.everyonecodes.anber.searchmanagement.data;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @Entity
 public class Rating {
@@ -12,21 +10,21 @@ public class Rating {
 //    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ElementCollection(targetClass = String.class)
-    private List<String> ratings = new ArrayList<>();
+    @ElementCollection(targetClass = Map.class)
+    private Set<Map<String,Integer>> ratings = new HashSet<>();
 //    @Range(min = 1, max = 5)
-    private double score = 0.0;
+    private String score = "no ratings yet";
 
     public Rating() {
     }
 
-    public Rating(List<String> ratings, double score) {
+    public Rating(Long id, Set<Map<String, Integer>> ratings, String score) {
+        this.id = id;
         this.ratings = ratings;
         this.score = score;
     }
 
-    public Rating(Long id, List<String> ratings, double score) {
-        this.id = id;
+    public Rating(Set<Map<String, Integer>> ratings, String score) {
         this.ratings = ratings;
         this.score = score;
     }
@@ -39,19 +37,19 @@ public class Rating {
         this.id = id;
     }
 
-    public List<String> getRatings() {
+    public Set<Map<String, Integer>> getRatings() {
         return ratings;
     }
 
-    public void setRatings(List<String> ratings) {
+    public void setRatings(Set<Map<String, Integer>> ratings) {
         this.ratings = ratings;
     }
 
-    public double getScore() {
+    public String getScore() {
         return score;
     }
 
-    public void setScore(double score) {
+    public void setScore(String score) {
         this.score = score;
     }
 
@@ -60,20 +58,11 @@ public class Rating {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Rating rating = (Rating) o;
-        return Double.compare(rating.score, score) == 0 && Objects.equals(id, rating.id) && Objects.equals(ratings, rating.ratings);
+        return Objects.equals(id, rating.id) && Objects.equals(ratings, rating.ratings) && Objects.equals(score, rating.score);
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(id, ratings, score);
-    }
-
-    @Override
-    public String toString() {
-        return "Rating{" +
-                "id=" + id +
-                ", ratings=" + ratings +
-                ", score=" + score +
-                '}';
     }
 }

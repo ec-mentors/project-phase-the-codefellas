@@ -5,9 +5,7 @@ import io.everyonecodes.anber.searchmanagement.repository.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -58,7 +56,7 @@ public class AccountService {
                 UnverifiedAccount account = translator.DtoToUnverifiedAccount(dto);
 
                 account.setTariffs(List.of());
-                account.setRating(new Rating(account.getId(), List.of("No Ratings Yet"), 0.0));
+                account.setRating(new Rating(account.getId(), Set.of(), "no ratings yet"));
                 ratingRepository.save(account.getRating());
                 unverifiedAccountRepository.save(account);
 
@@ -120,9 +118,6 @@ public class AccountService {
         }
         return Optional.empty();
     }
-
-
-
 
 
     public Optional<VerifiedAccount> editAccountV(Long id, String property, String input) {
@@ -238,18 +233,16 @@ public class AccountService {
         Optional<UnverifiedAccount> oAccountUnverified = unverifiedAccountRepository.findById(id);
         if (oAccountVerified.isPresent()) {
             return Optional.of(true);
-        }
-        else if (oAccountUnverified.isPresent()) {
+        } else if (oAccountUnverified.isPresent()) {
             return Optional.of(false);
-        }
-        else {
+        } else {
             return Optional.empty();
         }
     }
 
     public Optional<ProviderPublic> viewPublicProvider(Long id) {
         Optional<ProviderDTO> oProvider = providerRepository.findById(id);
-        if (oProvider.isPresent()){
+        if (oProvider.isPresent()) {
             var dto = oProvider.get();
             ProviderPublic provider = translator.dtoToPublic(dto);
             return Optional.of(provider);
