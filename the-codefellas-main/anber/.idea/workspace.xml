@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="4af1d5e0-be06-4038-88ec-f401b6d3b855" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/io/everyonecodes/anber/searchmanagement/data/Rating.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/io/everyonecodes/anber/searchmanagement/data/Rating.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/io/everyonecodes/anber/searchmanagement/endpoints/AccountEndpoint.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/io/everyonecodes/anber/searchmanagement/endpoints/AccountEndpoint.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/io/everyonecodes/anber/searchmanagement/service/AccountService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/io/everyonecodes/anber/searchmanagement/service/AccountService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/io/everyonecodes/anber/searchmanagement/service/ProviderService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/io/everyonecodes/anber/searchmanagement/service/ProviderService.java" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Class" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/../.." />
+  </component>
+  <component name="JpbToolWindowState">
+    <option name="myId2FirstActivated">
+      <map>
+        <entry key="com.haulmont.jpb.jpaInspector" value="true" />
+        <entry key="com.haulmont.jpb.jpaPalette" value="true" />
+        <entry key="com.haulmont.jpb.jpaStructure" value="true" />
+      </map>
+    </option>
+    <option name="myId2Visible">
+      <map>
+        <entry key="com.haulmont.jpb.jpaInspector" value="false" />
+        <entry key="com.haulmont.jpb.jpaPalette" value="false" />
+        <entry key="com.haulmont.jpb.jpaStructure" value="false" />
+      </map>
+    </option>
+  </component>
+  <component name="ProjectId" id="2CU8QqriHVvrwGNTyrR0WIAW8P9" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="1" id="Add" />
+  </component>
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="settings.editor.selected.configurable" value="preferences.lookFeel" />
+  </component>
+  <component name="RunManager" selected="JUnit.SearchServiceTest.manageFiltersCorrect">
+    <configuration name="AnberApplication" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="io.everyonecodes.anber.AnberApplication" />
+      <module name="anber" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="io.everyonecodes.anber.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="AnberApplicationTests" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="anber" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="io.everyonecodes.anber.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="io.everyonecodes.anber" />
+      <option name="MAIN_CLASS_NAME" value="io.everyonecodes.anber.AnberApplicationTests" />
+      <option name="TEST_OBJECT" value="class" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="SearchServiceTest.manageFiltersCorrect" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="anber" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="io.everyonecodes.anber.searchmanagement.service.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="io.everyonecodes.anber.searchmanagement.service" />
+      <option name="MAIN_CLASS_NAME" value="io.everyonecodes.anber.searchmanagement.service.SearchServiceTest" />
+      <option name="METHOD_NAME" value="manageFiltersCorrect(java.lang.String,java.util.List)" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="JUnit.SearchServiceTest.manageFiltersCorrect" />
+        <item itemvalue="Application.AnberApplication" />
+        <item itemvalue="JUnit.AnberApplicationTests" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="4af1d5e0-be06-4038-88ec-f401b6d3b855" name="Changes" comment="" />
+      <created>1658845791592</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1658845791592</updated>
+    </task>
+    <servers />
+  </component>
+  <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/anber$AnberApplication.ic" NAME="AnberApplication Coverage Results" MODIFIED="1658851756715" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="idea" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false">
+      <FILTER>io.everyonecodes.anber.*</FILTER>
+    </SUITE>
+  </component>
+</project>
