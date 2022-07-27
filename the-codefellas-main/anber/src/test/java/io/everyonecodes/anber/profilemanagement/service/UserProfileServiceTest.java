@@ -1,7 +1,7 @@
-package io.everyonecodes.anber.service;
+package io.everyonecodes.anber.profilemanagement.service;
 
-import io.everyonecodes.anber.data.User;
-import io.everyonecodes.anber.repository.UserRepository;
+import io.everyonecodes.anber.usermanagement.data.User;
+import io.everyonecodes.anber.usermanagement.repository.UserRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,8 +21,6 @@ import org.springframework.security.web.SecurityFilterChain;
 
 import java.util.Optional;
 import java.util.stream.Stream;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
 class UserProfileServiceTest {

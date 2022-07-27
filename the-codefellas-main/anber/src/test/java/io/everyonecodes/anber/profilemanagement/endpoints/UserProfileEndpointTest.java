@@ -1,7 +1,7 @@
-package io.everyonecodes.anber.endpointsOld;
+package io.everyonecodes.anber.profilemanagement.endpoints;
 
-import io.everyonecodes.anber.data.User;
-import io.everyonecodes.anber.service.UserProfileService;
+import io.everyonecodes.anber.profilemanagement.service.UserProfileService;
+import io.everyonecodes.anber.usermanagement.data.User;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +11,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.security.test.context.support.WithMockUser;
 
-import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class UserProfileEndpointTest {

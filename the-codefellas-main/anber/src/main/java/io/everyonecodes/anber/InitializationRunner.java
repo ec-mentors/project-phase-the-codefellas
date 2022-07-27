@@ -1,7 +1,7 @@
 package io.everyonecodes.anber;
 
-import io.everyonecodes.anber.data.User;
-import io.everyonecodes.anber.repository.UserRepository;
+import io.everyonecodes.anber.usermanagement.data.User;
+import io.everyonecodes.anber.usermanagement.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Bean;
@@ -31,7 +31,7 @@ public class InitializationRunner {
         return args -> {
             if (!userRepository.existsByEmail(adminEmail)) {
                 String password = passwordEncoder.encode(adminPassword);
-                User admin = new User("name", adminEmail, true, password);
+                User admin = new User(adminEmail, password, adminRole);
                 userRepository.save(admin);
             }
 

@@ -1,8 +1,8 @@
-package io.everyonecodes.anber.service;
+package io.everyonecodes.anber.usermanagement.service;
 
-import io.everyonecodes.anber.data.User;
-import io.everyonecodes.anber.data.UserPrivateDTO;
-import io.everyonecodes.anber.repository.UserRepository;
+import io.everyonecodes.anber.usermanagement.data.User;
+import io.everyonecodes.anber.usermanagement.data.UserPrivateDTO;
+import io.everyonecodes.anber.usermanagement.repository.UserRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -16,7 +16,6 @@ import org.springframework.security.web.SecurityFilterChain;
 
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
 class UserServiceTest {
@@ -74,7 +73,7 @@ class UserServiceTest {
     @Test
     void viewUserPrivateData_UserFound() {
         User user = new User(email, "password");
-        UserPrivateDTO userPrivateDTO = new UserPrivateDTO(email, user.getRoles(), user.getEmail());
+        UserPrivateDTO userPrivateDTO = new UserPrivateDTO(email, user.getEmail(), user.getRole());
         Mockito.when(userRepository.findOneByEmail(email)).thenReturn(Optional.of(user));
         Mockito.when(userDTO.toUserPrivateDTO(user)).thenReturn(userPrivateDTO);
         var oResult = userService.viewUserPrivateData(email);

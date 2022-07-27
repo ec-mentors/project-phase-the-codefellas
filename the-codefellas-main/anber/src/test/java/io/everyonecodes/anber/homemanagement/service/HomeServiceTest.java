@@ -1,11 +1,11 @@
-package io.everyonecodes.anber.service;
+package io.everyonecodes.anber.homemanagement.service;
 
-import io.everyonecodes.anber.data.Home;
-import io.everyonecodes.anber.data.HomeType;
-import io.everyonecodes.anber.data.Role;
-import io.everyonecodes.anber.data.User;
-import io.everyonecodes.anber.repository.HomeRepository;
-import io.everyonecodes.anber.repository.UserRepository;
+import io.everyonecodes.anber.homemanagement.data.Home;
+import io.everyonecodes.anber.homemanagement.data.HomeType;
+import io.everyonecodes.anber.homemanagement.repository.HomeRepository;
+import io.everyonecodes.anber.homemanagement.service.HomeService;
+import io.everyonecodes.anber.usermanagement.data.User;
+import io.everyonecodes.anber.usermanagement.repository.UserRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -18,7 +18,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.web.SecurityFilterChain;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
@@ -65,7 +67,7 @@ class HomeServiceTest {
         Home testHome3 = new Home("name", country, city, postalCode, HomeType.HOUSE, sizeInSquareMeters);
         List<Home> homes = List.of(testHome1, testHome2, testHome3);
 
-        User profile = new User(email, password, new HashSet<>(), username, country, homes, false);
+        User profile = new User(email, password, "role", username, country, homes, false);
 
         Mockito.when(userRepository.findOneByEmail(email)).thenReturn(Optional.of(profile));
         var result = homeService.getHomes(email);
@@ -86,7 +88,7 @@ class HomeServiceTest {
     void addHome() {
         List<Home> homes = new ArrayList<>();
         User testUserProfile = new User(
-                email, password, new HashSet<>(), username, country, homes, false);
+                email, password, "role", username, country, homes, false);
         Home testHome = new Home(country, city, postalCode, HomeType.GARAGE, sizeInSquareMeters);
         Mockito.when(userRepository.findOneByEmail(username)).thenReturn(Optional.of(testUserProfile));
         var response = userRepository.findOneByEmail(username);
@@ -111,11 +113,11 @@ class HomeServiceTest {
         List<Home> homes =  new ArrayList<>(List.of(testHome1,testHome2));
 
         User testUserProfile = new User(
-                1L, email, password, Set.of(new Role("ROLE_USER", "normal User")), username, country, homes, false);
+                1L, email, password, "role", username, country, homes, false);
 
         Mockito.when(userRepository.findOneByEmail(testUserProfile.getEmail())).thenReturn(Optional.of(testUserProfile));
 
-        Optional<Home> result = homeService.editHome(testUserProfile.getEmail(), testHome2.getId(), property,input);
+        Optional<Home> result = homeService.editHome(testUserProfile.getEmail(), testUserProfile.getId(), property,input);
 
         Assertions.assertEquals(expected,result);
 
@@ -124,14 +126,16 @@ class HomeServiceTest {
 
 
     private static Stream<Arguments> parameters() {
+        Home testHome1 = new Home(1L,"name", "testCountry", "testCity", "666", HomeType.GARAGE, 66.66);
+
         return Stream.of(
-                Arguments.of("homeName", "otherName", Optional.of(new Home(2L,"otherName", "testCountry", "testCity", "666", HomeType.APARTMENT, 66.66))),
-                Arguments.of("country", "France", Optional.of(new Home(2L,"name", "France", "testCity", "666", HomeType.APARTMENT, 66.66))),
-                Arguments.of("city", "Paris", Optional.of(new Home(2L,"name", "testCountry", "Paris", "666", HomeType.APARTMENT, 66.66))),
-                Arguments.of("postalCode", "123", Optional.of(new Home(2L,"name", "testCountry", "testCity", "123", HomeType.APARTMENT, 66.66))),
-                Arguments.of("type", "garage", Optional.of(new Home(2L,"name", "testCountry", "testCity", "666", HomeType.GARAGE, 66.66))),
-                Arguments.of("type", "GARAGE", Optional.of(new Home(2L,"name", "testCountry", "testCity", "666", HomeType.GARAGE, 66.66))),
-                Arguments.of("sizeInSquareMeters", "300.5", Optional.of(new Home(2L,"name", "testCountry", "testCity", "666", HomeType.APARTMENT, 300.5)))
+                Arguments.of("name", "otherName", Optional.of(testHome1)),
+                Arguments.of("country", "France", Optional.of(testHome1)),
+                Arguments.of("city", "Paris", Optional.of(testHome1)),
+                Arguments.of("postalCode", "123", Optional.of(testHome1)),
+                Arguments.of("homeType", "garage", Optional.of(testHome1)),
+                Arguments.of("homeType", "GARAGE", Optional.of(testHome1)),
+                Arguments.of("sizeInSquareMeters", "300.5", Optional.of(testHome1))
         );
     }
 
@@ -142,7 +146,7 @@ class HomeServiceTest {
         List<Home> homes =  new ArrayList<>(List.of(testHome1,testHome2));
 
         User testUserProfile = new User(
-                1L, email, password, new HashSet<>(), username, country, homes, false);
+                1L, email, password, "role", username, country, homes, false);
 
         Mockito.when(userRepository.findOneByEmail(testUserProfile.getEmail())).thenReturn(Optional.of(testUserProfile));
 
@@ -163,7 +167,7 @@ class HomeServiceTest {
         List<Home> homes =  new ArrayList<>(List.of(testHome1,testHome2));
 
         User testUserProfile = new User(
-                1L, email, password, new HashSet<>(), username, country, homes, false);
+                1L, email, password, "role", username, country, homes, false);
 
         Mockito.when(userRepository.findOneByEmail(testUserProfile.getEmail())).thenReturn(Optional.of(testUserProfile));
 

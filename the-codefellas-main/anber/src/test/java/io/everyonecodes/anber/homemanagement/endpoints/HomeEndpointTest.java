@@ -1,11 +1,13 @@
-package io.everyonecodes.anber.endpointsOld;
+package io.everyonecodes.anber.homemanagement.endpoints;
 
-import io.everyonecodes.anber.data.Home;
-import io.everyonecodes.anber.data.HomeType;
-import io.everyonecodes.anber.data.Role;
-import io.everyonecodes.anber.data.User;
-import io.everyonecodes.anber.service.HomeService;
+import io.everyonecodes.anber.homemanagement.data.Home;
+import io.everyonecodes.anber.homemanagement.data.HomeType;
+import io.everyonecodes.anber.homemanagement.service.HomeService;
+import io.everyonecodes.anber.usermanagement.data.User;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,9 +18,7 @@ import org.springframework.security.web.SecurityFilterChain;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class HomeEndpointTest {
@@ -75,7 +75,7 @@ class HomeEndpointTest {
                 "testCountry", "testCity", "2700", HomeType.APARTMENT, 25.5
         );
         User testUserProfile = new User(
-                1L, email, password, Set.of(new Role("ROLE_USER", "normal User")), username, country, List.of(testHome), false);
+                1L, email, password, "role", username, country, List.of(testHome), false);
 
         testRestTemplate.put("/profile/" + testUserProfile.getEmail() + "/edit/homes/" + testHome.getId() + "/country", "Ireland", Home.class);
         Mockito.verify(homeService).editHome(testUserProfile.getEmail(), testHome.getId(), "country", "Ireland");
@@ -88,7 +88,7 @@ class HomeEndpointTest {
         List<Home> homes =  new ArrayList<>(List.of(testHome1,testHome2));
 
         User testUserProfile = new User(
-                1L, email, password, Set.of(new Role("ROLE_USER", "normal User")), username, country, homes, false);
+                1L, email, password, "role", username, country, homes, false);
 
         testRestTemplate.delete("/profile/" + testUserProfile.getEmail() + "/edit/homes/remove/" + testHome1.getId());
         Mockito.verify(homeService).removeHome(testUserProfile.getEmail(), testHome1.getId());
@@ -102,10 +102,21 @@ class HomeEndpointTest {
         List<Home> homes =  new ArrayList<>(List.of(testHome1,testHome2));
 
         User testUserProfile = new User(
-                1L, email, password, Set.of(new Role("ROLE_USER", "normal User")), username, country, homes, false);
+                1L, email, password, "role", username, country, homes, false);
 
         testRestTemplate.delete("/profile/" + testUserProfile.getEmail() + "/edit/homes/delete");
         Mockito.verify(homeService).deleteAllHomes(testUserProfile.getEmail());
 
     }
 }
+
+
+
+
+
+
+
+
+
+
+
