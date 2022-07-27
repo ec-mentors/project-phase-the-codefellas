@@ -109,7 +109,6 @@ data:
       - website
       - email
       - phoneNumber
-
 webapptreelist:
   resourceinfos:
     - category: WebAppTree
