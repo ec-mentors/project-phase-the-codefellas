@@ -15,13 +15,13 @@ public class ProviderTranslator {
     }
 
     public UnverifiedAccount DtoToUnverifiedAccount(ProviderDTO dto) {
-        return new UnverifiedAccount(dto.getId(), dto.getProviderName(),dto.getWebsite(), false, dto.getTariffs(), dto.getRating());
+        return new UnverifiedAccount(dto.getId(), dto.getProviderName(), dto.getWebsite(), false, dto.getTariffs(), dto.getRating());
     }
 
     public VerifiedAccount unverifiedToVerifiedAccount(UnverifiedAccount privateAccount, ProviderDTO dto) {
         var publicAccount = DtoToVerifiedAccount(dto);
         publicAccount.setId(privateAccount.getId());
-    return publicAccount;
+        return publicAccount;
     }
 
     public UnverifiedAccount verifiedToUnverifiedAccount(VerifiedAccount account) {
@@ -35,4 +35,11 @@ public class ProviderTranslator {
         return new Tariff(dto.getTariffName(), dto.getBasicRate(), dto.getContractType(), dto.getPriceModel());
     }
 
+    public ProviderPublic dtoToPublic(ProviderDTO providerDTO) {
+        return new ProviderPublic(providerDTO.getProviderName(), providerDTO.getWebsite(),providerDTO.getRating(), providerDTO.getTariffs());
+    }
+
+
+
 }
+

@@ -246,4 +246,14 @@ public class AccountService {
             return Optional.empty();
         }
     }
+
+    public Optional<ProviderPublic> viewPublicProvider(Long id) {
+        Optional<ProviderDTO> oProvider = providerRepository.findById(id);
+        if (oProvider.isPresent()){
+            var dto = oProvider.get();
+            ProviderPublic provider = translator.dtoToPublic(dto);
+            return Optional.of(provider);
+        }
+        return Optional.empty();
+    }
 }

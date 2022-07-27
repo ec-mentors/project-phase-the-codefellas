@@ -1,5 +1,6 @@
 package io.everyonecodes.anber.searchmanagement.endpoints;
 
+import io.everyonecodes.anber.searchmanagement.data.ProviderPublic;
 import io.everyonecodes.anber.searchmanagement.data.UnverifiedAccount;
 import io.everyonecodes.anber.searchmanagement.data.VerifiedAccount;
 import io.everyonecodes.anber.searchmanagement.service.AccountService;
@@ -66,4 +67,10 @@ public class AccountEndpoint {
     void deleteAccount(@PathVariable Long id) {
         accountService.deleteAccount(id);
     }
+
+    @GetMapping("/{id}/view")
+    ProviderPublic viewProvider(@PathVariable Long id){
+        return accountService.viewPublicProvider(id).orElse(null);
+    }
+
 }
