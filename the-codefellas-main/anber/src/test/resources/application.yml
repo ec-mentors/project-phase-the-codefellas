@@ -62,7 +62,10 @@ messages:
     userRole:
       name: "ROLE_USER"
       description: "This user has access to site, after login - normal user"
-  verified: " [*]"
+  provider-account:
+    verified: " [*]"
+    no-ratings: "No Ratings"
+
 
 data:
   admin:

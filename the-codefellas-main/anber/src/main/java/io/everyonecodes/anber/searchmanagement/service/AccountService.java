@@ -25,7 +25,7 @@ public class AccountService {
                           VerifiedAccountRepository verifiedAccountRepository,
                           UnverifiedAccountRepository unverifiedAccountRepository,
                           RatingRepository ratingRepository,
-                          @Value("${messages.verified}") String verificationMark,
+                          @Value("${messages.provider-account.verified}") String verificationMark,
                           List<String> accountProperties,
                           ProviderTranslator translator) {
         this.providerRepository = providerRepository;

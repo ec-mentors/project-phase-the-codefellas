@@ -9,7 +9,7 @@ import java.util.Objects;
 public class Tariff {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+//    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @NotNull
