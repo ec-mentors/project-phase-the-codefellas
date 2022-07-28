@@ -28,7 +28,7 @@ public class UserService {
     }
 
     public User saveUser(User user) throws IllegalArgumentException {
-        if (!user.getPassword().matches("(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[!?@#$^&+=/_-])(?=\\S+$).{6,100}") || (!isEmailValid(user.getEmail())))
+        if (!user.getPassword().matches("(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[!?@#$^&+=/_-])(?=\\S+$).{6,100}") || (!isEmailValid(user.getEmail()) || user.getFirstName().isBlank() || user.getLastName().isBlank()))
             throw new IllegalArgumentException();
         String encodedPassword = passwordEncoder.encode(user.getPassword());
         user.setPassword(encodedPassword);
@@ -62,6 +62,11 @@ public class UserService {
         if (at < 0) return false;
         int dot = email.lastIndexOf(".");
         return at < dot;
+    }
+
+    public void deleteUser(String username) {
+        var oProfile = userRepository.findOneByEmail(username);
+        oProfile.ifPresent(userRepository::delete);
     }
 
 }

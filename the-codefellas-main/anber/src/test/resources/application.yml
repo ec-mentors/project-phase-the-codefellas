@@ -116,48 +116,97 @@ webapptreelist:
       uri: /webapptree
       restMethod: GET
       allowedRoles:
-        - role: ROLE_USER
-        - role: ROLE_ADMIN
+        - ROLE_USER
+        - ROLE_ADMIN
     - category: Account
       name: Edit my Profile
       description: Edit my Profile
       uri: '/{username}/edit/{profileOption}'
       restMethod: PUT
       allowedRoles:
-        - role: ROLE_USER
-        - role: ROLE_ADMIN
+        - ROLE_USER
+        - ROLE_ADMIN
     - category: Account
       name: Delete my Account
       description: Delete my Account
       uri: '/{username}/delete'
       restMethod: DELETE
       allowedRoles:
-        - role: ROLE_ADMIN
-        - role: ROLE_USER
+        - ROLE_ADMIN
+        - ROLE_USER
     - category: Homes
       name: Add my home
       description: Add my home to my Account
       uri: '/{username}/edit/homes/add'
       restMethod: PUT
       allowedRoles:
-        - role: ROLE_ADMIN
-        - role: ROLE_USER
+        - ROLE_ADMIN
+        - ROLE_USER
     - category: Homes
       name: Edit my home
       description: Edit my home
       uri: '/{username}/edit/homes/add'
       restMethod: PUT
       allowedRoles:
-        - role: ROLE_ADMIN
-        - role: ROLE_USER
+        - ROLE_ADMIN
+        - ROLE_USER
     - category: Homes
-      name: Delete my Home
-      description: Delete my Home
+      name: Remove my Home
+      description: Remove my Home
       uri: '/{username}/edit/homes/remove/{id}'
+      restMethod: DELETE
+      allowedRoles:
+        - ROLE_ADMIN
+        - ROLE_USER
+    - category: Homes
+      name: Delete all my Homes
+      description: Delete all my Homes
+      uri: '/{username}/edit/homes/delete'
+      restMethod: DELETE
+      allowedRoles:
+        - ROLE_ADMIN
+        - ROLE_USER
+    - category: Search
+      name: View all Providers
+      description: View all Providers
+      uri: 'provider/get'
+      restMethod: GET
+      allowedRoles:
+        - ROLE_ADMIN
+        - ROLE_USER
+    - category: Search
+      name: Search for filtered Providers
+      description: Search for filtered Providers
+      uri: 'provider/search/{filters}'
+      restMethod: GET
+      allowedRoles:
+        - ROLE_ADMIN
+        - ROLE_USER
+    - category: Search
+      name: Search for filtered Providers, sorted by BasicRate
+      description: Search for filtered Providers, sorted by BasicRate
+      uri: 'provider/search/sorted/basicrate/{operator}/{filters}'
+      restMethod: GET
+      allowedRoles:
+        - ROLE_ADMIN
+        - ROLE_USER
+    - category: Search
+      name: Search for filtered Providers, sorted by Rating
+      description: Search for filtered Providers, sorted by Rating
+      uri: 'provider/search/sorted/rating/{operator}/{filters}'
+      restMethod: GET
+      allowedRoles:
+        - ROLE_ADMIN
+        - ROLE_USER
+    - category: Rate
+      name: Rate a Provider
+      description: Rate a Provider
+      uri: 'provider//{id}/rate/{rating}'
       restMethod: PUT
       allowedRoles:
-        - role: ROLE_ADMIN
-        - role: ROLE_USER
+        - ROLE_ADMIN
+        - ROLE_USER
+
 
 testvalues:
   login-endpoint-url: "/signin"

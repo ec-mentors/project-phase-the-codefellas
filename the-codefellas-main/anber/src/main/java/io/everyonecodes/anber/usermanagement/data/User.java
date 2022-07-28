@@ -4,6 +4,7 @@ import io.everyonecodes.anber.homemanagement.data.Home;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 import java.util.ArrayList;
@@ -16,6 +17,14 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @NotBlank(message = "Name must not be empty")
+    @Column(name = "firstName")
+    private String firstName;
+
+    @NotBlank(message = "Name must not be empty")
+    @Column(name = "lastName")
+    private String lastName;
 
     @NotEmpty
     @Email(message = "must be a valid Email")
@@ -33,7 +42,7 @@ public class User {
 
     private String country;
 
-    @OneToMany
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Home> savedHomes = new ArrayList<>();
 
     private boolean notificationsEnabled = false;
@@ -44,6 +53,14 @@ public class User {
     public User(String email, String password) {
         this.email = email;
         this.password = password;
+    }
+
+    public User(String firstName, String lastName, String email, String password, String role) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.password = password;
+        this.role = role;
     }
 
     public User(String email, String password, String role, String username, String country, List<Home> savedHomes, boolean notificationsEnabled) {
@@ -62,6 +79,24 @@ public class User {
         this.role = role;
     }
 
+
+
+    public User(String firstName, String lastName, String email, String password) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.password = password;
+    }
+
+    public User(String firstName, String lastName, String email, String password, String role, String username) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.password = password;
+        this.role = role;
+        this.username = username;
+    }
+
     public User(Long id, String email, String password, String role, String username, String country, List<Home> savedHomes, boolean notificationsEnabled) {
         this.id = id;
         this.email = email;
@@ -71,6 +106,22 @@ public class User {
         this.country = country;
         this.savedHomes = savedHomes;
         this.notificationsEnabled = notificationsEnabled;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
     }
 
     public Long getId() {
@@ -142,18 +193,20 @@ public class User {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         User user = (User) o;
-        return notificationsEnabled == user.notificationsEnabled && Objects.equals(id, user.id) && Objects.equals(email, user.email) && Objects.equals(password, user.password) && Objects.equals(role, user.role) && Objects.equals(username, user.username) && Objects.equals(country, user.country) && Objects.equals(savedHomes, user.savedHomes);
+        return notificationsEnabled == user.notificationsEnabled && Objects.equals(id, user.id) && Objects.equals(firstName, user.firstName) && Objects.equals(lastName, user.lastName) && Objects.equals(email, user.email) && Objects.equals(password, user.password) && Objects.equals(role, user.role) && Objects.equals(username, user.username) && Objects.equals(country, user.country) && Objects.equals(savedHomes, user.savedHomes);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, email, password, role, username, country, savedHomes, notificationsEnabled);
+        return Objects.hash(id, firstName, lastName, email, password, role, username, country, savedHomes, notificationsEnabled);
     }
 
     @Override
     public String toString() {
         return "User{" +
                 "id=" + id +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
                 ", email='" + email + '\'' +
                 ", password='" + password + '\'' +
                 ", role='" + role + '\'' +

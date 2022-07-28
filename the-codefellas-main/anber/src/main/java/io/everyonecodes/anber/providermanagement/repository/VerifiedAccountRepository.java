@@ -1,6 +1,6 @@
-package io.everyonecodes.anber.searchmanagement.repository;
+package io.everyonecodes.anber.providermanagement.repository;
 
-import io.everyonecodes.anber.searchmanagement.data.VerifiedAccount;
+import io.everyonecodes.anber.providermanagement.data.VerifiedAccount;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

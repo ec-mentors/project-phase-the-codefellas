@@ -1,8 +1,8 @@
 package io.everyonecodes.anber.searchmanagement.repository;
 
-import io.everyonecodes.anber.searchmanagement.data.PriceModelType;
+import io.everyonecodes.anber.providermanagement.data.PriceModelType;
 import io.everyonecodes.anber.searchmanagement.data.ProviderDTO;
-import io.everyonecodes.anber.searchmanagement.data.ProviderType;
+import io.everyonecodes.anber.providermanagement.data.ProviderType;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

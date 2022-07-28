@@ -1,4 +1,6 @@
-package io.everyonecodes.anber.searchmanagement.data;
+package io.everyonecodes.anber.providermanagement.data;
+
+import io.everyonecodes.anber.ratingmanagement.data.Rating;
 
 import javax.persistence.*;
 import javax.validation.Valid;
@@ -8,7 +10,7 @@ import java.util.List;
 import java.util.Objects;
 
 @Entity
-public class UnverifiedAccount {
+public class VerifiedAccount  {
 
     @Id
 //    @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -19,7 +21,11 @@ public class UnverifiedAccount {
     @NotNull
     private String website;
     @NotNull
-    private boolean verified = false;
+    private String email;
+    @NotNull
+    private String phoneNumber;
+    @NotNull
+    private boolean verified = true;
 
     @Valid
 //    @NotNull
@@ -31,34 +37,40 @@ public class UnverifiedAccount {
     @OneToOne(fetch = FetchType.EAGER)
     private Rating rating;
 
-    public UnverifiedAccount() {
+    public VerifiedAccount() {
     }
 
-    public UnverifiedAccount(Long id, String providerName, String website, boolean verified, List<Tariff> tariffs, Rating rating) {
+    public VerifiedAccount(String providerName, String website, String email, String phoneNumber, boolean verified, List<Tariff> tariffs, Rating rating) {
+        this.providerName = providerName;
+        this.website = website;
+        this.email = email;
+        this.phoneNumber = phoneNumber;
+        this.verified = verified;
+        this.tariffs = tariffs;
+        this.rating = rating;
+    }
+
+    public VerifiedAccount(String providerName, String website, String email, String phoneNumber, List<Tariff> tariffs, Rating rating) {
+        this.providerName = providerName;
+        this.website = website;
+        this.email = email;
+        this.phoneNumber = phoneNumber;
+        this.tariffs = tariffs;
+        this.rating = rating;
+    }
+
+    public VerifiedAccount(Long id, String providerName, String website, String email, String phoneNumber, boolean verified, List<Tariff> tariffs, Rating rating) {
         this.id = id;
         this.providerName = providerName;
         this.website = website;
+        this.email = email;
+        this.phoneNumber = phoneNumber;
         this.verified = verified;
         this.tariffs = tariffs;
         this.rating = rating;
     }
 
-    public UnverifiedAccount(String providerName, String website, boolean verified, List<Tariff> tariffs, Rating rating) {
-        this.providerName = providerName;
-        this.website = website;
-        this.verified = verified;
-        this.tariffs = tariffs;
-        this.rating = rating;
-    }
-
-    public UnverifiedAccount(String providerName, String website, List<Tariff> tariffs, Rating rating) {
-        this.providerName = providerName;
-        this.website = website;
-        this.tariffs = tariffs;
-        this.rating = rating;
-    }
-
-        public Long getId() {
+    public Long getId() {
         return id;
     }
 
@@ -80,6 +92,22 @@ public class UnverifiedAccount {
 
     public void setWebsite(String website) {
         this.website = website;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
     }
 
     public boolean isVerified() {
@@ -110,21 +138,23 @@ public class UnverifiedAccount {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        UnverifiedAccount that = (UnverifiedAccount) o;
-        return verified == that.verified && Objects.equals(id, that.id) && Objects.equals(providerName, that.providerName) && Objects.equals(website, that.website) && Objects.equals(tariffs, that.tariffs) && Objects.equals(rating, that.rating);
+        VerifiedAccount that = (VerifiedAccount) o;
+        return verified == that.verified && Objects.equals(id, that.id) && Objects.equals(providerName, that.providerName) && Objects.equals(website, that.website) && Objects.equals(email, that.email) && Objects.equals(phoneNumber, that.phoneNumber) && Objects.equals(tariffs, that.tariffs) && Objects.equals(rating, that.rating);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, providerName, website, verified, tariffs, rating);
+        return Objects.hash(id, providerName, website, email, phoneNumber, verified, tariffs, rating);
     }
 
     @Override
     public String toString() {
-        return "UnverifiedAccount{" +
+        return "VerifiedAccount{" +
                 "id=" + id +
                 ", providerName='" + providerName + '\'' +
                 ", website='" + website + '\'' +
+                ", email='" + email + '\'' +
+                ", phoneNumber='" + phoneNumber + '\'' +
                 ", verified=" + verified +
                 ", tariffs=" + tariffs +
                 ", rating=" + rating +

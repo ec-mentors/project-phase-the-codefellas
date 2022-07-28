@@ -1,4 +1,4 @@
-package io.everyonecodes.anber.searchmanagement.data;
+package io.everyonecodes.anber.ratingmanagement.data;
 
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;

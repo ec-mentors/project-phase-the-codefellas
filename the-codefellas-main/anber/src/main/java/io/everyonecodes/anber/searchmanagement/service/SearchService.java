@@ -1,5 +1,9 @@
 package io.everyonecodes.anber.searchmanagement.service;
 
+import io.everyonecodes.anber.providermanagement.data.ContractType;
+import io.everyonecodes.anber.providermanagement.data.PriceModelType;
+import io.everyonecodes.anber.providermanagement.data.ProviderType;
+import io.everyonecodes.anber.ratingmanagement.data.Rating;
 import io.everyonecodes.anber.searchmanagement.data.*;
 import io.everyonecodes.anber.searchmanagement.repository.ProviderRepository;
 import org.springframework.beans.factory.annotation.Value;
@@ -30,8 +34,18 @@ public class SearchService {
         this.noRatings = noRatings;
     }
 
-    public List<ProviderDTO> getAll() {
+    public List<ProviderDTO> getAllDtos() {
         return providerRepository.findAll();
+    }
+
+    public List<Provider> getAllProviders() {
+        var providerList = providerRepository.findAll();
+        for (ProviderDTO dto : providerList) {
+            if (dto.getRating() == null) {
+                dto.setRating(new Rating(dto.getId(), new HashSet<>(), noRatings));
+            }
+        }
+        return translateList(providerList);
     }
 
     private List<String> getProperties() {

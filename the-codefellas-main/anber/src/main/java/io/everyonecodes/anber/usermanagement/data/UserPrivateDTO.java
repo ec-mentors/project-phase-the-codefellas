@@ -1,13 +1,22 @@
 package io.everyonecodes.anber.usermanagement.data;
 
+import io.everyonecodes.anber.homemanagement.data.Home;
+
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
+import java.util.List;
 import java.util.Objects;
 
 public class UserPrivateDTO {
 
     @NotEmpty
     private String username;
+    @NotEmpty
+    private String firstName;
+    @NotEmpty
+    private String lastName;
+    @NotEmpty
+    private List<Home> homes;
     @NotEmpty
     private String role;
     @NotEmpty
@@ -21,6 +30,39 @@ public class UserPrivateDTO {
         this.username = username;
         this.role = role;
         this.email = email;
+    }
+
+    public UserPrivateDTO(String username, String firstName, String lastName, List<Home> homes, String role, String email) {
+        this.username = username;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.homes = homes;
+        this.role = role;
+        this.email = email;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public List<Home> getHomes() {
+        return homes;
+    }
+
+    public void setHomes(List<Home> homes) {
+        this.homes = homes;
     }
 
     public String getUsername() {
@@ -52,18 +94,21 @@ public class UserPrivateDTO {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         UserPrivateDTO that = (UserPrivateDTO) o;
-        return Objects.equals(username, that.username) && Objects.equals(role, that.role) && Objects.equals(email, that.email);
+        return Objects.equals(username, that.username) && Objects.equals(firstName, that.firstName) && Objects.equals(lastName, that.lastName) && Objects.equals(homes, that.homes) && Objects.equals(role, that.role) && Objects.equals(email, that.email);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(username, role, email);
+        return Objects.hash(username, firstName, lastName, homes, role, email);
     }
 
     @Override
     public String toString() {
         return "UserPrivateDTO{" +
                 "username='" + username + '\'' +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", homes=" + homes +
                 ", role='" + role + '\'' +
                 ", email='" + email + '\'' +
                 '}';

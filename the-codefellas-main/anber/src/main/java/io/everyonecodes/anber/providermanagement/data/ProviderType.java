@@ -1,4 +1,4 @@
-package io.everyonecodes.anber.searchmanagement.data;
+package io.everyonecodes.anber.providermanagement.data;
 
 public enum ProviderType {
     ELECTRICITY,

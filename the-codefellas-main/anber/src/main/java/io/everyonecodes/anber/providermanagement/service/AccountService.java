@@ -1,7 +1,17 @@
-package io.everyonecodes.anber.searchmanagement.service;
+package io.everyonecodes.anber.providermanagement.service;
 
+import io.everyonecodes.anber.providermanagement.data.ProviderPublic;
+import io.everyonecodes.anber.providermanagement.data.Tariff;
+import io.everyonecodes.anber.providermanagement.data.UnverifiedAccount;
+import io.everyonecodes.anber.providermanagement.data.VerifiedAccount;
+import io.everyonecodes.anber.providermanagement.repository.TariffRepository;
+import io.everyonecodes.anber.providermanagement.repository.UnverifiedAccountRepository;
+import io.everyonecodes.anber.providermanagement.repository.VerifiedAccountRepository;
+import io.everyonecodes.anber.ratingmanagement.data.Rating;
+import io.everyonecodes.anber.ratingmanagement.repository.RatingRepository;
 import io.everyonecodes.anber.searchmanagement.data.*;
 import io.everyonecodes.anber.searchmanagement.repository.*;
+import io.everyonecodes.anber.searchmanagement.service.ProviderTranslator;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 

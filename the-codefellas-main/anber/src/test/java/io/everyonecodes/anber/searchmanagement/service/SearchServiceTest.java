@@ -1,6 +1,10 @@
 package io.everyonecodes.anber.searchmanagement.service;
 
 import io.everyonecodes.anber.DatabaseInitializer;
+import io.everyonecodes.anber.providermanagement.data.ContractType;
+import io.everyonecodes.anber.providermanagement.data.PriceModelType;
+import io.everyonecodes.anber.providermanagement.data.ProviderType;
+import io.everyonecodes.anber.ratingmanagement.data.Rating;
 import io.everyonecodes.anber.searchmanagement.data.*;
 import io.everyonecodes.anber.searchmanagement.repository.ProviderRepository;
 import org.junit.jupiter.api.Assertions;
@@ -40,12 +44,25 @@ class SearchServiceTest {
 
 
     @Test
-    void getAll() {
+    void getAllDtos() {
         Mockito.when(providerRepository.findAll()).thenReturn(List.of(new ProviderDTO()));
-        var result = searchService.getAll();
+        var result = searchService.getAllDtos();
         var expected = List.of(new ProviderDTO());
         Assertions.assertEquals(expected, result);
         Mockito.verify(providerRepository).findAll();
+    }
+
+
+    @Test
+    void getAllProviders() {
+        Mockito.when(providerRepository.findAll()).thenReturn(List.of(new ProviderDTO()));
+        Mockito.when(translator.DtoToProvider(Mockito.any(ProviderDTO.class))).thenReturn(new Provider());
+
+        var result = searchService.getAllProviders();
+        var expected = List.of(new Provider());
+        Assertions.assertEquals(expected, result);
+        Mockito.verify(providerRepository).findAll();
+        Mockito.verify(translator).DtoToProvider(Mockito.any(ProviderDTO.class));
     }
 
 

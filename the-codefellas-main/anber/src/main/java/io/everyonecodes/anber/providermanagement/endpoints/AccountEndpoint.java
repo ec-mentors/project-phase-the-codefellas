@@ -1,9 +1,9 @@
-package io.everyonecodes.anber.searchmanagement.endpoints;
+package io.everyonecodes.anber.providermanagement.endpoints;
 
-import io.everyonecodes.anber.searchmanagement.data.ProviderPublic;
-import io.everyonecodes.anber.searchmanagement.data.UnverifiedAccount;
-import io.everyonecodes.anber.searchmanagement.data.VerifiedAccount;
-import io.everyonecodes.anber.searchmanagement.service.AccountService;
+import io.everyonecodes.anber.providermanagement.data.ProviderPublic;
+import io.everyonecodes.anber.providermanagement.data.UnverifiedAccount;
+import io.everyonecodes.anber.providermanagement.data.VerifiedAccount;
+import io.everyonecodes.anber.providermanagement.service.AccountService;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 

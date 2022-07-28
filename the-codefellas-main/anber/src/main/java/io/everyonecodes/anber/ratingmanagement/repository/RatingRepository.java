@@ -1,6 +1,6 @@
-package io.everyonecodes.anber.searchmanagement.repository;
+package io.everyonecodes.anber.ratingmanagement.repository;
 
-import io.everyonecodes.anber.searchmanagement.data.Rating;
+import io.everyonecodes.anber.ratingmanagement.data.Rating;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface RatingRepository

@@ -1,6 +1,6 @@
-package io.everyonecodes.anber.searchmanagement.endpoints;
+package io.everyonecodes.anber.ratingmanagement.endpoints;
 
-import io.everyonecodes.anber.searchmanagement.service.RatingService;
+import io.everyonecodes.anber.ratingmanagement.service.RatingService;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;

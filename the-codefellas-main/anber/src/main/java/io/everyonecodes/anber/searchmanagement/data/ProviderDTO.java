@@ -1,5 +1,11 @@
 package io.everyonecodes.anber.searchmanagement.data;
 
+import io.everyonecodes.anber.providermanagement.data.ContractType;
+import io.everyonecodes.anber.providermanagement.data.PriceModelType;
+import io.everyonecodes.anber.providermanagement.data.ProviderType;
+import io.everyonecodes.anber.providermanagement.data.Tariff;
+import io.everyonecodes.anber.ratingmanagement.data.Rating;
+
 import javax.persistence.*;
 import java.util.List;
 import java.util.Objects;

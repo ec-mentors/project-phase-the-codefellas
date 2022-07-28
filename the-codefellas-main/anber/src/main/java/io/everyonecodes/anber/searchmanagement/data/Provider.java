@@ -1,5 +1,8 @@
 package io.everyonecodes.anber.searchmanagement.data;
 
+import io.everyonecodes.anber.providermanagement.data.ContractType;
+import io.everyonecodes.anber.providermanagement.data.PriceModelType;
+
 import java.util.Objects;
 
 public class Provider {

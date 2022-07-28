@@ -1,6 +1,6 @@
-package io.everyonecodes.anber.searchmanagement.repository;
+package io.everyonecodes.anber.providermanagement.repository;
 
-import io.everyonecodes.anber.searchmanagement.data.Tariff;
+import io.everyonecodes.anber.providermanagement.data.Tariff;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface TariffRepository

@@ -1,8 +1,8 @@
-package io.everyonecodes.anber.searchmanagement.service;
+package io.everyonecodes.anber.ratingmanagement.service;
 
-import io.everyonecodes.anber.searchmanagement.data.Rating;
+import io.everyonecodes.anber.ratingmanagement.data.Rating;
 import io.everyonecodes.anber.searchmanagement.repository.ProviderRepository;
-import io.everyonecodes.anber.searchmanagement.repository.RatingRepository;
+import io.everyonecodes.anber.ratingmanagement.repository.RatingRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;

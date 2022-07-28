@@ -31,7 +31,7 @@ public class InitializationRunner {
         return args -> {
             if (!userRepository.existsByEmail(adminEmail)) {
                 String password = passwordEncoder.encode(adminPassword);
-                User admin = new User(adminEmail, password, adminRole);
+                User admin = new User("admin", "admin", adminEmail, password, adminRole, adminEmail);
                 userRepository.save(admin);
             }
 

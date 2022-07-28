@@ -3,6 +3,7 @@ package io.everyonecodes.anber.searchmanagement.endpoints;
 import io.everyonecodes.anber.searchmanagement.data.Provider;
 import io.everyonecodes.anber.searchmanagement.data.ProviderDTO;
 import io.everyonecodes.anber.searchmanagement.service.SearchService;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,22 +22,28 @@ public class SearchEndpoint {
     }
 
 
-    @GetMapping("/get/all")
-    List<ProviderDTO> getAll() {
-        return searchService.getAll();
+    @GetMapping("/getdto")
+    @Secured("ROLE_ADMIN")
+    List<ProviderDTO> getAllDto() {
+        return searchService.getAllDtos();
     }
 
-    @GetMapping("/{filters}")
+    @GetMapping("/get")
+    List<Provider> getAll() {
+        return searchService.getAllProviders();
+    }
+
+    @GetMapping("/search/{filters}")
     List<Provider> getProvidersWithOptionalFilters(@PathVariable String filters) {
         return searchService.manageFilters(filters);
     }
 
-    @GetMapping("/sorted/basicrate/{operator}/{filters}")
+    @GetMapping("/search/sorted/basicrate/{operator}/{filters}")
     List<Provider> getSortedProvidersWithOptionalFilters(@PathVariable String operator, @PathVariable String filters) {
         return searchService.sortByBasicRate(operator, filters);
     }
 
-    @GetMapping("/sorted/rating/{operator}/{filters}")
+    @GetMapping("/search/sorted/rating/{operator}/{filters}")
     List<Provider> getSortedProvidersByRatingWithOptionalFilters(@PathVariable String operator, @PathVariable String filters) {
         return searchService.sortByRating(operator, filters);
     }

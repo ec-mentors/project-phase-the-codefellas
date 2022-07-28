@@ -10,8 +10,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.security.web.SecurityFilterChain;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class SearchEndpointTest {
 
@@ -25,15 +23,21 @@ class SearchEndpointTest {
     SecurityFilterChain securityFilterChain;
 
     @Test
-    void getAll() {
-        testRestTemplate.getForObject("/provider/get/all", Provider[].class);
-        Mockito.verify(searchService).getAll();
+    void getAllDtos() {
+        testRestTemplate.getForObject("/provider/getdto", Provider[].class);
+        Mockito.verify(searchService).getAllDtos();
+    }
+
+    @Test
+    void getAllProviders() {
+        testRestTemplate.getForObject("/provider/get", Provider[].class);
+        Mockito.verify(searchService).getAllProviders();
     }
 
     @Test
     void getProvidersWithOptionalFilters() {
         String filters = "test";
-        testRestTemplate.getForObject("/provider/" + filters, Provider[].class);
+        testRestTemplate.getForObject("/provider/search/" + filters, Provider[].class);
         Mockito.verify(searchService).manageFilters(filters);
     }
 
@@ -42,7 +46,15 @@ class SearchEndpointTest {
     void getSortedProvidersWithOptionalFilters() {
         String filters = "test";
         String operator = "foo";
-        testRestTemplate.getForObject("/provider/sorted/" + operator + "/" + filters, Provider[].class);
+        testRestTemplate.getForObject("/provider/search/sorted/basicrate/" + operator + "/" + filters, Provider[].class);
         Mockito.verify(searchService).sortByBasicRate(operator, filters);
+    }
+
+    @Test
+    void getSortedByRatingProvidersWithOptionalFilters() {
+        String filters = "test";
+        String operator = "foo";
+        testRestTemplate.getForObject("/provider/search/sorted/rating/" + operator + "/" + filters, Provider[].class);
+        Mockito.verify(searchService).sortByRating(operator, filters);
     }
 }

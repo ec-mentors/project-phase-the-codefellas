@@ -1,4 +1,6 @@
-package io.everyonecodes.anber.searchmanagement.data;
+package io.everyonecodes.anber.providermanagement.data;
+
+import io.everyonecodes.anber.ratingmanagement.data.Rating;
 
 import java.util.List;
 import java.util.Objects;

@@ -12,6 +12,9 @@ public class UserDTO {
     public UserPrivateDTO toUserPrivateDTO(User user) {
         return new UserPrivateDTO(
                 user.getUsername(),
+                user.getFirstName(),
+                user.getLastName(),
+                user.getSavedHomes(),
                 user.getRole(),
                 user.getEmail()
         );
