@@ -77,6 +77,7 @@ public class RatingService {
                         }
                     }
                 }
+                return Optional.of("User " + loggedInUser() + " already gave a rating to Provider " + dto.getProviderName() + "!");
             }
         }
         return Optional.empty();
