@@ -5,6 +5,7 @@ import java.util.Objects;
 public class Provider {
 
     private String providerName;
+    private String rating;
     private String tariffName;
     private double basicRate;
     private ContractType contractType;
@@ -20,6 +21,27 @@ public class Provider {
         this.basicRate = basicRate;
         this.contractType = contractType;
         this.priceModel = priceModel;
+    }
+
+
+
+    public Provider(String providerName, String rating, String tariffName, double basicRate, ContractType contractType, PriceModelType priceModel) {
+        this.providerName = providerName;
+        this.rating = rating;
+        this.tariffName = tariffName;
+        this.basicRate = basicRate;
+        this.contractType = contractType;
+        this.priceModel = priceModel;
+    }
+
+
+
+    public String getRating() {
+        return rating;
+    }
+
+    public void setRating(String rating) {
+        this.rating = rating;
     }
 
     public String getProviderName() {

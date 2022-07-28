@@ -1,17 +1,11 @@
 package io.everyonecodes.anber.searchmanagement.service;
 
-import io.everyonecodes.anber.searchmanagement.data.PriceModelType;
-import io.everyonecodes.anber.searchmanagement.data.Provider;
-import io.everyonecodes.anber.searchmanagement.data.ProviderDTO;
-import io.everyonecodes.anber.searchmanagement.data.ProviderType;
+import io.everyonecodes.anber.searchmanagement.data.*;
 import io.everyonecodes.anber.searchmanagement.repository.ProviderRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -22,15 +16,18 @@ public class SearchService {
     private final List<String> searchProperties;
     private final String sortAscending;
     private final String sortDescending;
+    private final String noRatings;
 
     public SearchService(ProviderRepository providerRepository, ProviderTranslator translator, List<String> searchProperties,
                          @Value("${data.search-engine.sort.asc}") String sortAscending,
-                         @Value("${data.search-engine.sort.desc}") String sortDescending) {
+                         @Value("${data.search-engine.sort.desc}") String sortDescending,
+                         @Value("${messages.provider-account.no-ratings}") String noRatings) {
         this.providerRepository = providerRepository;
         this.translator = translator;
         this.searchProperties = searchProperties;
         this.sortAscending = sortAscending;
         this.sortDescending = sortDescending;
+        this.noRatings = noRatings;
     }
 
     public List<ProviderDTO> getAll() {
@@ -56,6 +53,14 @@ public class SearchService {
 
         for (int i = 0; i < checkedFilters.size(); i++) {
             String filter = checkedFilters.get(i);
+
+            for (ProviderDTO dto : providerList) {
+                if (dto.getRating() == null) {
+                    dto.setRating(new Rating(dto.getId(), new HashSet<>(), noRatings));
+                }
+            }
+            providerList.forEach(this::checkRatings);
+
             if (filter.isEmpty()) {
                 continue;
             }
@@ -73,13 +78,35 @@ public class SearchService {
                 var providerListPn = new ArrayList<>(providerRepository.findByProviderName(filter));
                 providerList.retainAll(providerListPn);
             }
-            //tariff name
+
+            //rating
             if (i == 3) {
+                String operator = String.valueOf(filter.charAt(0));
+                double value = Double.parseDouble(filter.substring(1));
+
+
+                if (operator.equals("<")) {
+                    var providerListRating = providerList.stream()
+                            .filter(prov -> Double.parseDouble(prov.getRating().getScore()) < (value))
+                            .collect(Collectors.toCollection(ArrayList::new));
+                    providerList.retainAll(providerListRating);
+                } else {
+                    var providerListRating =
+                            providerList.stream()
+                                    .filter(prov -> Double.parseDouble(prov.getRating().getScore()) > (value))
+                                    .collect(Collectors.toCollection(ArrayList::new));
+                    providerList.retainAll(providerListRating);
+                }
+
+            }
+
+            //tariff name
+            if (i == 4) {
                 var providerListTn = new ArrayList<>(providerRepository.findByTariffName(filter));
                 providerList.retainAll(providerListTn);
             }
             //basic rate
-            if (i == 4) {
+            if (i == 5) {
                 String operator = String.valueOf(filter.charAt(0));
                 double value = Double.parseDouble(filter.substring(1));
 
@@ -92,20 +119,27 @@ public class SearchService {
                 } else {
                     var providerListBr2 =
                             providerList.stream()
-                                    .filter(prov -> prov.getBasicRate() < (value))
+                                    .filter(prov -> prov.getBasicRate() <= (value))
                                     .collect(Collectors.toCollection(ArrayList::new));
                     providerList.retainAll(providerListBr2);
                 }
 
             }
             //price model
-            if (i == 5) {
+            if (i == 6) {
                 var providerListPm = new ArrayList<>(providerRepository.findByPriceModel(PriceModelType.valueOf(filter.toUpperCase())));
                 providerList.retainAll(providerListPm);
             }
         }
 
-        return translateList(providerList);
+        var providers = translateList(providerList);
+        for (Provider prov : providers) {
+            if (prov.getRating().equals("0")) {
+                prov.setRating(noRatings);
+            }
+        }
+
+        return providers;
     }
 
 
@@ -120,12 +154,12 @@ public class SearchService {
         for (String filter : filters) {
 
             //country
-            if (filter.startsWith(searchProperties.get(0).substring(0,3))) {
+            if (filter.startsWith(searchProperties.get(0).substring(0, 3))) {
                 String country = filter.substring(3).replace("_", " ");
                 sortedFilters.set(0, country);
             }
             //provider type
-            if (filter.startsWith(searchProperties.get(1).substring(0,3))) {
+            if (filter.startsWith(searchProperties.get(1).substring(0, 3))) {
                 String type = filter.substring(3).toUpperCase();
 
                 var providerTypes = Arrays.stream(getEnumNames(ProviderType.class)).toList();
@@ -137,32 +171,62 @@ public class SearchService {
                 sortedFilters.set(1, type);
             }
             //provider name
-            if (filter.startsWith(searchProperties.get(2).substring(0,3))) {
+            if (filter.startsWith(searchProperties.get(2).substring(0, 3))) {
                 String providerName = filter.substring(3);
                 sortedFilters.set(2, providerName);
             }
+
+            //rating < filter
+            if (filter.startsWith(searchProperties.get(3).substring(0, 2) + "<")) {
+                String rating = filter.substring(2);
+                sortedFilters.set(3, rating);
+            }
+            //rating > filter
+            if (filter.startsWith(searchProperties.get(3).substring(0, 2) + ">")) {
+                String rating = filter.substring(2);
+                sortedFilters.set(3, rating);
+            }
+            //rating = filter
+            if (filter.startsWith(searchProperties.get(3).substring(0, 3))) {
+                String rating = filter.substring(2);
+                sortedFilters.set(3, rating);
+            }
+
             //tariff name
-            if (filter.startsWith(searchProperties.get(3).substring(0,3))) {
+            if (filter.startsWith(searchProperties.get(4).substring(0, 3))) {
                 String tariffName = filter.substring(3);
-                sortedFilters.set(3, tariffName);
+                sortedFilters.set(4, tariffName);
             }
             //basic rate < filter
-            if (filter.startsWith(searchProperties.get(4).substring(0,2) +"<")) {
+            if (filter.startsWith(searchProperties.get(5).substring(0, 2) + "<")) {
                 String basicRate = filter.substring(2);
-                sortedFilters.set(4, basicRate);
+                sortedFilters.set(5, basicRate);
             }
             //basic rate > filter
-            if (filter.startsWith(searchProperties.get(4).substring(0,2) +">")) {
+            if (filter.startsWith(searchProperties.get(5).substring(0, 2) + ">")) {
                 String basicRate = filter.substring(2);
-                sortedFilters.set(4, basicRate);
+                sortedFilters.set(5, basicRate);
             }
             //basic rate = filter
-            if (filter.startsWith(searchProperties.get(4).substring(0,3))) {
+            if (filter.startsWith(searchProperties.get(5).substring(0, 3))) {
                 String basicRate = filter.substring(2);
-                sortedFilters.set(4, basicRate);
+                sortedFilters.set(5, basicRate);
+            }
+
+            //contract type
+            if (filter.startsWith(searchProperties.get(6).substring(0, 3))) {
+                String type = filter.substring(3).toUpperCase();
+
+                var contractTypes = Arrays.stream(getEnumNames(ContractType.class)).toList();
+
+                if (!contractTypes.contains(type)) {
+                    type = "";
+                }
+
+                sortedFilters.set(6, type);
             }
             //price model
-            if (filter.startsWith(searchProperties.get(5).substring(0,3))) {
+            if (filter.startsWith(searchProperties.get(7).substring(0, 3))) {
                 String priceModel = filter.substring(3).toUpperCase();
 
                 var priceModelTypes = Arrays.stream(getEnumNames(PriceModelType.class)).toList();
@@ -171,7 +235,7 @@ public class SearchService {
                     priceModel = "";
                 }
 
-                sortedFilters.set(5, priceModel);
+                sortedFilters.set(7, priceModel);
             }
         }
 
@@ -208,4 +272,34 @@ public class SearchService {
 
         return providers;
     }
+
+    public List<Provider> sortByRating(String operator, String filters) {
+
+        var providers = manageFilters(filters);
+
+        if (operator.equalsIgnoreCase(sortAscending)) {
+            providers.sort(Comparator.comparing(Provider::getRating));
+        }
+        if (operator.equalsIgnoreCase(sortDescending)) {
+            providers.sort(Comparator.comparing(Provider::getRating).reversed());
+        }
+
+        return providers;
+    }
+
+    private Rating checkRatings(ProviderDTO dto) {
+        var rating = dto.getRating();
+
+        if (rating == null) {
+            dto.setRating(new Rating(dto.getId(), Set.of(), noRatings));
+        }
+
+        if (rating.getScore().equals(noRatings)) {
+//            rating.setScore("0.0");
+            dto.setRating(new Rating(rating.getId(), rating.getUsersRated(), "0"));
+            return rating;
+        }
+        return rating;
+    }
+
 }

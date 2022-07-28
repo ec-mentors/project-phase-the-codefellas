@@ -95,8 +95,10 @@ data:
       - "cn=country"
       - "pt=provider type"
       - "pn=provider name"
+      - "ra=rating"
       - "tn=tariff name"
       - "br=basic rate"
+      - "ct=contract type"
       - "pm=price model"
   home:
     home-properties:

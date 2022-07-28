@@ -60,7 +60,7 @@ public class RatingService {
 
                     if (dto.getRating().getScore().equals(noRatings)) {
                         dto.getRating().setScore(String.valueOf(rating));
-                        ratingRepository.save(new Rating(dto.getId(), users, String.valueOf(rating)));
+                        ratingRepository.save(new Rating(dto.getId(), users, String.valueOf(Math.round((double) rating * 100.00)/100.00)));
                         return Optional.of("Current rating for Provider " + dto.getProviderName() + " is: " + (Math.round((double) rating * 100.00)/100.00) );
                     } else {
                         double score = Double.parseDouble(dto.getRating().getScore());

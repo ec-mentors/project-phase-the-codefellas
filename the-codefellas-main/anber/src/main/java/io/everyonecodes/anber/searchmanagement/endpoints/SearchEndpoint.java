@@ -31,10 +31,13 @@ public class SearchEndpoint {
         return searchService.manageFilters(filters);
     }
 
-    @GetMapping("/sorted/{operator}/{filters}")
+    @GetMapping("/sorted/basicrate/{operator}/{filters}")
     List<Provider> getSortedProvidersWithOptionalFilters(@PathVariable String operator, @PathVariable String filters) {
         return searchService.sortByBasicRate(operator, filters);
     }
 
-
+    @GetMapping("/sorted/rating/{operator}/{filters}")
+    List<Provider> getSortedProvidersByRatingWithOptionalFilters(@PathVariable String operator, @PathVariable String filters) {
+        return searchService.sortByRating(operator, filters);
+    }
 }

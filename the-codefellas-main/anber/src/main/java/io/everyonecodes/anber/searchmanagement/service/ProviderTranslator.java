@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 public class ProviderTranslator {
 
     public Provider DtoToProvider(ProviderDTO dto) {
-        return new Provider(dto.getProviderName(), dto.getTariffName(), dto.getBasicRate(), dto.getContractType(), dto.getPriceModel());
+        return new Provider(dto.getProviderName(), dto.getRating().getScore(), dto.getTariffName(), dto.getBasicRate(), dto.getContractType(), dto.getPriceModel());
     }
 
     public VerifiedAccount DtoToVerifiedAccount(ProviderDTO dto) {
