@@ -29,6 +29,7 @@ public class AccountService {
     private final String verificationMark;
     private final List<String> accountProperties;
     private final ProviderTranslator translator;
+    private final String noRatings;
 
     public AccountService(ProviderRepository providerRepository,
                           TariffRepository tariffRepository,
@@ -37,7 +38,8 @@ public class AccountService {
                           RatingRepository ratingRepository,
                           @Value("${messages.provider-account.verified}") String verificationMark,
                           List<String> accountProperties,
-                          ProviderTranslator translator) {
+                          ProviderTranslator translator,
+                          @Value("${messages.provider-account.no-ratings}") String noRatings) {
         this.providerRepository = providerRepository;
         this.tariffRepository = tariffRepository;
         this.verifiedAccountRepository = verifiedAccountRepository;
@@ -46,6 +48,7 @@ public class AccountService {
         this.verificationMark = verificationMark;
         this.accountProperties = accountProperties;
         this.translator = translator;
+        this.noRatings = noRatings;
     }
 
 
@@ -254,7 +257,12 @@ public class AccountService {
         Optional<ProviderDTO> oProvider = providerRepository.findById(id);
         if (oProvider.isPresent()) {
             var dto = oProvider.get();
+                if (dto.getRating() == null) {
+                    dto.setRating(new Rating(dto.getId(), new HashSet<>(), noRatings));
+                }
+
             ProviderPublic provider = translator.dtoToPublic(dto);
+
             return Optional.of(provider);
         }
         return Optional.empty();

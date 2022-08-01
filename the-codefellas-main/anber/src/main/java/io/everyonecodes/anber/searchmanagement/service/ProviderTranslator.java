@@ -4,7 +4,8 @@ import io.everyonecodes.anber.providermanagement.data.ProviderPublic;
 import io.everyonecodes.anber.providermanagement.data.Tariff;
 import io.everyonecodes.anber.providermanagement.data.UnverifiedAccount;
 import io.everyonecodes.anber.providermanagement.data.VerifiedAccount;
-import io.everyonecodes.anber.searchmanagement.data.*;
+import io.everyonecodes.anber.searchmanagement.data.Provider;
+import io.everyonecodes.anber.searchmanagement.data.ProviderDTO;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -30,9 +31,6 @@ public class ProviderTranslator {
 
     public UnverifiedAccount verifiedToUnverifiedAccount(VerifiedAccount account) {
         return new UnverifiedAccount(account.getId(), account.getProviderName(), account.getWebsite(), false, account.getTariffs(), account.getRating());
-//        var privateAccount = DtoToUnverifiedAccount(dto);
-//        privateAccount.setId(publicAccount.getId());
-//        return privateAccount;
     }
 
     public Tariff DtoToTariff(ProviderDTO dto) {

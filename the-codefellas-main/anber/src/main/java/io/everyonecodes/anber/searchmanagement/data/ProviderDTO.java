@@ -46,6 +46,34 @@ public class ProviderDTO {
     public ProviderDTO() {
     }
 
+    public ProviderDTO(Long id, String providerName, List<Tariff> tariffs, String website, String email, String phoneNumber, boolean verified, Rating rating) {
+        this.id = id;
+        this.providerName = providerName;
+        this.tariffs = tariffs;
+        this.website = website;
+        this.email = email;
+        this.phoneNumber = phoneNumber;
+        this.verified = verified;
+        this.rating = rating;
+    }
+
+    public ProviderDTO(Long id, String countryName, ProviderType providerType, String providerName, List<Tariff> tariffs, String tariffName, double basicRate, ContractType contractType, PriceModelType priceModel, String website, String email, String phoneNumber, boolean verified, Rating rating) {
+        this.id = id;
+        this.countryName = countryName;
+        this.providerType = providerType;
+        this.providerName = providerName;
+        this.tariffs = tariffs;
+        this.tariffName = tariffName;
+        this.basicRate = basicRate;
+        this.contractType = contractType;
+        this.priceModel = priceModel;
+        this.website = website;
+        this.email = email;
+        this.phoneNumber = phoneNumber;
+        this.verified = verified;
+        this.rating = rating;
+    }
+
     public ProviderDTO(Long id, String countryName, ProviderType providerType, String providerName, String tariffName, double basicRate, ContractType contractType, PriceModelType priceModel, Rating rating) {
         this.id = id;
         this.countryName = countryName;
