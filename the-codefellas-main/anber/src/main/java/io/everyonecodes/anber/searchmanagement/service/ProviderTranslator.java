@@ -1,7 +1,7 @@
 package io.everyonecodes.anber.searchmanagement.service;
 
 import io.everyonecodes.anber.providermanagement.data.ProviderPublic;
-import io.everyonecodes.anber.providermanagement.data.Tariff;
+import io.everyonecodes.anber.tariffmanagement.data.Tariff;
 import io.everyonecodes.anber.providermanagement.data.UnverifiedAccount;
 import io.everyonecodes.anber.providermanagement.data.VerifiedAccount;
 import io.everyonecodes.anber.searchmanagement.data.Provider;

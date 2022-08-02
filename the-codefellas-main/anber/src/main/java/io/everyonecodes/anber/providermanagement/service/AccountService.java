@@ -1,10 +1,10 @@
 package io.everyonecodes.anber.providermanagement.service;
 
 import io.everyonecodes.anber.providermanagement.data.ProviderPublic;
-import io.everyonecodes.anber.providermanagement.data.Tariff;
+import io.everyonecodes.anber.tariffmanagement.data.Tariff;
 import io.everyonecodes.anber.providermanagement.data.UnverifiedAccount;
 import io.everyonecodes.anber.providermanagement.data.VerifiedAccount;
-import io.everyonecodes.anber.providermanagement.repository.TariffRepository;
+import io.everyonecodes.anber.tariffmanagement.repository.TariffRepository;
 import io.everyonecodes.anber.providermanagement.repository.UnverifiedAccountRepository;
 import io.everyonecodes.anber.providermanagement.repository.VerifiedAccountRepository;
 import io.everyonecodes.anber.ratingmanagement.data.Rating;

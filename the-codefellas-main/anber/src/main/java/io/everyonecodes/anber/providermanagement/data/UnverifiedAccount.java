@@ -1,6 +1,7 @@
 package io.everyonecodes.anber.providermanagement.data;
 
 import io.everyonecodes.anber.ratingmanagement.data.Rating;
+import io.everyonecodes.anber.tariffmanagement.data.Tariff;
 
 import javax.persistence.*;
 import javax.validation.Valid;
@@ -13,7 +14,6 @@ import java.util.Objects;
 public class UnverifiedAccount {
 
     @Id
-//    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @NotNull
     @Column(unique = true)
@@ -24,11 +24,9 @@ public class UnverifiedAccount {
     private boolean verified = false;
 
     @Valid
-//    @NotNull
-    @OneToMany(fetch = FetchType.EAGER)
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Tariff> tariffs = new ArrayList<>();
 
-//    @NotNull
     @Valid
     @OneToOne(fetch = FetchType.EAGER)
     private Rating rating;
@@ -131,5 +129,12 @@ public class UnverifiedAccount {
                 ", tariffs=" + tariffs +
                 ", rating=" + rating +
                 '}';
+    }
+
+
+
+    public UnverifiedAccount removeTariffs() {
+        tariffs.clear();
+        return this;
     }
 }

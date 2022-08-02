@@ -3,7 +3,7 @@ package io.everyonecodes.anber.searchmanagement.data;
 import io.everyonecodes.anber.providermanagement.data.ContractType;
 import io.everyonecodes.anber.providermanagement.data.PriceModelType;
 import io.everyonecodes.anber.providermanagement.data.ProviderType;
-import io.everyonecodes.anber.providermanagement.data.Tariff;
+import io.everyonecodes.anber.tariffmanagement.data.Tariff;
 import io.everyonecodes.anber.ratingmanagement.data.Rating;
 
 import javax.persistence.*;
@@ -24,7 +24,7 @@ public class ProviderDTO {
 
     private String providerName;
 
-    @OneToMany
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Tariff> tariffs;
 
     private String tariffName;
@@ -240,5 +240,10 @@ public class ProviderDTO {
                 ", verified=" + verified +
                 ", rating=" + rating +
                 '}';
+    }
+
+    public ProviderDTO removeTariffs() {
+        tariffs.clear();
+        return this;
     }
 }

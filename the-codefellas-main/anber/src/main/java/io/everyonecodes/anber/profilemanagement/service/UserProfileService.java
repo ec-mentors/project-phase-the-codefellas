@@ -5,7 +5,6 @@ import io.everyonecodes.anber.usermanagement.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,53 +16,38 @@ public class UserProfileService {
     private final UserRepository userRepository;
     private final List<String> profileOptions;
     private final String boolTrue;
-    private final PasswordEncoder encoder;
-
 
 
     public UserProfileService(UserRepository userRepository,
-                              List<String> profileOptions, @Value("${data.boolean.true}") String boolTrue, PasswordEncoder encoder) {
+                              List<String> profileOptions, @Value("${data.boolean.true}") String boolTrue) {
         this.userRepository = userRepository;
         this.profileOptions = profileOptions;
         this.boolTrue = boolTrue;
-        this.encoder = encoder;
     }
 
     private String loggedInUser() {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         if (principal instanceof UserDetails) {
-            return ((UserDetails)principal).getUsername();
+            return ((UserDetails) principal).getUsername();
         } else {
             return principal.toString();
         }
     }
 
-    public List<User> viewAll(){
+    public List<User> viewAll() {
         return userRepository.findAll();
     }
 
 
     public Optional<User> viewProfile(String username) {
 
-
         Optional<User> oUser = userRepository.findOneByEmail(username);
         if (oUser.isPresent()) {
             User user = oUser.get();
-//            Optional<User> oProfile = userRepository.findOneByEmail(username);
-//            if (oProfile.isEmpty()) {
-//                User newProfile = new User();
-//                newProfile.setEmail(user.getEmail());
-//                newProfile.setPassword(encoder.encode(user.getPassword()));
-//
-//                newProfile = userRepository.save(newProfile);
-//                return Optional.of(newProfile);
-//            }
-//            else {
-                if (user.getEmail().equals(loggedInUser())) {
-                    return oUser;
-                }
-//            }
+            if (user.getEmail().equals(loggedInUser())) {
+                return oUser;
+            }
         }
         return Optional.empty();
     }
