@@ -317,6 +317,7 @@ mvnw
 mvnw.cmd
 .mvn
 config.yml
+testconfig.yml
 
 # Eclipse m2e generated files
 # Eclipse Core
