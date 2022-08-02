@@ -32,6 +32,8 @@ public class InitializationRunner {
             if (!userRepository.existsByEmail(adminEmail)) {
                 String password = passwordEncoder.encode(adminPassword);
                 User admin = new User("admin", "admin", adminEmail, password, adminRole, adminEmail);
+                admin.setLoginAttempts(0);
+                admin.setAccountNonLocked(true);
                 userRepository.save(admin);
             }
 

@@ -34,6 +34,8 @@ public class UserService {
         user.setPassword(encodedPassword);
         user.setRole(roleUser);
         user.setUsername(user.getEmail());
+        user.setAccountNonLocked(true);
+        user.setLoginAttempts(0);
         user = userRepository.save(user);
         return user;
     }

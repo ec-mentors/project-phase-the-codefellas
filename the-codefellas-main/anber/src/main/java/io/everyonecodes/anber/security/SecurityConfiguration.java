@@ -1,5 +1,8 @@
 package io.everyonecodes.anber.security;
 
+import io.everyonecodes.anber.CustomLoginFailureHandler;
+import io.everyonecodes.anber.CustomLoginSuccessHandler;
+import io.everyonecodes.anber.UserPrincipal;
 import io.everyonecodes.anber.usermanagement.repository.UserRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,10 +15,20 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
 @EnableGlobalMethodSecurity(securedEnabled = true)
 public class SecurityConfiguration {
+
+    private final CustomLoginSuccessHandler customLoginSuccessHandler;
+    private final CustomLoginFailureHandler customLoginFailureHandler;
+
+    public SecurityConfiguration(CustomLoginSuccessHandler customLoginSuccessHandler, CustomLoginFailureHandler customLoginFailureHandler) {
+        this.customLoginSuccessHandler = customLoginSuccessHandler;
+        this.customLoginFailureHandler = customLoginFailureHandler;
+    }
+
 
     @Bean
     protected SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -27,10 +40,20 @@ public class SecurityConfiguration {
                 .antMatchers(HttpMethod.POST,"/pwreset/passwordreset/**").permitAll()
                 .anyRequest().authenticated()
                 .and()
-                .formLogin()
+                .csrf().disable().formLogin()
+                .loginPage("/login")
+                .failureUrl("/login?error=true")
                 .usernameParameter("email")
+                .passwordParameter("password")
+                .successHandler(customLoginSuccessHandler)
+                .failureHandler(customLoginFailureHandler)
                 .and()
-                .httpBasic();
+                // logout
+                .logout()
+                .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
+                .logoutSuccessUrl("/").and()
+                .exceptionHandling()
+                .accessDeniedPage("/access-denied");
 
         return http.build();
     }

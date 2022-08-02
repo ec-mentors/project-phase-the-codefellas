@@ -1,4 +1,4 @@
-package io.everyonecodes.anber.security;
+package io.everyonecodes.anber;
 
 import io.everyonecodes.anber.usermanagement.data.User;
 import org.springframework.security.core.GrantedAuthority;
@@ -37,7 +37,7 @@ public class UserPrincipal implements UserDetails {
 
     @Override
     public boolean isAccountNonLocked() {
-        return true;
+        return user.isAccountNonLocked();
     }
 
     @Override
