@@ -4,6 +4,7 @@ import io.everyonecodes.anber.providermanagement.data.ProviderPublic;
 import io.everyonecodes.anber.providermanagement.data.UnverifiedAccount;
 import io.everyonecodes.anber.providermanagement.data.VerifiedAccount;
 import io.everyonecodes.anber.providermanagement.service.AccountService;
+import io.everyonecodes.anber.searchmanagement.data.ProviderDTO;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
@@ -71,6 +72,12 @@ public class AccountEndpoint {
     @GetMapping("/{id}/view")
     ProviderPublic viewProvider(@PathVariable Long id){
         return accountService.viewPublicProvider(id).orElse(null);
+    }
+
+    @GetMapping("/db/fill")
+    @Secured("ROLE_ADMIN")
+    List<ProviderDTO> fillInDtoDataTariffs() {
+        return accountService.fillInDtoData();
     }
 
 

@@ -267,4 +267,30 @@ public class AccountService {
         }
         return Optional.empty();
     }
+
+
+
+    public List<ProviderDTO> fillInDtoData() {
+
+        if ((providerRepository.findById(1L).get().getTariffs().isEmpty() && providerRepository.findById(1L).get().getRating() == null)
+                && (providerRepository.findById(500L).get().getTariffs().isEmpty() && providerRepository.findById(500L).get().getRating() == null) ) {
+
+            for (int i = 0; i < providerRepository.findAll().size(); i++) {
+
+                var dto = providerRepository.findAll().get(i);
+                var tariffs = tariffRepository.findAllByProviderId(dto.getId());
+                dto.setTariffs(tariffs);
+                tariffRepository.saveAll(tariffs);
+                providerRepository.save(dto);
+
+                var initialRating = new Rating(dto.getId(), Set.of(), noRatings);
+                dto.setRating(initialRating);
+                providerRepository.save(dto);
+
+                ratingRepository.save(initialRating);
+            }
+        }
+        return providerRepository.findAll();
+    }
+
 }

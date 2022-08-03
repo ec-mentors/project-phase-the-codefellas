@@ -1,18 +1,33 @@
 package io.everyonecodes.anber.searchmanagement.service;
 
 import io.everyonecodes.anber.providermanagement.data.ProviderPublic;
-import io.everyonecodes.anber.tariffmanagement.data.Tariff;
 import io.everyonecodes.anber.providermanagement.data.UnverifiedAccount;
 import io.everyonecodes.anber.providermanagement.data.VerifiedAccount;
 import io.everyonecodes.anber.searchmanagement.data.Provider;
 import io.everyonecodes.anber.searchmanagement.data.ProviderDTO;
+import io.everyonecodes.anber.searchmanagement.repository.ProviderRepository;
+import io.everyonecodes.anber.tariffmanagement.repository.TariffRepository;
 import org.springframework.stereotype.Service;
 
 @Service
 public class ProviderTranslator {
 
+
+    private final ProviderRepository providerRepository;
+    private final TariffRepository tariffRepository;
+
+    public ProviderTranslator(ProviderRepository providerRepository, TariffRepository tariffRepository) {
+        this.providerRepository = providerRepository;
+        this.tariffRepository = tariffRepository;
+    }
+
     public Provider DtoToProvider(ProviderDTO dto) {
-        return new Provider(dto.getProviderName(), dto.getRating().getScore(), dto.getTariffName(), dto.getBasicRate(), dto.getContractType(), dto.getPriceModel());
+        return new Provider(dto.getProviderName(), dto.getRating().getScore(),
+                dto.getTariffs().get(0).getTariffName(),
+                dto.getTariffs().get(0).getBasicRate(),
+                dto.getTariffs().get(0).getContractType(),
+                dto.getTariffs().get(0).getPriceModel());
+
     }
 
     public VerifiedAccount DtoToVerifiedAccount(ProviderDTO dto) {
@@ -33,13 +48,18 @@ public class ProviderTranslator {
         return new UnverifiedAccount(account.getId(), account.getProviderName(), account.getWebsite(), false, account.getTariffs(), account.getRating());
     }
 
-    public Tariff DtoToTariff(ProviderDTO dto) {
-        return new Tariff(dto.getTariffName(), dto.getBasicRate(), dto.getContractType(), dto.getPriceModel());
-    }
-
     public ProviderPublic dtoToPublic(ProviderDTO providerDTO) {
         return new ProviderPublic(providerDTO.getProviderName(), providerDTO.getWebsite(),providerDTO.getRating(), providerDTO.getTariffs());
     }
+
+//    private void addTariffToDto(Long id) {
+//        if (providerRepository.findById(id).isPresent()) {
+//            var dto = providerRepository.findById(id).get();
+//            var tariffs = tariffRepository.findAllByProviderId(id);
+//            dto.setTariffs(tariffs);
+//            providerRepository.save(dto);
+//        }
+//    }
 
 
 
