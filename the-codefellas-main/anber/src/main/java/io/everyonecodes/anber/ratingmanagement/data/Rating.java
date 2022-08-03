@@ -17,7 +17,7 @@ public class Rating {
     @ElementCollection(targetClass = String.class)
     private Set<String> usersRated = new HashSet<>();
 //    @Range(min = 1, max = 5)
-    private String score = "No Ratings";
+    private String score;
 
     public Rating() {
     }

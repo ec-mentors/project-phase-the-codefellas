@@ -4,8 +4,10 @@ import io.everyonecodes.anber.providermanagement.data.ContractType;
 import io.everyonecodes.anber.providermanagement.data.PriceModelType;
 import io.everyonecodes.anber.providermanagement.data.ProviderType;
 import io.everyonecodes.anber.ratingmanagement.data.Rating;
-import io.everyonecodes.anber.searchmanagement.data.*;
+import io.everyonecodes.anber.searchmanagement.data.Provider;
+import io.everyonecodes.anber.searchmanagement.data.ProviderDTO;
 import io.everyonecodes.anber.searchmanagement.repository.ProviderRepository;
+import io.everyonecodes.anber.tariffmanagement.repository.TariffRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -21,17 +23,20 @@ public class SearchService {
     private final String sortAscending;
     private final String sortDescending;
     private final String noRatings;
+    private final TariffRepository tariffRepository;
 
     public SearchService(ProviderRepository providerRepository, ProviderTranslator translator, List<String> searchProperties,
                          @Value("${data.search-engine.sort.asc}") String sortAscending,
                          @Value("${data.search-engine.sort.desc}") String sortDescending,
-                         @Value("${messages.provider-account.no-ratings}") String noRatings) {
+                         @Value("${messages.provider-account.no-ratings}") String noRatings,
+                         TariffRepository tariffRepository) {
         this.providerRepository = providerRepository;
         this.translator = translator;
         this.searchProperties = searchProperties;
         this.sortAscending = sortAscending;
         this.sortDescending = sortDescending;
         this.noRatings = noRatings;
+        this.tariffRepository = tariffRepository;
     }
 
     public List<ProviderDTO> getAllDtos() {
@@ -116,7 +121,13 @@ public class SearchService {
 
             //tariff name
             if (i == 4) {
-                var providerListTn = new ArrayList<>(providerRepository.findByTariffName(filter));
+//                var providerListTn = new ArrayList<>(providerRepository.findByTariffName(filter));
+//                providerList.retainAll(providerListTn);
+                var providerListTn = providerRepository.findAll().stream()
+                        .filter(prov -> prov.getTariffs().stream()
+                                .anyMatch(br -> br.getTariffName().equals(filter)))
+                        .collect(Collectors.toCollection(ArrayList::new));
+
                 providerList.retainAll(providerListTn);
             }
             //basic rate
@@ -124,24 +135,41 @@ public class SearchService {
                 String operator = String.valueOf(filter.charAt(0));
                 double value = Double.parseDouble(filter.substring(1));
 
+
                 if (operator.equals(">")) {
                     var providerListBr1 =
                             providerList.stream()
-                                    .filter(prov -> prov.getBasicRate() > (value))
+                                    .filter(prov -> prov.getTariffs().stream()
+                                            .anyMatch(br -> br.getBasicRate() > value))
                                     .collect(Collectors.toCollection(ArrayList::new));
+
                     providerList.retainAll(providerListBr1);
                 } else {
                     var providerListBr2 =
                             providerList.stream()
-                                    .filter(prov -> prov.getBasicRate() <= (value))
+                                    .filter(prov -> prov.getTariffs().stream()
+                                            .anyMatch(br -> br.getBasicRate() <= value))
                                     .collect(Collectors.toCollection(ArrayList::new));
                     providerList.retainAll(providerListBr2);
                 }
 
+//                else {
+//                    var providerListBr2 =
+//                            providerList.stream()
+//                                    .filter(prov -> prov.getBasicRate() <= (value))
+//                                    .collect(Collectors.toCollection(ArrayList::new));
+//                    providerList.retainAll(providerListBr2);
+//                }
+
             }
             //price model
             if (i == 6) {
-                var providerListPm = new ArrayList<>(providerRepository.findByPriceModel(PriceModelType.valueOf(filter.toUpperCase())));
+//                var providerListPm = new ArrayList<>(providerRepository.findByPriceModel(PriceModelType.valueOf(filter.toUpperCase())));
+//                providerList.retainAll(providerListPm);
+                var providerListPm = providerRepository.findAll().stream()
+                        .filter(prov -> prov.getTariffs().stream()
+                                .anyMatch(br -> br.getPriceModel().equals(PriceModelType.valueOf(filter.toUpperCase())))).collect(Collectors.toCollection(ArrayList::new));
+
                 providerList.retainAll(providerListPm);
             }
         }

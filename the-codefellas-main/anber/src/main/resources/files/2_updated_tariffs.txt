@@ -1,0 +1,6 @@
+name1; 0.55; six months; per consumption
+name2; 0.42; twelve months; fixed
+name3; 0.31; fixed
+0.22; twelve months; fix
+name5; one month; perconsumption
+name6; fixed

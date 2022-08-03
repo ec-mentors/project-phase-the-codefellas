@@ -1,5 +1,7 @@
 package io.everyonecodes.anber;
 
+import io.everyonecodes.anber.searchmanagement.repository.ProviderRepository;
+import io.everyonecodes.anber.tariffmanagement.repository.TariffRepository;
 import io.everyonecodes.anber.usermanagement.data.User;
 import io.everyonecodes.anber.usermanagement.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,15 +17,21 @@ public class InitializationRunner {
     private final String adminEmail;
     private final String adminRole;
     private final DatabaseInitializer dbInitializer;
+    private final ProviderRepository providerRepository;
+    private final TariffRepository tariffRepository;
 
     public InitializationRunner(@Value("${data.admin.password}") String adminPassword,
                                 @Value("${data.admin.email}") String adminEmail,
                                 @Value("${data.roles.admin}") String adminRole,
-                                DatabaseInitializer dbInitializer) {
+                                DatabaseInitializer dbInitializer,
+                                ProviderRepository providerRepository,
+                                TariffRepository tariffRepository) {
         this.adminPassword = adminPassword;
         this.adminEmail = adminEmail;
         this.adminRole = adminRole;
         this.dbInitializer = dbInitializer;
+        this.providerRepository = providerRepository;
+        this.tariffRepository = tariffRepository;
     }
 
     @Bean

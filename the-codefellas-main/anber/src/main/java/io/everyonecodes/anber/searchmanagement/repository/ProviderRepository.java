@@ -1,8 +1,7 @@
 package io.everyonecodes.anber.searchmanagement.repository;
 
-import io.everyonecodes.anber.providermanagement.data.PriceModelType;
-import io.everyonecodes.anber.searchmanagement.data.ProviderDTO;
 import io.everyonecodes.anber.providermanagement.data.ProviderType;
+import io.everyonecodes.anber.searchmanagement.data.ProviderDTO;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -14,8 +13,7 @@ public interface ProviderRepository
     List<ProviderDTO> findByProviderType(ProviderType providerType);
 
     List<ProviderDTO> findByProviderName(String providerName);
-    List<ProviderDTO> findByTariffName(String tariffName);
-    List<ProviderDTO> findByBasicRate(Double basicRate);
-    List<ProviderDTO> findByPriceModel(PriceModelType priceModel);
+//    List<ProviderDTO> findByTariffName(String tariffName);
+//    List<ProviderDTO> findByPriceModel(PriceModelType priceModel);
 }
 

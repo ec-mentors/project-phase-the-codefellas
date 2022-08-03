@@ -1,14 +1,19 @@
 package io.everyonecodes.anber.providermanagement.data;
 
 import io.everyonecodes.anber.ratingmanagement.data.Rating;
+import io.everyonecodes.anber.tariffmanagement.data.Tariff;
 
+import javax.persistence.FetchType;
+import javax.persistence.OneToMany;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 public class ProviderPublic {
     private String providerName, website;
     private Rating rating;
-    private List<Tariff> tariffs;
+    @OneToMany(fetch = FetchType.EAGER)
+    private List<Tariff> tariffs = new ArrayList<>();
 
     public ProviderPublic(String providerName, String website, Rating rating, List<Tariff> tariffs) {
         this.providerName = providerName;
