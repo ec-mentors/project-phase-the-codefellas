@@ -4,7 +4,6 @@ import io.everyonecodes.anber.email.service.EmailService;
 import io.everyonecodes.anber.email.service.NotificationService;
 import io.everyonecodes.anber.usermanagement.data.UserPrivateDTO;
 import io.everyonecodes.anber.usermanagement.service.UserService;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -36,9 +35,9 @@ public class EmailEndpoint {
     }
 
     // endpoint only for review
-    @Secured({"ROLE_ADMIN"})
-    @GetMapping("/notifications/email/test/{username}")
-    void sendTestHtmlEmail(@PathVariable String username) {
-        emailService.sendTestHTMLEmail(username);
-    }
+//    @Secured({"ROLE_ADMIN"})
+//    @GetMapping("/notifications/email/test/{username}")
+//    void sendTestHtmlEmail(@PathVariable String username) {
+//        emailService.sendTestHTMLEmail(username);
+//    }
 }

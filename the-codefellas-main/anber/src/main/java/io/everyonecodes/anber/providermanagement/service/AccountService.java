@@ -1,5 +1,6 @@
 package io.everyonecodes.anber.providermanagement.service;
 
+import io.everyonecodes.anber.email.service.EmailService;
 import io.everyonecodes.anber.providermanagement.data.ProviderPublic;
 import io.everyonecodes.anber.providermanagement.data.Tariff;
 import io.everyonecodes.anber.providermanagement.data.UnverifiedAccount;
@@ -30,6 +31,7 @@ public class AccountService {
     private final List<String> accountProperties;
     private final ProviderTranslator translator;
     private final String noRatings;
+    private final EmailService emailService;
 
     public AccountService(ProviderRepository providerRepository,
                           TariffRepository tariffRepository,
@@ -39,7 +41,7 @@ public class AccountService {
                           @Value("${messages.provider-account.verified}") String verificationMark,
                           List<String> accountProperties,
                           ProviderTranslator translator,
-                          @Value("${messages.provider-account.no-ratings}") String noRatings) {
+                          @Value("${messages.provider-account.no-ratings}") String noRatings, EmailService emailService) {
         this.providerRepository = providerRepository;
         this.tariffRepository = tariffRepository;
         this.verifiedAccountRepository = verifiedAccountRepository;
@@ -49,6 +51,7 @@ public class AccountService {
         this.accountProperties = accountProperties;
         this.translator = translator;
         this.noRatings = noRatings;
+        this.emailService = emailService;
     }
 
 
@@ -85,6 +88,8 @@ public class AccountService {
         Optional<UnverifiedAccount> oAccount = unverifiedAccountRepository.findById(id);
         if (oAccount.isPresent()) {
             UnverifiedAccount account = oAccount.get();
+
+            emailService.sendVerificationNotificationHTMLEmail(account); // Sends verification Email
 
             ProviderDTO dto = providerRepository.findById(account.getId()).stream()
                     .findFirst().orElse(null);
