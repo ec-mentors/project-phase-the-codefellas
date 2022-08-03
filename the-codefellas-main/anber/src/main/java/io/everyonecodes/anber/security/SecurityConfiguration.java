@@ -38,6 +38,7 @@ public class SecurityConfiguration {
                 .antMatchers(HttpMethod.GET, "/pwreset/passwordreset/**").permitAll()
                 .antMatchers(HttpMethod.GET,"/notifications/email/test/**").permitAll()
                 .antMatchers(HttpMethod.POST,"/pwreset/passwordreset/**").permitAll()
+                .antMatchers("/login").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .csrf().disable().formLogin()

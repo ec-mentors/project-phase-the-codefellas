@@ -118,6 +118,8 @@ public class EmailService {
             throw new IllegalArgumentException();
         userTemp.setPassword(passwordEncoder.encode(newPassword));
         confirmationToken.setConfirmedAt(LocalDateTime.now());
+        userTemp.setAccountNonLocked(true);
+        userTemp.setLoginAttempts(0);
         confirmationTokenRepository.save(confirmationToken);
         userRepository.save(userTemp);
 
