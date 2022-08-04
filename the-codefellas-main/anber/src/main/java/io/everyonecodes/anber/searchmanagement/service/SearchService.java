@@ -7,6 +7,7 @@ import io.everyonecodes.anber.ratingmanagement.data.Rating;
 import io.everyonecodes.anber.searchmanagement.data.Provider;
 import io.everyonecodes.anber.searchmanagement.data.ProviderDTO;
 import io.everyonecodes.anber.searchmanagement.repository.ProviderRepository;
+import io.everyonecodes.anber.tariffmanagement.data.Tariff;
 import io.everyonecodes.anber.tariffmanagement.repository.TariffRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -103,7 +104,6 @@ public class SearchService {
                 String operator = String.valueOf(filter.charAt(0));
                 double value = Double.parseDouble(filter.substring(1));
 
-
                 if (operator.equals("<")) {
                     var providerListRating = providerList.stream()
                             .filter(prov -> Double.parseDouble(prov.getRating().getScore()) < (value))
@@ -116,13 +116,9 @@ public class SearchService {
                                     .collect(Collectors.toCollection(ArrayList::new));
                     providerList.retainAll(providerListRating);
                 }
-
             }
-
             //tariff name
             if (i == 4) {
-//                var providerListTn = new ArrayList<>(providerRepository.findByTariffName(filter));
-//                providerList.retainAll(providerListTn);
                 var providerListTn = providerRepository.findAll().stream()
                         .filter(prov -> prov.getTariffs().stream()
                                 .anyMatch(br -> br.getTariffName().equals(filter)))
@@ -152,20 +148,9 @@ public class SearchService {
                                     .collect(Collectors.toCollection(ArrayList::new));
                     providerList.retainAll(providerListBr2);
                 }
-
-//                else {
-//                    var providerListBr2 =
-//                            providerList.stream()
-//                                    .filter(prov -> prov.getBasicRate() <= (value))
-//                                    .collect(Collectors.toCollection(ArrayList::new));
-//                    providerList.retainAll(providerListBr2);
-//                }
-
             }
             //price model
             if (i == 6) {
-//                var providerListPm = new ArrayList<>(providerRepository.findByPriceModel(PriceModelType.valueOf(filter.toUpperCase())));
-//                providerList.retainAll(providerListPm);
                 var providerListPm = providerRepository.findAll().stream()
                         .filter(prov -> prov.getTariffs().stream()
                                 .anyMatch(br -> br.getPriceModel().equals(PriceModelType.valueOf(filter.toUpperCase())))).collect(Collectors.toCollection(ArrayList::new));
@@ -291,6 +276,30 @@ public class SearchService {
 
 
     private List<Provider> translateList(List<ProviderDTO> dtoList) {
+
+
+        var dtoWithMultipleTariffs = dtoList.stream()
+                .filter(prov -> prov.getTariffs().size() > 1)
+                .collect(Collectors.toList());
+
+        for (ProviderDTO dto : dtoWithMultipleTariffs) {
+            for (int i = 0; i < dto.getTariffs().size(); i++) {
+                dtoList.remove(dto);
+                dtoList.add(new ProviderDTO(
+                                dto.getProviderName(),
+                                List.of(new Tariff(
+                                        dto.getTariffs().get(i).getTariffName(),
+                                        dto.getTariffs().get(i).getBasicRate(),
+                                        dto.getTariffs().get(i).getContractType(),
+                                        dto.getTariffs().get(i).getPriceModel(),
+                                        dto.getId())
+                                ),
+                                dto.getRating()
+                        )
+                );
+            }
+        }
+
         return dtoList.stream()
                 .map(translator::DtoToProvider)
                 .collect(Collectors.toList());
