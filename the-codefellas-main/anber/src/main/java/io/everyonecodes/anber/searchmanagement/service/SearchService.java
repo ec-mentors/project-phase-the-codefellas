@@ -8,7 +8,6 @@ import io.everyonecodes.anber.searchmanagement.data.Provider;
 import io.everyonecodes.anber.searchmanagement.data.ProviderDTO;
 import io.everyonecodes.anber.searchmanagement.repository.ProviderRepository;
 import io.everyonecodes.anber.tariffmanagement.data.Tariff;
-import io.everyonecodes.anber.tariffmanagement.repository.TariffRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -24,20 +23,30 @@ public class SearchService {
     private final String sortAscending;
     private final String sortDescending;
     private final String noRatings;
-    private final TariffRepository tariffRepository;
+    private final String comparatorSmallerThan;
+    private final String comparatorGreaterThan;
+    private final String concatOperatorAnd;
+    private final String valueZero;
+
 
     public SearchService(ProviderRepository providerRepository, ProviderTranslator translator, List<String> searchProperties,
                          @Value("${data.search-engine.sort.asc}") String sortAscending,
                          @Value("${data.search-engine.sort.desc}") String sortDescending,
                          @Value("${messages.provider-account.no-ratings}") String noRatings,
-                         TariffRepository tariffRepository) {
+                         @Value("${data.search-engine.comparator.smaller}") String comparatorSmallerThan,
+                         @Value("${data.search-engine.comparator.greater}") String comparatorGreaterThan,
+                         @Value("${data.search-engine.and}") String concatOperatorAnd,
+                         @Value("${data.search-engine.zero}") String valueZero) {
         this.providerRepository = providerRepository;
         this.translator = translator;
         this.searchProperties = searchProperties;
         this.sortAscending = sortAscending;
         this.sortDescending = sortDescending;
         this.noRatings = noRatings;
-        this.tariffRepository = tariffRepository;
+        this.comparatorSmallerThan = comparatorSmallerThan;
+        this.comparatorGreaterThan = comparatorGreaterThan;
+        this.concatOperatorAnd = concatOperatorAnd;
+        this.valueZero = valueZero;
     }
 
     public List<ProviderDTO> getAllDtos() {
@@ -61,7 +70,7 @@ public class SearchService {
 
     public List<Provider> manageFilters(String filters) {
 
-        List<String> filtersList = new ArrayList<>(List.of(filters.split("&")));
+        List<String> filtersList = new ArrayList<>(List.of(filters.split(concatOperatorAnd)));
 
         var checkedFilters = checkForFilter(filtersList);
 
@@ -104,7 +113,7 @@ public class SearchService {
                 String operator = String.valueOf(filter.charAt(0));
                 double value = Double.parseDouble(filter.substring(1));
 
-                if (operator.equals("<")) {
+                if (operator.equals(comparatorSmallerThan)) {
                     var providerListRating = providerList.stream()
                             .filter(prov -> Double.parseDouble(prov.getRating().getScore()) < (value))
                             .collect(Collectors.toCollection(ArrayList::new));
@@ -132,7 +141,7 @@ public class SearchService {
                 double value = Double.parseDouble(filter.substring(1));
 
 
-                if (operator.equals(">")) {
+                if (operator.equals(comparatorGreaterThan)) {
                     var providerListBr1 =
                             providerList.stream()
                                     .filter(prov -> prov.getTariffs().stream()
@@ -161,7 +170,7 @@ public class SearchService {
 
         var providers = translateList(providerList);
         for (Provider prov : providers) {
-            if (prov.getRating().equals("0")) {
+            if (prov.getRating().equals(valueZero)) {
                 prov.setRating(noRatings);
             }
         }
@@ -204,12 +213,12 @@ public class SearchService {
             }
 
             //rating < filter
-            if (filter.startsWith(searchProperties.get(3).substring(0, 2) + "<")) {
+            if (filter.startsWith(searchProperties.get(3).substring(0, 2) + comparatorSmallerThan)) {
                 String rating = filter.substring(2);
                 sortedFilters.set(3, rating);
             }
             //rating > filter
-            if (filter.startsWith(searchProperties.get(3).substring(0, 2) + ">")) {
+            if (filter.startsWith(searchProperties.get(3).substring(0, 2) + comparatorGreaterThan)) {
                 String rating = filter.substring(2);
                 sortedFilters.set(3, rating);
             }
@@ -225,12 +234,12 @@ public class SearchService {
                 sortedFilters.set(4, tariffName);
             }
             //basic rate < filter
-            if (filter.startsWith(searchProperties.get(5).substring(0, 2) + "<")) {
+            if (filter.startsWith(searchProperties.get(5).substring(0, 2) + comparatorSmallerThan)) {
                 String basicRate = filter.substring(2);
                 sortedFilters.set(5, basicRate);
             }
             //basic rate > filter
-            if (filter.startsWith(searchProperties.get(5).substring(0, 2) + ">")) {
+            if (filter.startsWith(searchProperties.get(5).substring(0, 2) + comparatorGreaterThan)) {
                 String basicRate = filter.substring(2);
                 sortedFilters.set(5, basicRate);
             }
@@ -346,8 +355,7 @@ public class SearchService {
         }
 
         if (rating.getScore().equals(noRatings)) {
-//            rating.setScore("0.0");
-            dto.setRating(new Rating(rating.getId(), rating.getUsersRated(), "0"));
+            dto.setRating(new Rating(rating.getId(), rating.getUsersRated(), valueZero));
             return rating;
         }
         return rating;

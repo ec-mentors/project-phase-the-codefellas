@@ -2,6 +2,7 @@ package io.everyonecodes.anber.profilemanagement.endpoints;
 
 import io.everyonecodes.anber.profilemanagement.service.UserProfileService;
 import io.everyonecodes.anber.usermanagement.data.User;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -15,9 +16,12 @@ import java.util.List;
 public class UserProfileEndpoint {
 
     private final UserProfileService userProfileService;
+    private final String userFailedDelete;
 
-    public UserProfileEndpoint(UserProfileService userProfileService) {
+    public UserProfileEndpoint(UserProfileService userProfileService,
+                               @Value("${messages.user.failed-delete}") String userFailedDelete) {
         this.userProfileService = userProfileService;
+        this.userFailedDelete = userFailedDelete;
     }
 
     @GetMapping("/all")
@@ -47,7 +51,7 @@ public class UserProfileEndpoint {
         String name = SecurityContextHolder.getContext().getAuthentication().getName();
 
         if(!name.equalsIgnoreCase(username)) {
-            throw new AuthenticationException("User can only delete himself") {
+            throw new AuthenticationException(userFailedDelete) {
 
             };
         }

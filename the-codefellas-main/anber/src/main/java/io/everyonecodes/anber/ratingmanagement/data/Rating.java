@@ -11,12 +11,10 @@ import java.util.Set;
 public class Rating {
 
     @Id
-//    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ElementCollection(targetClass = String.class)
     private Set<String> usersRated = new HashSet<>();
-//    @Range(min = 1, max = 5)
     private String score;
 
     public Rating() {

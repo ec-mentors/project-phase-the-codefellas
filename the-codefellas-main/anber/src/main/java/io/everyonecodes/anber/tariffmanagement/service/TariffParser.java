@@ -57,7 +57,6 @@ public class TariffParser {
                     return Optional.of(initialTariff);
                 }
             } catch (IndexOutOfBoundsException | NoSuchElementException e) {
-                System.out.println("Could not read data from file correctly.");
                 e.printStackTrace();
             }
         }

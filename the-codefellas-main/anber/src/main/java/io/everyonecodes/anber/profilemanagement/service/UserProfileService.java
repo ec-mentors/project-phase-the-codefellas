@@ -2,9 +2,8 @@ package io.everyonecodes.anber.profilemanagement.service;
 
 import io.everyonecodes.anber.usermanagement.data.User;
 import io.everyonecodes.anber.usermanagement.repository.UserRepository;
+import io.everyonecodes.anber.usermanagement.service.UserService;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,24 +15,18 @@ public class UserProfileService {
     private final UserRepository userRepository;
     private final List<String> profileOptions;
     private final String boolTrue;
-
+    private final UserService userService;
 
     public UserProfileService(UserRepository userRepository,
-                              List<String> profileOptions, @Value("${data.boolean.true}") String boolTrue) {
+                              List<String> profileOptions,
+                              @Value("${data.boolean.true}") String boolTrue,
+                              UserService userService) {
         this.userRepository = userRepository;
         this.profileOptions = profileOptions;
         this.boolTrue = boolTrue;
+        this.userService = userService;
     }
 
-    private String loggedInUser() {
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
-        if (principal instanceof UserDetails) {
-            return ((UserDetails) principal).getUsername();
-        } else {
-            return principal.toString();
-        }
-    }
 
     public List<User> viewAll() {
         return userRepository.findAll();
@@ -45,7 +38,7 @@ public class UserProfileService {
         Optional<User> oUser = userRepository.findOneByEmail(username);
         if (oUser.isPresent()) {
             User user = oUser.get();
-            if (user.getEmail().equals(loggedInUser())) {
+            if (user.getEmail().equals(userService.loggedInUser())) {
                 return oUser;
             }
         }
