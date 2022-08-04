@@ -1,6 +1,7 @@
 package io.everyonecodes.anber.usermanagement.service;
 
 
+import io.everyonecodes.anber.usermanagement.authentication.AuthenticationService;
 import io.everyonecodes.anber.usermanagement.data.User;
 import io.everyonecodes.anber.usermanagement.data.UserPrivateDTO;
 import io.everyonecodes.anber.usermanagement.data.UserPublicDTO;
@@ -18,13 +19,15 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final AuthenticationService authenticationService;
     private final UserDTO mapper;
     private final String roleUser;
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, UserDTO mapper,
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, AuthenticationService authenticationService, UserDTO mapper,
                        @Value("${data.roles.user}") String roleUser) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.authenticationService = authenticationService;
         this.mapper = mapper;
         this.roleUser = roleUser;
     }
@@ -36,6 +39,8 @@ public class UserService {
         user.setPassword(encodedPassword);
         user.setRole(roleUser);
         user.setUsername(user.getEmail());
+        user.setAccountNonLocked(true);
+        user.setLoginAttempts(0);
         user = userRepository.save(user);
         return user;
     }
@@ -67,8 +72,8 @@ public class UserService {
     }
 
     public void deleteUser(String username) {
-        var oProfile = userRepository.findOneByEmail(username);
-        oProfile.ifPresent(userRepository::delete);
+        var oUser = userRepository.findOneByEmail(username);
+        oUser.ifPresent(userRepository::delete);
     }
 
     public String loggedInUser() {
@@ -81,4 +86,26 @@ public class UserService {
         }
     }
 
+    public Optional<UserPrivateDTO> viewIndividualProfileDataUser(User user) {
+        if (authenticationService.onAuthentication(user)) {
+            return getUserByUsername(user.getEmail()).map(mapper::toUserPrivateDTO);
+        }
+        return Optional.empty();
+    }
+
+    public boolean isUserLocked(User user) {
+        var oUser = userRepository.findOneByEmail(user.getEmail());
+        var foundUser = oUser.get();
+        return foundUser.isAccountNonLocked();
+    }
+
+    public void unlockUser(String username) {
+        var oUser = userRepository.findOneByEmail(username);
+        if (oUser.isPresent()) {
+            var user = oUser.get();
+            user.setLoginAttempts(0);
+            user.setAccountNonLocked(true);
+            userRepository.save(user);
+        }
+    }
 }

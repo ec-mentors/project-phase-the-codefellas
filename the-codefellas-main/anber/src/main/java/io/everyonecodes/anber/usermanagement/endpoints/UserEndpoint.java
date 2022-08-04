@@ -48,4 +48,10 @@ public class UserEndpoint {
         userService.deleteUser(username);
     }
 
+    @PutMapping("/{username}/unlock")
+    @Secured("ROLE_ADMIN")
+    void unlockUser(@PathVariable String username) {
+        userService.unlockUser(username);
+    }
+
 }

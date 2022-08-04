@@ -1,5 +1,6 @@
 package io.everyonecodes.anber.security;
 
+
 import io.everyonecodes.anber.usermanagement.repository.UserRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -25,6 +26,7 @@ public class SecurityConfiguration {
                 .antMatchers(HttpMethod.GET, "/pwreset/passwordreset/**").permitAll()
                 .antMatchers(HttpMethod.GET,"/notifications/email/test/**").permitAll()
                 .antMatchers(HttpMethod.POST,"/pwreset/passwordreset/**").permitAll()
+                .antMatchers(HttpMethod.POST, "/signin").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .formLogin()
