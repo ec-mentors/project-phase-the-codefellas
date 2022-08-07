@@ -1,10 +1,8 @@
 package io.everyonecodes.anber.ratingmanagement.endpoints;
 
 import io.everyonecodes.anber.ratingmanagement.service.RatingService;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/provider")
@@ -16,8 +14,9 @@ public class RatingEndpoint {
         this.ratingService = ratingService;
     }
 
-    @PutMapping("/{id}/rate/{rating}")
-    String rateProvider(@PathVariable Long id, @PathVariable int rating) {
+    @PutMapping("/{id}/rate")
+    @Secured("ROLE_USER")
+    String rateProvider(@PathVariable Long id, @RequestBody int rating) {
         return ratingService.rateProvider(rating, id).orElse(null);
     }
 }

@@ -32,7 +32,7 @@ public class User {
     private String email;
 
     @NotEmpty
-    @Size(min = 6, max = 60, message = "must be at least 6 characters long.")
+    @Size(min = 6, max = 60, message = "must be at least 6 characters long")
     private String password;
 
     private String role;
@@ -49,10 +49,8 @@ public class User {
     private int loginAttempts;
     private boolean accountNonLocked = true;
 
-
     public User() {
     }
-
     public User(String email, String password) {
         this.email = email;
         this.password = password;

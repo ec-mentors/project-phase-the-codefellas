@@ -141,7 +141,16 @@ public class TariffService {
             return "";
         }
 
-        String errorMessage = errorMessage1.replace(placeholderTariffName, tariff.getTariffName()) + i + errorMessage2 + newLine;
+
+        String errorMessage = "";
+
+        if (tariff.getTariffName() == null) {
+            errorMessage = errorMessage1.replace(placeholderTariffName, "") + i + errorMessage2 + newLine;
+        }
+        else {
+            errorMessage = errorMessage1.replace(placeholderTariffName, tariff.getTariffName()) + i + errorMessage2 + newLine;
+        }
+
         if (tariff.getTariffName() == null) {
             errorMessage += listElementTariffName + newLine;
         }
@@ -167,6 +176,7 @@ public class TariffService {
             var list = provider.getTariffs();
             list.add(tariff);
             providerRepository.save(provider);
+            //send notification mails to subscribers
         }
 
         if (unverifiedAccountRepository.findById(id).isPresent()) {

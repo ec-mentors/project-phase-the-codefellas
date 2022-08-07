@@ -1,20 +1,24 @@
 package io.everyonecodes.anber.searchmanagement.endpoints;
 
-import io.everyonecodes.anber.searchmanagement.data.Provider;
 import io.everyonecodes.anber.searchmanagement.service.SearchService;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@AutoConfigureMockMvc
 class SearchEndpointTest {
 
     @Autowired
-    TestRestTemplate testRestTemplate;
+    MockMvc mockMvc;
 
     @MockBean
     SearchService searchService;
@@ -23,40 +27,59 @@ class SearchEndpointTest {
     SecurityFilterChain securityFilterChain;
 
 
-//    @Test
-//    @WithMockUser(username = "ADMIN", password = "admin", authorities = {"ROLE_ADMIN"})
-//    void getAllDtos() {
-//        testRestTemplate.getForObject("/provider/getdto", Provider[].class);
-//        Mockito.verify(searchService).getAllDtos();
-//    }
+    @Test
+    @WithMockUser(username = "admin@email.com", password = "admin", roles = "ADMIN")
+    void getAllDtos() throws Exception {
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/provider/getdto"))
+                .andExpect(MockMvcResultMatchers.status().isOk());
+
+        Mockito.verify(searchService).getAllDtos();
+    }
 
     @Test
-    void getAllProviders() {
-        testRestTemplate.getForObject("/provider/get", Provider[].class);
+    @WithMockUser(username = "test@email.com", password = "Password1!", roles = "USER")
+    void getAllProviders() throws Exception {
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/provider/get"))
+                        .andExpect(MockMvcResultMatchers.status().isOk());
+
         Mockito.verify(searchService).getAllProviders();
     }
 
     @Test
-    void getProvidersWithOptionalFilters() {
+    @WithMockUser(username = "test@email.com", password = "Password1!", roles = "USER")
+    void getProvidersWithOptionalFilters() throws Exception {
         String filters = "test";
-        testRestTemplate.getForObject("/provider/search/" + filters, Provider[].class);
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/provider/search/" + filters))
+                .andExpect(MockMvcResultMatchers.status().isOk());
+
         Mockito.verify(searchService).manageFilters(filters);
     }
 
 
     @Test
-    void getSortedProvidersWithOptionalFilters() {
+    @WithMockUser(username = "test@email.com", password = "Password1!", roles = "USER")
+    void getSortedProvidersWithOptionalFilters() throws Exception {
         String filters = "test";
         String operator = "foo";
-        testRestTemplate.getForObject("/provider/search/sorted/basicrate/" + operator + "/" + filters, Provider[].class);
+
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/provider/search/sorted/basicrate/" + operator + "/" + filters))
+                .andExpect(MockMvcResultMatchers.status().isOk());
+
         Mockito.verify(searchService).sortByBasicRate(operator, filters);
     }
 
     @Test
-    void getSortedByRatingProvidersWithOptionalFilters() {
+    @WithMockUser(username = "test@email.com", password = "Password1!", roles = "USER")
+    void getSortedByRatingProvidersWithOptionalFilters() throws Exception {
         String filters = "test";
         String operator = "foo";
-        testRestTemplate.getForObject("/provider/search/sorted/rating/" + operator + "/" + filters, Provider[].class);
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/provider/search/sorted/rating/" + operator + "/" + filters))
+                .andExpect(MockMvcResultMatchers.status().isOk());
         Mockito.verify(searchService).sortByRating(operator, filters);
     }
 }

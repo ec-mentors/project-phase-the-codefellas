@@ -1,7 +1,8 @@
 package io.everyonecodes.anber.usermanagement.endpoints;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.everyonecodes.anber.usermanagement.data.User;
 import io.everyonecodes.anber.usermanagement.data.UserPrivateDTO;
-import io.everyonecodes.anber.usermanagement.service.UserDTO;
 import io.everyonecodes.anber.usermanagement.service.UserService;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -10,11 +11,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
@@ -27,17 +27,13 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 class LoginEndpointTest {
 
     @Autowired
-    TestRestTemplate testRestTemplate;
+    MockMvc mockMvc;
 
     @Autowired
-    MockMvc mockMvc;
+    ObjectMapper objectMapper;
 
     @MockBean
     UserService userService;
-
-    @MockBean
-    UserDTO userDTO;
-
 
     @Value("${testvalues.login-endpoint-url}")
     String url;
@@ -54,31 +50,38 @@ class LoginEndpointTest {
     @MockBean
     SecurityFilterChain filterChain;
 
+    private final User user = new User("test@email.com", "Password1!");
 
-    @Test
-    @WithMockUser(username = "ADMIN", password = "admin", authorities = "ROLE_ADMIN")
-    void viewIndividualProfile_returnsProfileData() {
-        testRestTemplate.getForObject(url, UserPrivateDTO.class);
 
-        Mockito.verify(userService).viewIndividualProfileData("user");
+    private ResultActions mockUserCredentials() throws Exception {
+        return mockMvc.perform(MockMvcRequestBuilders.post(url)
+                .with(user("test@email.com").password("Password1!").roles("USER"))
+                .contentType("application/json")
+                .content(objectMapper.writeValueAsString(new User(user.getEmail(), user.getPassword())))
+                .accept(MediaType.APPLICATION_JSON));
     }
 
     @Test
-    void viewIndividualPrivateData_authorized() throws Exception{
-        String username = "firstUser";
-        Mockito.when(userService.viewIndividualProfileData(username))
-                .thenReturn(Optional.of(new UserPrivateDTO()));
-        mockMvc.perform(MockMvcRequestBuilders.get(url)
-                        .with(user("firstUser").password("Coding12#").roles("USER"))
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isOk());
-        Mockito.verify(userService, Mockito.times(1)).viewIndividualProfileData(username);
+    void viewIndividualUser_unlocked() throws Exception {
+
+        Mockito.when(userService.isUserUnlocked(user)).thenReturn(true);
+        Mockito.when(userService.viewIndividualProfileDataUser(user)).thenReturn(Optional.of(new UserPrivateDTO()));
+
+        mockUserCredentials().andExpect(MockMvcResultMatchers.status().isOk());
+
+        Mockito.verify(userService).isUserUnlocked(user);
+        Mockito.verify(userService).viewIndividualProfileDataUser(user);
     }
 
     @Test
-    void viewIndividualProfile_returnsNull() {
-        testRestTemplate.getForObject(url, UserPrivateDTO.class);
-        Mockito.verify(userService, Mockito.never()).viewIndividualProfileData(Mockito.any());
+    void viewIndividualUser_locked() throws Exception {
+
+        Mockito.when(userService.isUserUnlocked(user)).thenReturn(false);
+
+        mockUserCredentials().andExpect(MockMvcResultMatchers.status().isForbidden());
+
+        Mockito.verify(userService).isUserUnlocked(user);
+        Mockito.verify(userService, Mockito.never()).viewIndividualProfileDataUser(user);
     }
 
 }

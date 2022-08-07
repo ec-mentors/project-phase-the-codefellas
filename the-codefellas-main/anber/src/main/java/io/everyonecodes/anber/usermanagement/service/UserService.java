@@ -93,7 +93,7 @@ public class UserService {
         return Optional.empty();
     }
 
-    public boolean isUserLocked(User user) {
+    public boolean isUserUnlocked(User user) {
         var oUser = userRepository.findOneByEmail(user.getEmail());
         var foundUser = oUser.get();
         return foundUser.isAccountNonLocked();
