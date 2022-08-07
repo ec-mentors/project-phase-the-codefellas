@@ -1,5 +1,6 @@
 package io.everyonecodes.anber.usermanagement.endpoints;
 
+import io.everyonecodes.anber.email.service.EmailService;
 import io.everyonecodes.anber.usermanagement.data.User;
 import io.everyonecodes.anber.usermanagement.service.UserService;
 import org.springframework.http.HttpStatus;
@@ -17,9 +18,11 @@ import javax.validation.Valid;
 public class UserEndpoint {
 
     private final UserService userService;
+    private final EmailService emailService;
 
-    public UserEndpoint(UserService userService) {
+    public UserEndpoint(UserService userService, EmailService emailService) {
         this.userService = userService;
+        this.emailService = emailService;
     }
 
     @PostMapping("/register")
@@ -45,6 +48,8 @@ public class UserEndpoint {
             };
         }
 
+
+        emailService.deleteConfirmationTokenAndSendDeleteMail(username);
         userService.deleteUser(username);
     }
 

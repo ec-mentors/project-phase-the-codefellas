@@ -47,8 +47,7 @@ public class User {
 
     private boolean notificationsEnabled = false;
     private int loginAttempts;
-    private boolean accountNonLocked = true;
-
+    private boolean accountNonLocked;
 
     public User() {
     }

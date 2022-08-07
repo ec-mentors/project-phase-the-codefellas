@@ -1,6 +1,7 @@
 package io.everyonecodes.anber.usermanagement.service;
 
 
+import io.everyonecodes.anber.email.service.EmailService;
 import io.everyonecodes.anber.usermanagement.authentication.AuthenticationService;
 import io.everyonecodes.anber.usermanagement.data.User;
 import io.everyonecodes.anber.usermanagement.data.UserPrivateDTO;
@@ -20,14 +21,16 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationService authenticationService;
+    private final EmailService emailService;
     private final UserDTO mapper;
     private final String roleUser;
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, AuthenticationService authenticationService, UserDTO mapper,
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, AuthenticationService authenticationService, EmailService emailService, UserDTO mapper,
                        @Value("${data.roles.user}") String roleUser) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.authenticationService = authenticationService;
+        this.emailService = emailService;
         this.mapper = mapper;
         this.roleUser = roleUser;
     }
@@ -72,8 +75,9 @@ public class UserService {
     }
 
     public void deleteUser(String username) {
-        var oUser = userRepository.findOneByEmail(username);
-        oUser.ifPresent(userRepository::delete);
+        var oProfile = userRepository.findOneByEmail(username);
+        emailService.sendDeleteMail(username);
+        oProfile.ifPresent(userRepository::delete);
     }
 
     public String loggedInUser() {
@@ -87,8 +91,8 @@ public class UserService {
     }
 
     public Optional<UserPrivateDTO> viewIndividualProfileDataUser(User user) {
-        if (authenticationService.onAuthentication(user)) {
-            return getUserByUsername(user.getEmail()).map(mapper::toUserPrivateDTO);
+        if(authenticationService.onAuthentication(user)) {
+            return getUserByUsername(user.getUsername()).map(mapper::toUserPrivateDTO);
         }
         return Optional.empty();
     }
