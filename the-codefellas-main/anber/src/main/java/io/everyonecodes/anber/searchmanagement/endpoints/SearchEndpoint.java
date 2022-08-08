@@ -38,21 +38,25 @@ public class SearchEndpoint {
     }
 
     @GetMapping("/get")
+    @Secured("ROLE_USER")
     List<Provider> getAll() {
         return searchService.getAllProviders();
     }
 
     @GetMapping("/search/{filters}")
+    @Secured("ROLE_USER")
     List<Provider> getProvidersWithOptionalFilters(@PathVariable String filters) {
         return searchService.manageFilters(filters);
     }
 
     @GetMapping("/search/sorted/basicrate/{operator}/{filters}")
+    @Secured("ROLE_USER")
     List<Provider> getSortedProvidersWithOptionalFilters(@PathVariable String operator, @PathVariable String filters) {
         return searchService.sortByBasicRate(operator, filters);
     }
 
     @GetMapping("/search/sorted/rating/{operator}/{filters}")
+    @Secured("ROLE_USER")
     List<Provider> getSortedProvidersByRatingWithOptionalFilters(@PathVariable String operator, @PathVariable String filters) {
         return searchService.sortByRating(operator, filters);
     }

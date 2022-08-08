@@ -8,10 +8,10 @@ import io.everyonecodes.anber.usermanagement.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class HomeService {
@@ -130,13 +130,23 @@ public class HomeService {
                 home.setPostalCode(input);
             }
             if (property.equals(homeProperties.get(4))) {
-                home.setType(HomeType.valueOf(input.toUpperCase()));
+                if (getEnumNames(HomeType.class).contains(input.toUpperCase())) {
+                    home.setHomeType(HomeType.valueOf(input.toUpperCase()));
+                }
             }
 
             if (property.equals(homeProperties.get(5))) {
-                home.setSizeInSquareMeters(Double.parseDouble(input));
+                try {
+                    home.setSizeInSquareMeters(Double.parseDouble(input));
+                } catch (NumberFormatException e) {
+                    //do nothing
+                }
             }
             homeRepository.save(home);
         }
+    }
+
+    private static List<String> getEnumNames(Class<? extends Enum<?>> e) {
+        return Stream.of(e.getEnumConstants()).map(Enum::name).toList();
     }
 }

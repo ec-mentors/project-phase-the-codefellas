@@ -3,7 +3,6 @@ package io.everyonecodes.anber.homemanagement.service;
 import io.everyonecodes.anber.homemanagement.data.Home;
 import io.everyonecodes.anber.homemanagement.data.HomeType;
 import io.everyonecodes.anber.homemanagement.repository.HomeRepository;
-import io.everyonecodes.anber.homemanagement.service.HomeService;
 import io.everyonecodes.anber.usermanagement.data.User;
 import io.everyonecodes.anber.usermanagement.repository.UserRepository;
 import org.junit.jupiter.api.Assertions;
@@ -117,7 +116,7 @@ class HomeServiceTest {
 
         Mockito.when(userRepository.findOneByEmail(testUserProfile.getEmail())).thenReturn(Optional.of(testUserProfile));
 
-        Optional<Home> result = homeService.editHome(testUserProfile.getEmail(), testUserProfile.getId(), property,input);
+        Optional<Home> result = homeService.editHome(testUserProfile.getEmail(), testUserProfile.getSavedHomes().get(0).getId(), property,input);
 
         Assertions.assertEquals(expected,result);
 
@@ -126,16 +125,21 @@ class HomeServiceTest {
 
 
     private static Stream<Arguments> parameters() {
-        Home testHome1 = new Home(1L,"name", "testCountry", "testCity", "666", HomeType.GARAGE, 66.66);
-
-        return Stream.of(
-                Arguments.of("name", "otherName", Optional.of(testHome1)),
-                Arguments.of("country", "France", Optional.of(testHome1)),
-                Arguments.of("city", "Paris", Optional.of(testHome1)),
-                Arguments.of("postalCode", "123", Optional.of(testHome1)),
-                Arguments.of("homeType", "garage", Optional.of(testHome1)),
-                Arguments.of("homeType", "GARAGE", Optional.of(testHome1)),
-                Arguments.of("sizeInSquareMeters", "300.5", Optional.of(testHome1))
+                return Stream.of(
+                Arguments.of("homeName", "otherName", Optional.of(
+                        new Home(1L,"otherName", "testCountry", "testCity", "666", HomeType.GARAGE, 66.66))),
+                Arguments.of("country", "France", Optional.of(
+                        new Home(1L,"name", "France", "testCity", "666", HomeType.GARAGE, 66.66))),
+                Arguments.of("city", "Paris", Optional.of(
+                        new Home(1L,"name", "testCountry", "Paris", "666", HomeType.GARAGE, 66.66))),
+                Arguments.of("postalCode", "123", Optional.of(
+                        new Home(1L,"name", "testCountry", "testCity", "123", HomeType.GARAGE, 66.66))),
+                Arguments.of("type", "apartment", Optional.of(
+                        new Home(1L,"name", "testCountry", "testCity", "666", HomeType.APARTMENT, 66.66))),
+                Arguments.of("type", "APARTMENT", Optional.of(
+                        new Home(1L,"name", "testCountry", "testCity", "666", HomeType.APARTMENT, 66.66))),
+                Arguments.of("sizeInSquareMeters", "300.5", Optional.of(
+                        new Home(1L,"name", "testCountry", "testCity", "666", HomeType.GARAGE, 300.5)))
         );
     }
 

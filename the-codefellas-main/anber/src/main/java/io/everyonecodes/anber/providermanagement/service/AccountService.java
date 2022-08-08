@@ -194,6 +194,7 @@ public class AccountService {
                         .map(Tariff::getId)
                         .collect(Collectors.toList());
                 tariffRepository.deleteAllByIdInBatch(ids);
+                ratingRepository.deleteById(id);
                 unverifiedAccountRepository.deleteById(id);
 
             }

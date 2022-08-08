@@ -80,7 +80,7 @@ public class RatingService {
                         }
                     }
                 }
-                return Optional.of(alreadyRated.replace(placeholderProviderName, dto.getProviderName()).replace(placeholderLoggedInUser, userService.loggedInUser()));
+                return Optional.of(alreadyRated.replace(placeholderProviderName, dto.getProviderName()).replace(placeholderLoggedInUser, userName));
             }
         }
         return Optional.empty();

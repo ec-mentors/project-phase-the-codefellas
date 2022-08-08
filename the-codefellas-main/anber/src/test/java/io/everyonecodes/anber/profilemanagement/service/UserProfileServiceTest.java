@@ -2,20 +2,16 @@ package io.everyonecodes.anber.profilemanagement.service;
 
 import io.everyonecodes.anber.usermanagement.data.User;
 import io.everyonecodes.anber.usermanagement.repository.UserRepository;
+import io.everyonecodes.anber.usermanagement.service.UserService;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
@@ -31,8 +27,8 @@ class UserProfileServiceTest {
     @MockBean
     UserRepository userRepository;
 
-    @Value("${data.boolean.true}")
-    String boolTrue;
+    @MockBean
+    UserService userService;
 
     @MockBean
     SecurityFilterChain filterChain;
@@ -42,18 +38,17 @@ class UserProfileServiceTest {
 
 
     private final String username = "test@mail.com";
-    private final User user = new User("test@mail.com", "password");
-//    private final UserProfile profile = new UserProfile(user.getEmail(), user.getPassword(), user.getUsername(), "country", List.of(), false);
+    private final User user = new User(username, "password");
 
-    Authentication authentication = Mockito.mock(Authentication.class);
-    SecurityContext securityContext = Mockito.mock(SecurityContext.class);
-
-
-    @BeforeEach
-    public void initSecurityContext() {
-        Mockito.when(authentication.getPrincipal()).thenReturn(user.getEmail());
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-    }
+//    Authentication authentication = Mockito.mock(Authentication.class);
+//    SecurityContext securityContext = Mockito.mock(SecurityContext.class);
+//
+//
+//    @BeforeEach
+//    public void initSecurityContext() {
+//        Mockito.when(authentication.getPrincipal()).thenReturn(user.getEmail());
+//        SecurityContextHolder.getContext().setAuthentication(authentication);
+//    }
 
     @Test
     void viewAll() {
@@ -63,11 +58,11 @@ class UserProfileServiceTest {
 
     @Test
     void viewProfile_Exists() {
-        Mockito.when(securityContext.getAuthentication()).thenReturn(authentication);
-        SecurityContextHolder.setContext(securityContext);
+//        Mockito.when(securityContext.getAuthentication()).thenReturn(authentication);
+//        SecurityContextHolder.setContext(securityContext);
 
         Mockito.when(userRepository.findOneByEmail(user.getEmail())).thenReturn(Optional.of(user));
-//        Mockito.when(userRepository.findOneByEmail(profile.getEmail())).thenReturn(Optional.of(profile));
+        Mockito.when(userService.loggedInUser()).thenReturn(username);
 
         var oResult = userProfileService.viewProfile(username);
 
@@ -76,38 +71,19 @@ class UserProfileServiceTest {
         Assertions.assertEquals(expected, oResult);
 
         Mockito.verify(userRepository).findOneByEmail(user.getEmail());
+        Mockito.verify(userService).loggedInUser();
     }
 
     @Test
     void viewProfile_UserNotExist() {
         Mockito.when(userRepository.findOneByEmail(user.getEmail())).thenReturn(Optional.empty());
-//        Mockito.when(userProfileRepository.findOneByEmail(profile.getEmail())).thenReturn(Optional.empty());
 
         var oResult = userProfileService.viewProfile(username);
 
         Assertions.assertEquals(Optional.empty(), oResult);
 
         Mockito.verify(userRepository).findOneByEmail(user.getEmail());
-//        Mockito.verify(userProfileRepository, Mockito.never()).findOneByEmail(profile.getEmail());
-    }
-
-    @Test
-    void viewProfile_ProfileNotExist() {
-        User newProfile = new User(user.getEmail(), "password");
-
-        Mockito.when(userRepository.findOneByEmail(user.getEmail())).thenReturn(Optional.of(user));
-//        Mockito.when(userProfileRepository.findOneByEmail(profile.getEmail())).thenReturn(Optional.empty());
-//        Mockito.when(userProfileRepository.save(newProfile)).thenReturn((newProfile));
-
-        var oResult = userProfileService.viewProfile(username);
-
-        var expected = Optional.of(newProfile);
-
-        Assertions.assertEquals(expected, oResult);
-
-        Mockito.verify(userRepository).findOneByEmail(user.getEmail());
-//        Mockito.verify(userProfileRepository).findOneByEmail(profile.getEmail());
-//        Mockito.verify(userProfileRepository).save(newProfile);
+        Mockito.verify(userService, Mockito.never()).loggedInUser();
     }
 
     @Test

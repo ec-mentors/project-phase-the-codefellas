@@ -19,7 +19,7 @@ public class TariffEndpoint {
 
     @PutMapping("/update/tariff/{id}")
     @Secured("ROLE_ADMIN")
-    void updateTariff(@PathVariable Long id) {
-        tariffService.tariffApplier(id);
+    String updateTariff(@PathVariable Long id) {
+        return tariffService.tariffApplier(id);
     }
 }

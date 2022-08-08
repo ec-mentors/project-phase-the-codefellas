@@ -19,7 +19,7 @@ public class LoginEndpoint {
 
     @PostMapping
     UserPrivateDTO viewIndividualProfile(@RequestBody User user) {
-        if (userService.isUserLocked(user)) {
+        if (userService.isUserUnlocked(user)) {
             return userService.viewIndividualProfileDataUser(user)
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Bad credentials"));
         }
