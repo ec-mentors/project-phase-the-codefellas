@@ -44,13 +44,8 @@ public class DatabaseInitializer {
 
             ScriptRunner sr = new ScriptRunner(con);
 
-<<<<<<< HEAD
-            File f = new File("src/main/resources/static/anber_dummydatabase.sql");
-            String absolutePath = f.getAbsolutePath();
-=======
             File f = new File(sqlPath);
             String absolutePath = f.getCanonicalPath();
->>>>>>> fe35ad8c671ef7446c137941e4b09d1e881c099b
 
             Reader reader = new BufferedReader(new FileReader(absolutePath));
             sr.runScript(reader);

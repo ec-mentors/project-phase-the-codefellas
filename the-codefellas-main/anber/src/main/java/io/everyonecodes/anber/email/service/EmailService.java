@@ -1,7 +1,8 @@
 package io.everyonecodes.anber.email.service;
 
-import io.everyonecodes.anber.email.data.Notification;
+import io.everyonecodes.anber.providermanagement.data.ProviderType;
 import io.everyonecodes.anber.providermanagement.data.UnverifiedAccount;
+import io.everyonecodes.anber.providermanagement.data.VerifiedAccount;
 import io.everyonecodes.anber.providermanagement.repository.UnverifiedAccountRepository;
 import io.everyonecodes.anber.providermanagement.repository.VerifiedAccountRepository;
 import io.everyonecodes.anber.searchmanagement.data.ProviderDTO;
@@ -48,15 +49,15 @@ public class EmailService {
     private final UnverifiedAccountRepository unverifiedAccountRepository;
     private final VerifiedAccountRepository verifiedAccountRepository;
     private final TariffRepository tariffRepository;
-    private List<ProviderDTO> currentProviderList;
+    private List<VerifiedAccount> verifiedList = new ArrayList<>();
+    private List<UnverifiedAccount> unverifiedList = new ArrayList<>();
 
     public EmailService(JavaMailSender javaMailSender, UserRepository userRepository, PasswordEncoder passwordEncoder,
                         UserDTO userDTO, NotificationService notificationService,
                         @Value("${spring.mail.username}") String setUsernameValue,
                         @Value("${spring.mail.password}") String setPasswordValue,
                         ProviderRepository providerRepository, UnverifiedAccountRepository unverifiedAccountRepository,
-                        VerifiedAccountRepository verifiedAccountRepository, TariffRepository tariffRepository,
-                        List<ProviderDTO> currentProviderList) {
+                        VerifiedAccountRepository verifiedAccountRepository, TariffRepository tariffRepository) {
         this.javaMailSender = javaMailSender;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
@@ -68,7 +69,6 @@ public class EmailService {
         this.unverifiedAccountRepository = unverifiedAccountRepository;
         this.verifiedAccountRepository = verifiedAccountRepository;
         this.tariffRepository = tariffRepository;
-        this.currentProviderList = currentProviderList;
     }
 
     // send email with link that allows password change
@@ -125,46 +125,129 @@ public class EmailService {
         allowedUsers.put(key, value);
     }
 
-//    //-----------email notifications----------------//
-
     //every day at 10am
-    @Scheduled(cron = "0 0/5 * * * ?")
+    @Scheduled(cron = "0 0/1 * * * ?")
     public void sendEmailNotificationForNewProviders() {
 
-        sendNewProvidersNotificationHTMLEmail(); //Send Notification email for new provider
 
-    }
+        sendNewProvidersNotificationHTMLEmail(unverifiedList, verifiedList); // Send Notification email for new provider
 
-    private String toEmailString(Notification notification) {
-        return "From: \"" + notification.getCreator() + "\"\n" +
-                "Message: \"" + notification.getMessage() + "\"\n";
     }
 
     // Send new provider email
-    public void sendNewProvidersNotificationHTMLEmail() {
-//        var notificationUserList = userRepository.findAllByNotificationsEnabled(true);
-//
-//        List<UnverifiedAccount> unverifiedList = unverifiedAccountRepository.findAll();
-//        List<VerifiedAccount> verifiedList = verifiedAccountRepository.findAll();
-//
-//        currentProviderList.addAll(unverifiedList);
-//        currentList.addAll(unverifiedList);
-//        currentList.addAll(verifiedList);
-//        System.out.println(currentList);
-//        List<String> testList2 = List.of("1", "2", "5", "7", "8", "9", "10");
-//        List<String> newNumbersList = new ArrayList<>();
-//        for (String number : testList2) {
-//            if (!currentList.contains(number)) {
-//                newNumbersList.add(number);
-//            }
-//        }
-//        System.out.println(newNumbersList);
-//
-//
-//        for (User user : notificationUserList) {
-//            var mailAddress = user.getEmail();
-//
-//        }
+    public void sendNewProvidersNotificationHTMLEmail(List<UnverifiedAccount> ProvidersAddedUnverified,
+                                                      List<VerifiedAccount> ProvidersAddedVerified) {
+        var notificationUserList = userRepository.findAllByNotificationsEnabled(true);
+
+
+        System.out.println(unverifiedList.stream().toList());
+
+        // Data Fill for the first Run
+        if (unverifiedList.isEmpty()) {
+            var update = unverifiedAccountRepository.findAll();
+            unverifiedList.addAll(update);
+        }
+
+        System.out.println(verifiedList.stream().toList());
+
+        if (verifiedList.isEmpty()) {
+            var update = verifiedAccountRepository.findAll();
+            verifiedList.addAll(update);
+        }
+
+
+        // Up-to-date Providers
+        var up2DateProvidersListUnverified = unverifiedAccountRepository.findAll();
+        var up2DateProvidersListVerified = verifiedAccountRepository.findAll();
+
+        // Lists for new added Provider Entries
+        List<UnverifiedAccount> newProvidersAddedUnverified = new ArrayList<>();
+        List<VerifiedAccount> newProvidersAddedVerified = new ArrayList<>();
+
+        // New Entries check
+        for (UnverifiedAccount unverifiedAccount : up2DateProvidersListUnverified) {
+            if (!unverifiedList.contains(unverifiedAccount)) {
+                newProvidersAddedUnverified.add(unverifiedAccount);
+            }
+        }
+
+        for (VerifiedAccount verifiedAccount : up2DateProvidersListVerified) {
+            if (!verifiedList.contains(verifiedAccount)) {
+                newProvidersAddedVerified.add(verifiedAccount);
+            }
+        }
+
+        // String Building for Mail
+        StringBuilder uAccountNames = new StringBuilder();
+        StringBuilder vAccountNames = new StringBuilder();
+
+        for (UnverifiedAccount unverifiedAccount : newProvidersAddedUnverified) {
+            var uAccountName = unverifiedAccount.getProviderName();
+            uAccountNames.append(uAccountName).append("<br>");
+        }
+
+        for (VerifiedAccount verifiedAccount : newProvidersAddedVerified) {
+            var vAccountName = verifiedAccount.getProviderName();
+            vAccountNames.append(vAccountName).append("<br>");
+        }
+
+        // Sending the actual email to enabled users
+        for (User user : notificationUserList) {
+            var mailAddress = user.getEmail();
+            mailingNewProviders(mailAddress, uAccountNames.toString(), vAccountNames.toString());
+        }
+
+        saveListValues(newProvidersAddedUnverified, newProvidersAddedVerified);
+    }
+
+    // Adding the new entries to the persistent List
+    private void saveListValues(List<UnverifiedAccount> newProvidersAddedUnverified, List<VerifiedAccount> newProvidersAddedVerified) {
+        unverifiedList = unverifiedAccountRepository.findAll();
+        verifiedList = verifiedAccountRepository.findAll();
+    }
+
+    private void mailingNewProviders(String mailAddress, String uAccountNames, String vAccountNames) {
+        String from = setUsernameValue;
+        final String username = from;
+        final String password = setPasswordValue;
+        String host = "smtp.gmail.com";
+        Properties props = new Properties();
+        props.put("mail.smtp.auth", "true");
+        props.put("mail.smtp.starttls.enable", "true");
+        props.put("mail.smtp.host", host);
+        props.put("mail.smtp.port", "587");
+        Session session = Session.getInstance(props,
+                new javax.mail.Authenticator() {
+                    protected PasswordAuthentication getPasswordAuthentication() {
+                        return new PasswordAuthentication(username, password);
+                    }
+                });
+        try {
+            MimeMessage message = new MimeMessage(session);
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "utf-8");
+            helper.setTo(mailAddress);
+
+            String body = "<h3><font color=black>Dear " + mailAddress + ",\n" +
+                    "<br><br><br><br><u>Here is your semi-annual provider update!</u>" +
+                    "\n</font></h3><br>";
+            body += "<font color=black><p><i></i>";
+            body += "<h3>" + "<u>Unverified Providers added:</u>" + "<br><br>"
+                    + uAccountNames + "<br><br>"
+                    + "<u>Verified Providers added:</u>" + "<br><br>"
+                    + vAccountNames +
+                    "</h3></p></font>"
+                    + "<html><body><img src='cid:identifier1234'></body></html>";
+            helper.setText(body, true);
+            File f = new File("project-phase/the-codefellas-main/anber/src/main/resources/images/AnberLogoEmail.png");
+            String absolutePath = f.getAbsolutePath();
+            Resource res = new FileSystemResource(new File(absolutePath));
+            helper.addInline("identifier1234", res);
+            helper.setSubject("Your semi-annual provider update is here.");
+            helper.setFrom(from);
+            javaMailSender.send(message);
+        } catch (MessagingException e) {
+            e.printStackTrace();
+        }
     }
 
     // Send verification email
@@ -177,24 +260,43 @@ public class EmailService {
     }
 
     private String extractTariffs(Long id) {
-        var tariffsForMail = tariffRepository.findAllByProviderId(id);
-        var tariffName = "";
-        var basicrate = 0.0;
-        var contractType = "";
-        var priceModel = "";
-        var extractedTariffs = "";
-        for (Tariff tariff : tariffsForMail) {
-            tariffName = tariff.getTariffName();
-            basicrate = tariff.getBasicRate();
-            contractType = String.valueOf(tariff.getContractType());
-            priceModel = String.valueOf(tariff.getPriceModel());
-            extractedTariffs = "Tariff Name: " + tariffName + ", " +
-                    "Basic Rate: " + basicrate + ", " +
-                    "Contract Type: " + contractType + ", " +
-                    "Price Model: " + priceModel;
-            return extractedTariffs;
+        var uAccount = unverifiedAccountRepository.findById(id);
+        var oProviderAccount = providerRepository.findById(id);
+        ProviderDTO providerAccount;
+        ProviderType providerType = null;
+        if (oProviderAccount.isPresent()) {
+            providerAccount = oProviderAccount.get();
+            providerType = providerAccount.getProviderType();
         }
-        return "There are no tariffs yet for this provider.";
+        if (uAccount.isPresent()) {
+            var tariffsForMail = uAccount.get();
+            var tariffsList = tariffsForMail.getTariffs();
+            var tariffName = "";
+            var basicrate = 0.0;
+            var contractType = "";
+            var priceModel = "";
+            var extractedTariffs = "";
+            assert providerType != null;
+            StringBuilder stringBuilder = new StringBuilder();
+            if (tariffsList.isEmpty()) {
+                extractedTariffs = "There are no tariffs yet for this provider.";
+                stringBuilder.append(extractedTariffs);
+            }
+            for (Tariff tariff : tariffsList) {
+                tariffName = tariff.getTariffName();
+                basicrate = tariff.getBasicRate();
+                contractType = String.valueOf(tariff.getContractType());
+                priceModel = String.valueOf(tariff.getPriceModel());
+                extractedTariffs = "<br>Tariff Name: " + tariffName + ", " +
+                        "Provider Type: " + providerType + ", " +
+                        "Basic Rate: " + basicrate + ", " +
+                        "Contract Type: " + contractType + ", " +
+                        "Price Model: " + priceModel;
+                stringBuilder.append(extractedTariffs);
+            }
+            return stringBuilder.toString();
+        }
+        return "Provider was not found.";
     }
 
     // Method for sending a notification mail
@@ -227,7 +329,7 @@ public class EmailService {
                     + "<u>Provider Name:</u>  " + account.getProviderName() + "<br><br>"
                     + "<u>Provider Website:</u>  " + account.getWebsite() + "<br><br>"
                     + "<u>Provider Score:</u>  " + account.getRating().getScore() + "<br><br>"
-                    + "<u>Provider Tariffs:</u>  " + extractTariffs(account.getId()) + "<br><br>" // Tariffs WIP so this is basic for now
+                    + "<u>Provider Tariffs:</u>  " + extractTariffs(account.getId()) + "<br><br>"
                     +
                     "</h3></p></font>"
                     + "<html><body><img src='cid:identifier1234'></body></html>";
@@ -238,8 +340,6 @@ public class EmailService {
             helper.addInline("identifier1234", res);
             helper.setSubject("A provider just got verified!");
             helper.setFrom(from);
-            File file = new File(absolutePath);
-//            helper.addAttachment("AnberLogo.png", file); // - leave this here in case we need it for other attachments
             javaMailSender.send(message);
         } catch (MessagingException e) {
             e.printStackTrace();
@@ -275,12 +375,6 @@ public class EmailService {
             String body = "<h3><font color=black>Dear " + oUser.get().getEmail() + ",\n" +
                     "<br><br><br><br>Click here to reset your password:\n</font></h3><br>";
             body += "<font color=black><p><i></i>";
-            /// Notification part of email goes here if needed
-//            List<Notification> notifications = new ArrayList<>();
-//            String notificationsAsString = notifications.stream()
-//                    .map(this::toEmailStringHTML)
-//                    .collect(Collectors.joining("<br>"));
-//            body += notificationsAsString;
             body += "<h3>" + "https://localhost:8080/pwreset/passwordreset/" + uuid + "</h3></p></font>"
                     + "<html><body><img src='cid:identifier1234'></body></html>";
             helper.setText(body, true);
@@ -290,16 +384,10 @@ public class EmailService {
             helper.addInline("identifier1234", res);
             helper.setSubject("Password Reset Confirmation from Anber-project");
             helper.setFrom(from);
-            File file = new File(absolutePath);
-//            helper.addAttachment("AnberLogo.png", file); // - leave this here in case we need it for other attachments
             javaMailSender.send(message);
         } catch (MessagingException e) {
             e.printStackTrace();
         }
     }
 
-    private String toEmailStringHTML(Notification notification) {
-        return "<b>From:</b> \"" + notification.getCreator() + "\"<br>" +
-                "<b>Message:</b> \"" + notification.getMessage() + "\"<br>";
-    }
 }
