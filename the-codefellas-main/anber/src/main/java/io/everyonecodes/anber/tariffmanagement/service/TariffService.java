@@ -4,6 +4,7 @@ import io.everyonecodes.anber.providermanagement.repository.UnverifiedAccountRep
 import io.everyonecodes.anber.providermanagement.repository.VerifiedAccountRepository;
 import io.everyonecodes.anber.searchmanagement.repository.ProviderRepository;
 import io.everyonecodes.anber.tariffmanagement.data.Tariff;
+import io.everyonecodes.anber.tariffmanagement.email.TariffErrorEmailService;
 import io.everyonecodes.anber.tariffmanagement.repository.TariffRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -31,7 +32,7 @@ public class TariffService {
     private final String listElementPriceModel;
     private final String missingTariffName;
     private final String placeholderTariffName;
-
+    private final TariffErrorEmailService tariffErrorEmailService;
 
 
     public TariffService(TariffRepository tariffRepository,
@@ -50,7 +51,8 @@ public class TariffService {
                          @Value("${messages.tariff.contractType}") String listElementContractType,
                          @Value("${messages.tariff.priceModel}") String listElementPriceModel,
                          @Value("${messages.tariff.missing}") String missingTariffName,
-                         @Value("${data.placeholders.tariffName}") String placeholderTariffName) {
+                         @Value("${data.placeholders.tariffName}") String placeholderTariffName,
+                         TariffErrorEmailService tariffErrorEmailService) {
         this.tariffRepository = tariffRepository;
         this.providerRepository = providerRepository;
         this.verifiedAccountRepository = verifiedAccountRepository;
@@ -68,6 +70,7 @@ public class TariffService {
         this.listElementPriceModel = listElementPriceModel;
         this.missingTariffName = missingTariffName;
         this.placeholderTariffName = placeholderTariffName;
+        this.tariffErrorEmailService = tariffErrorEmailService;
     }
 
     private final String newLine = "\n";
@@ -120,8 +123,9 @@ public class TariffService {
                 }
                 i++;
             }
+
             if (!totalResult.isBlank()) {
-                //write mail with error message
+                tariffErrorEmailService.sendEmailTariffError(dto, totalResult);
                 return (totalResult + newLine + updateFailure);
             } else {
                 return updateSuccess;
