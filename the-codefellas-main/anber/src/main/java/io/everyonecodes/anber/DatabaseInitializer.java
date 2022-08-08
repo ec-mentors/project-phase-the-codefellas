@@ -40,8 +40,8 @@ public class DatabaseInitializer {
 
             ScriptRunner sr = new ScriptRunner(con);
 
-            File f = new File("the-codefellas-main/anber/src/main/resources/static/anber_dummydatabase.sql");
-            String absolutePath = f.getCanonicalPath();
+            File f = new File("src/main/resources/static/anber_dummydatabase.sql");
+            String absolutePath = f.getAbsolutePath();
 
             Reader reader = new BufferedReader(new FileReader(absolutePath));
             sr.runScript(reader);

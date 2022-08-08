@@ -2,7 +2,12 @@ package io.everyonecodes.anber.email.service;
 
 import io.everyonecodes.anber.email.data.Notification;
 import io.everyonecodes.anber.providermanagement.data.UnverifiedAccount;
+import io.everyonecodes.anber.providermanagement.repository.UnverifiedAccountRepository;
+import io.everyonecodes.anber.providermanagement.repository.VerifiedAccountRepository;
+import io.everyonecodes.anber.searchmanagement.data.ProviderDTO;
 import io.everyonecodes.anber.searchmanagement.repository.ProviderRepository;
+import io.everyonecodes.anber.tariffmanagement.data.Tariff;
+import io.everyonecodes.anber.tariffmanagement.repository.TariffRepository;
 import io.everyonecodes.anber.usermanagement.data.User;
 import io.everyonecodes.anber.usermanagement.data.UserPrivateDTO;
 import io.everyonecodes.anber.usermanagement.repository.UserRepository;
@@ -40,12 +45,18 @@ public class EmailService {
     private final String setUsernameValue;
     private final String setPasswordValue;
     private final ProviderRepository providerRepository;
+    private final UnverifiedAccountRepository unverifiedAccountRepository;
+    private final VerifiedAccountRepository verifiedAccountRepository;
+    private final TariffRepository tariffRepository;
+    private List<ProviderDTO> currentProviderList;
 
     public EmailService(JavaMailSender javaMailSender, UserRepository userRepository, PasswordEncoder passwordEncoder,
                         UserDTO userDTO, NotificationService notificationService,
                         @Value("${spring.mail.username}") String setUsernameValue,
                         @Value("${spring.mail.password}") String setPasswordValue,
-                        ProviderRepository providerRepository) {
+                        ProviderRepository providerRepository, UnverifiedAccountRepository unverifiedAccountRepository,
+                        VerifiedAccountRepository verifiedAccountRepository, TariffRepository tariffRepository,
+                        List<ProviderDTO> currentProviderList) {
         this.javaMailSender = javaMailSender;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
@@ -54,6 +65,10 @@ public class EmailService {
         this.setUsernameValue = setUsernameValue;
         this.setPasswordValue = setPasswordValue;
         this.providerRepository = providerRepository;
+        this.unverifiedAccountRepository = unverifiedAccountRepository;
+        this.verifiedAccountRepository = verifiedAccountRepository;
+        this.tariffRepository = tariffRepository;
+        this.currentProviderList = currentProviderList;
     }
 
     // send email with link that allows password change
@@ -113,27 +128,43 @@ public class EmailService {
 //    //-----------email notifications----------------//
 
     //every day at 10am
-    @Scheduled(cron = "0 0 10 * * ?")
-    public void sendEmailNotificationDaily() {
-//        var subject = "Daily Notifications from Anber";
-//        var message = "Here are your notifications:\n\n";
-//        var mailMessage = new SimpleMailMessage();
-//        List<User> users = userRepository.findAllByNotificationsEnabled(true);
-//        for (User user : users) {
-//            if (users.isEmpty()) {
-//                return;
-//            }
-//            mailMessage.setTo(user.getEmail());
-//            mailMessage.setSubject(subject);
-//            mailMessage.setText(message);
-//            mailMessage.setFrom("anber.project@gmail.com");
-//            javaMailSender.send(mailMessage);
-//        }
+    @Scheduled(cron = "0 0/5 * * * ?")
+    public void sendEmailNotificationForNewProviders() {
+
+        sendNewProvidersNotificationHTMLEmail(); //Send Notification email for new provider
+
     }
 
     private String toEmailString(Notification notification) {
         return "From: \"" + notification.getCreator() + "\"\n" +
                 "Message: \"" + notification.getMessage() + "\"\n";
+    }
+
+    // Send new provider email
+    public void sendNewProvidersNotificationHTMLEmail() {
+//        var notificationUserList = userRepository.findAllByNotificationsEnabled(true);
+//
+//        List<UnverifiedAccount> unverifiedList = unverifiedAccountRepository.findAll();
+//        List<VerifiedAccount> verifiedList = verifiedAccountRepository.findAll();
+//
+//        currentProviderList.addAll(unverifiedList);
+//        currentList.addAll(unverifiedList);
+//        currentList.addAll(verifiedList);
+//        System.out.println(currentList);
+//        List<String> testList2 = List.of("1", "2", "5", "7", "8", "9", "10");
+//        List<String> newNumbersList = new ArrayList<>();
+//        for (String number : testList2) {
+//            if (!currentList.contains(number)) {
+//                newNumbersList.add(number);
+//            }
+//        }
+//        System.out.println(newNumbersList);
+//
+//
+//        for (User user : notificationUserList) {
+//            var mailAddress = user.getEmail();
+//
+//        }
     }
 
     // Send verification email
@@ -143,6 +174,27 @@ public class EmailService {
             var mailAddress = user.getEmail();
             mailingNotification(mailAddress, account);
         }
+    }
+
+    private String extractTariffs(Long id) {
+        var tariffsForMail = tariffRepository.findAllByProviderId(id);
+        var tariffName = "";
+        var basicrate = 0.0;
+        var contractType = "";
+        var priceModel = "";
+        var extractedTariffs = "";
+        for (Tariff tariff : tariffsForMail) {
+            tariffName = tariff.getTariffName();
+            basicrate = tariff.getBasicRate();
+            contractType = String.valueOf(tariff.getContractType());
+            priceModel = String.valueOf(tariff.getPriceModel());
+            extractedTariffs = "Tariff Name: " + tariffName + ", " +
+                    "Basic Rate: " + basicrate + ", " +
+                    "Contract Type: " + contractType + ", " +
+                    "Price Model: " + priceModel;
+            return extractedTariffs;
+        }
+        return "There are no tariffs yet for this provider.";
     }
 
     // Method for sending a notification mail
@@ -166,6 +218,7 @@ public class EmailService {
             MimeMessage message = new MimeMessage(session);
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "utf-8");
             helper.setTo(mailAddress);
+
             String body = "<h3><font color=black>Dear " + mailAddress + ",\n" +
                     "<br><br><br><br><u>The provider " + account.getProviderName() + " just got verified!</u>" +
                     "\n</font></h3><br>";
@@ -173,8 +226,8 @@ public class EmailService {
             body += "<h3>" + "<u>Provider Details:</u>" + "<br><br>"
                     + "<u>Provider Name:</u>  " + account.getProviderName() + "<br><br>"
                     + "<u>Provider Website:</u>  " + account.getWebsite() + "<br><br>"
-                    + "<u>Provider Score:</u>  " + account.getRating().getScore()+ "<br><br>"
-                    + "<u>Provider Tariffs:</u>  " + account.getTariffs() + "<br><br>" // Tariffs WIP so this is basic for now
+                    + "<u>Provider Score:</u>  " + account.getRating().getScore() + "<br><br>"
+                    + "<u>Provider Tariffs:</u>  " + extractTariffs(account.getId()) + "<br><br>" // Tariffs WIP so this is basic for now
                     +
                     "</h3></p></font>"
                     + "<html><body><img src='cid:identifier1234'></body></html>";
