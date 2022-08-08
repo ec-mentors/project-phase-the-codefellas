@@ -29,10 +29,13 @@ public class AuthenticationService {
                     resetFailedLoginAttempts(userLogin);
                     return true;
                 }
+
                 if (userLogin.getLoginAttempts() <= 4) {
                         updateFailedLoginAttempts(userLogin);
                         return false;
+
                 }
+
                 if (userLogin.getLoginAttempts() == 5) {
                         sendFailedLoginEmail.sendEmailLoginFail(userLogin);
                         userLogin.setAccountNonLocked(false);

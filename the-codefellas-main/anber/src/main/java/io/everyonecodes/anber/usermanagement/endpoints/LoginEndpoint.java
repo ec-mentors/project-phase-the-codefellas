@@ -1,4 +1,3 @@
-
 package io.everyonecodes.anber.usermanagement.endpoints;
 
 import io.everyonecodes.anber.usermanagement.data.User;

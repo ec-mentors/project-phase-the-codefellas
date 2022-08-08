@@ -36,6 +36,7 @@ public class InitializationRunner {
             if (!userRepository.existsByEmail(adminEmail)) {
                 String password = passwordEncoder.encode(adminPassword);
                 User admin = new User(adminUsername, adminUsername.toLowerCase(), adminEmail, password, adminRole, adminEmail);
+                admin.setAccountNonLocked(true);
                 userRepository.save(admin);
             }
             dbInitializer.createDummyDatabase();
