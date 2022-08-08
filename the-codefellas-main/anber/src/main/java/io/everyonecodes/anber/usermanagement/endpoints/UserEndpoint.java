@@ -4,7 +4,6 @@ import io.everyonecodes.anber.usermanagement.data.User;
 import io.everyonecodes.anber.usermanagement.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.annotation.Secured;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
@@ -36,16 +35,22 @@ public class UserEndpoint {
     @PreRemove
     @DeleteMapping("/{username}/delete")
     @Secured("ROLE_USER")
-    void deleteProfile(@PathVariable String username) {
+    void deleteUser(@PathVariable String username) {
         String name = SecurityContextHolder.getContext().getAuthentication().getName();
 
-        if(!name.equalsIgnoreCase(username)) {
-            throw new AuthenticationException("User can only delete himself") {
+        if(!name.equals(username)) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User can only delete himself") {
 
             };
         }
 
         userService.deleteUser(username);
+    }
+
+    @PutMapping("/{username}/unlock")
+    @Secured("ROLE_ADMIN")
+    void unlockUser(@PathVariable String username) {
+        userService.unlockUser(username);
     }
 
 }

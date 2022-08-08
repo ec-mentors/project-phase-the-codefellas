@@ -8,12 +8,8 @@ import java.util.List;
 
 public interface ProviderRepository
         extends JpaRepository<ProviderDTO, Long> {
-
     List<ProviderDTO> findByCountryName(String countryName);
     List<ProviderDTO> findByProviderType(ProviderType providerType);
-
     List<ProviderDTO> findByProviderName(String providerName);
-//    List<ProviderDTO> findByTariffName(String tariffName);
-//    List<ProviderDTO> findByPriceModel(PriceModelType priceModel);
 }
 

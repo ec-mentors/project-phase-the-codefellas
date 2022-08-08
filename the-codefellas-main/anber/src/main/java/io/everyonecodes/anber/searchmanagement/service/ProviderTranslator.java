@@ -5,21 +5,10 @@ import io.everyonecodes.anber.providermanagement.data.UnverifiedAccount;
 import io.everyonecodes.anber.providermanagement.data.VerifiedAccount;
 import io.everyonecodes.anber.searchmanagement.data.Provider;
 import io.everyonecodes.anber.searchmanagement.data.ProviderDTO;
-import io.everyonecodes.anber.searchmanagement.repository.ProviderRepository;
-import io.everyonecodes.anber.tariffmanagement.repository.TariffRepository;
 import org.springframework.stereotype.Service;
 
 @Service
 public class ProviderTranslator {
-
-
-    private final ProviderRepository providerRepository;
-    private final TariffRepository tariffRepository;
-
-    public ProviderTranslator(ProviderRepository providerRepository, TariffRepository tariffRepository) {
-        this.providerRepository = providerRepository;
-        this.tariffRepository = tariffRepository;
-    }
 
     public Provider DtoToProvider(ProviderDTO dto) {
         return new Provider(dto.getProviderName(), dto.getRating().getScore(),
@@ -27,7 +16,6 @@ public class ProviderTranslator {
                 dto.getTariffs().get(0).getBasicRate(),
                 dto.getTariffs().get(0).getContractType(),
                 dto.getTariffs().get(0).getPriceModel());
-
     }
 
     public VerifiedAccount DtoToVerifiedAccount(ProviderDTO dto) {
@@ -51,17 +39,5 @@ public class ProviderTranslator {
     public ProviderPublic dtoToPublic(ProviderDTO providerDTO) {
         return new ProviderPublic(providerDTO.getProviderName(), providerDTO.getWebsite(),providerDTO.getRating(), providerDTO.getTariffs());
     }
-
-//    private void addTariffToDto(Long id) {
-//        if (providerRepository.findById(id).isPresent()) {
-//            var dto = providerRepository.findById(id).get();
-//            var tariffs = tariffRepository.findAllByProviderId(id);
-//            dto.setTariffs(tariffs);
-//            providerRepository.save(dto);
-//        }
-//    }
-
-
-
 }
 

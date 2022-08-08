@@ -1,12 +1,12 @@
+
 package io.everyonecodes.anber.usermanagement.endpoints;
 
+import io.everyonecodes.anber.usermanagement.data.User;
 import io.everyonecodes.anber.usermanagement.data.UserPrivateDTO;
 import io.everyonecodes.anber.usermanagement.service.UserService;
-import org.springframework.security.access.annotation.Secured;
-import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @RequestMapping("/signin")
@@ -18,10 +18,15 @@ public class LoginEndpoint {
         this.userService = userService;
     }
 
-    @GetMapping
-    @Secured({"ROLE_ADMIN", "ROLE_USER"})
-    UserPrivateDTO viewIndividualProfile(Authentication authentication) {
-        return userService.viewIndividualProfileData(authentication.getName()).orElse(null);
+    @PostMapping
+    UserPrivateDTO viewIndividualProfile(@RequestBody User user) {
+        if (userService.isUserUnlocked(user)) {
+            return userService.viewIndividualProfileDataUser(user)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Bad credentials"));
+        }
+        else {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Account locked");
+        }
     }
 
 }

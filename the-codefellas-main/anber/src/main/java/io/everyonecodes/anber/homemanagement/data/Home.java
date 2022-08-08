@@ -19,37 +19,37 @@ public class Home {
     private String postalCode;
 
     @Enumerated
-    private HomeType type;
+    private HomeType homeType;
     private double sizeInSquareMeters;
 
 
     public Home() {
     }
 
-    public Home(String country, String city, String postalCode, HomeType type, double sizeInSquareMeters) {
+    public Home(String country, String city, String postalCode, HomeType homeType, double sizeInSquareMeters) {
         this.country = country;
         this.city = city;
         this.postalCode = postalCode;
-        this.type = type;
+        this.homeType = homeType;
         this.sizeInSquareMeters = sizeInSquareMeters;
     }
 
-    public Home(Long id, String homeName, String country, String city, String postalCode, HomeType type, double sizeInSquareMeters) {
+    public Home(Long id, String homeName, String country, String city, String postalCode, HomeType homeType, double sizeInSquareMeters) {
         this.id = id;
         this.homeName = homeName;
         this.country = country;
         this.city = city;
         this.postalCode = postalCode;
-        this.type = type;
+        this.homeType = homeType;
         this.sizeInSquareMeters = sizeInSquareMeters;
     }
 
-    public Home(String homeName, String country, String city, String postalCode, HomeType type, double sizeInSquareMeters) {
+    public Home(String homeName, String country, String city, String postalCode, HomeType homeType, double sizeInSquareMeters) {
         this.homeName = homeName;
         this.country = country;
         this.city = city;
         this.postalCode = postalCode;
-        this.type = type;
+        this.homeType = homeType;
         this.sizeInSquareMeters = sizeInSquareMeters;
     }
 
@@ -85,12 +85,12 @@ public class Home {
         this.postalCode = postalCode;
     }
 
-    public HomeType getType() {
-        return type;
+    public HomeType getHomeType() {
+        return homeType;
     }
 
-    public void setType(HomeType type) {
-        this.type = type;
+    public void setHomeType(HomeType homeType) {
+        this.homeType = homeType;
     }
 
     public double getSizeInSquareMeters() {
@@ -114,12 +114,12 @@ public class Home {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Home home = (Home) o;
-        return Double.compare(home.sizeInSquareMeters, sizeInSquareMeters) == 0 && Objects.equals(id, home.id) && Objects.equals(homeName, home.homeName) && Objects.equals(country, home.country) && Objects.equals(city, home.city) && Objects.equals(postalCode, home.postalCode) && type == home.type;
+        return Double.compare(home.sizeInSquareMeters, sizeInSquareMeters) == 0 && Objects.equals(id, home.id) && Objects.equals(homeName, home.homeName) && Objects.equals(country, home.country) && Objects.equals(city, home.city) && Objects.equals(postalCode, home.postalCode) && homeType == home.homeType;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, homeName, country, city, postalCode, type, sizeInSquareMeters);
+        return Objects.hash(id, homeName, country, city, postalCode, homeType, sizeInSquareMeters);
     }
 
     @Override
@@ -130,7 +130,7 @@ public class Home {
                 ", country='" + country + '\'' +
                 ", city='" + city + '\'' +
                 ", postalCode='" + postalCode + '\'' +
-                ", type=" + type +
+                ", type=" + homeType +
                 ", sizeInSquareMeters=" + sizeInSquareMeters +
                 '}';
     }

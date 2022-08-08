@@ -1,11 +1,10 @@
 package io.everyonecodes.anber.ratingmanagement.service;
 
 import io.everyonecodes.anber.ratingmanagement.data.Rating;
-import io.everyonecodes.anber.searchmanagement.repository.ProviderRepository;
 import io.everyonecodes.anber.ratingmanagement.repository.RatingRepository;
+import io.everyonecodes.anber.searchmanagement.repository.ProviderRepository;
+import io.everyonecodes.anber.usermanagement.service.UserService;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
@@ -16,25 +15,30 @@ public class RatingService {
 
     private final RatingRepository ratingRepository;
     private final ProviderRepository providerRepository;
+    private final UserService userService;
     private final String noRatings;
+    private final String currentRating;
+    private final String alreadyRated;
+    private final String placeholderProviderName;
+    private final String placeholderLoggedInUser;
 
 
     public RatingService(RatingRepository ratingRepository,
                          ProviderRepository providerRepository,
-                         @Value("${messages.provider-account.no-ratings}") String noRatings) {
+                         UserService userService,
+                         @Value("${messages.provider-account.no-ratings}") String noRatings,
+                         @Value("${messages.ratings.current}") String currentRating,
+                         @Value("${messages.ratings.already-rated}") String alreadyRated,
+                         @Value("${data.placeholders.providerName}") String placeholderProviderName,
+                         @Value("${data.placeholders.loggedInUser}") String placeholderLoggedInUser) {
         this.ratingRepository = ratingRepository;
         this.providerRepository = providerRepository;
+        this.userService = userService;
         this.noRatings = noRatings;
-    }
-
-    private String loggedInUser() {
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
-        if (principal instanceof UserDetails) {
-            return ((UserDetails) principal).getUsername();
-        } else {
-            return principal.toString();
-        }
+        this.currentRating = currentRating;
+        this.alreadyRated = alreadyRated;
+        this.placeholderProviderName = placeholderProviderName;
+        this.placeholderLoggedInUser = placeholderLoggedInUser;
     }
 
     private boolean isInRange(int rating) {
@@ -43,7 +47,7 @@ public class RatingService {
 
     public Optional<String> rateProvider(int rating, Long id) {
         if (isInRange(rating)) {
-            String userName = loggedInUser();
+            String userName = userService.loggedInUser();
 
             var oProviderDTO = providerRepository.findById(id);
             if (oProviderDTO.isPresent()) {
@@ -61,7 +65,7 @@ public class RatingService {
                     if (dto.getRating().getScore().equals(noRatings)) {
                         dto.getRating().setScore(String.valueOf(rating));
                         ratingRepository.save(new Rating(dto.getId(), users, String.valueOf(Math.round((double) rating * 100.00)/100.00)));
-                        return Optional.of("Current rating for Provider " + dto.getProviderName() + " is: " + (Math.round((double) rating * 100.00)/100.00) );
+                        return Optional.of(currentRating.replace(placeholderProviderName, dto.getProviderName()) + (Math.round((double) rating * 100.00)/100.00) );
                     } else {
                         double score = Double.parseDouble(dto.getRating().getScore());
                         score = (score + rating) / numberOfRatings;
@@ -72,12 +76,11 @@ public class RatingService {
                             updatedRating.setUsersRated(users);
                             updatedRating.setScore(String.valueOf(score));
                             ratingRepository.save(updatedRating);
-                            return Optional.of("Current rating for Provider " + dto.getProviderName() + " is: " + (Math.round(score *100.00)/100.00) );
-
+                            return Optional.of(currentRating.replace(placeholderProviderName, dto.getProviderName()) + (Math.round(score *100.00)/100.00) );
                         }
                     }
                 }
-                return Optional.of("User " + loggedInUser() + " already gave a rating to Provider " + dto.getProviderName() + "!");
+                return Optional.of(alreadyRated.replace(placeholderProviderName, dto.getProviderName()).replace(placeholderLoggedInUser, userName));
             }
         }
         return Optional.empty();

@@ -72,7 +72,7 @@ public class AccountService {
                 UnverifiedAccount account = translator.DtoToUnverifiedAccount(dto);
 
                 account.setTariffs(List.of());
-                account.setRating(new Rating(account.getId(), Set.of(), "no ratings yet"));
+                account.setRating(new Rating(account.getId(), Set.of(), noRatings));
                 ratingRepository.save(account.getRating());
                 unverifiedAccountRepository.save(account);
 
@@ -199,6 +199,7 @@ public class AccountService {
                         .map(Tariff::getId)
                         .collect(Collectors.toList());
                 tariffRepository.deleteAllByIdInBatch(ids);
+                ratingRepository.deleteById(id);
                 unverifiedAccountRepository.deleteById(id);
 
             }

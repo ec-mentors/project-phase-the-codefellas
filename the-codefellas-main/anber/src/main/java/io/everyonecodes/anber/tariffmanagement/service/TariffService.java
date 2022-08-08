@@ -5,6 +5,7 @@ import io.everyonecodes.anber.providermanagement.repository.VerifiedAccountRepos
 import io.everyonecodes.anber.searchmanagement.repository.ProviderRepository;
 import io.everyonecodes.anber.tariffmanagement.data.Tariff;
 import io.everyonecodes.anber.tariffmanagement.repository.TariffRepository;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -17,13 +18,59 @@ public class TariffService {
     private final ProviderRepository providerRepository;
     private final VerifiedAccountRepository verifiedAccountRepository;
     private final UnverifiedAccountRepository unverifiedAccountRepository;
+    private final String tariffFilePath;
+    private final String placeholderId;
+    private final String updateFailure;
+    private final String updateSuccess;
+    private final String providerNotFound;
+    private final String errorMessage1;
+    private final String errorMessage2;
+    private final String listElementTariffName;
+    private final String listElementBasicRate;
+    private final String listElementContractType;
+    private final String listElementPriceModel;
+    private final String missingTariffName;
+    private final String placeholderTariffName;
 
-    public TariffService(TariffRepository tariffRepository, ProviderRepository providerRepository, VerifiedAccountRepository verifiedAccountRepository, UnverifiedAccountRepository unverifiedAccountRepository) {
+
+
+    public TariffService(TariffRepository tariffRepository,
+                         ProviderRepository providerRepository,
+                         VerifiedAccountRepository verifiedAccountRepository,
+                         UnverifiedAccountRepository unverifiedAccountRepository,
+                         @Value("${paths.tariff-file}") String tariffFilePath,
+                         @Value("${data.placeholders.id}") String placeholderId,
+                         @Value("${messages.tariff.failure}") String updateFailure,
+                         @Value("${messages.tariff.success}") String updateSuccess,
+                         @Value("${messages.tariff.not-found}") String providerNotFound,
+                         @Value("${messages.tariff.error1}") String errorMessage1,
+                         @Value("${messages.tariff.error2}") String errorMessage2,
+                         @Value("${messages.tariff.tariffName}") String listElementTariffName,
+                         @Value("${messages.tariff.basicRate}") String listElementBasicRate,
+                         @Value("${messages.tariff.contractType}") String listElementContractType,
+                         @Value("${messages.tariff.priceModel}") String listElementPriceModel,
+                         @Value("${messages.tariff.missing}") String missingTariffName,
+                         @Value("${data.placeholders.tariffName}") String placeholderTariffName) {
         this.tariffRepository = tariffRepository;
         this.providerRepository = providerRepository;
         this.verifiedAccountRepository = verifiedAccountRepository;
         this.unverifiedAccountRepository = unverifiedAccountRepository;
+        this.tariffFilePath = tariffFilePath;
+        this.placeholderId = placeholderId;
+        this.updateFailure = updateFailure;
+        this.updateSuccess = updateSuccess;
+        this.providerNotFound = providerNotFound;
+        this.errorMessage1 = errorMessage1;
+        this.errorMessage2 = errorMessage2;
+        this.listElementTariffName = listElementTariffName;
+        this.listElementBasicRate = listElementBasicRate;
+        this.listElementContractType = listElementContractType;
+        this.listElementPriceModel = listElementPriceModel;
+        this.missingTariffName = missingTariffName;
+        this.placeholderTariffName = placeholderTariffName;
     }
+
+    private final String newLine = "\n";
 
     private List<Tariff> tariffFileReader(String file) {
 
@@ -42,7 +89,7 @@ public class TariffService {
     public String tariffApplier(Long id) {
         if (providerRepository.findById(id).isPresent()) {
 
-            List<Tariff> tariffs = tariffFileReader("the-codefellas-main/anber/src/main/resources/files/" + id + "_updated_tariffs.txt");
+            List<Tariff> tariffs = tariffFileReader(tariffFilePath.replace(placeholderId, String.valueOf(id)));
 
             var totalResult = "";
             int i = 1;
@@ -75,13 +122,13 @@ public class TariffService {
             }
             if (!totalResult.isBlank()) {
                 //write mail with error message
-                return (totalResult + "\nTariffs were not updated.");
+                return (totalResult + newLine + updateFailure);
             } else {
-                return "Tariffs were updated successfully.";
+                return updateSuccess;
             }
 
         }
-        return "Couldn't find provider to update.";
+        return providerNotFound;
     }
 
 
@@ -94,21 +141,30 @@ public class TariffService {
             return "";
         }
 
-        String errorMessage = "The following fields of the tariff " + tariff.getTariffName() + " (number " + i + " in provided list) are not filled in correctly: \n";
+
+        String errorMessage = "";
+
         if (tariff.getTariffName() == null) {
-            errorMessage += "-) TariffName\n";
+            errorMessage = errorMessage1.replace(placeholderTariffName, "") + i + errorMessage2 + newLine;
+        }
+        else {
+            errorMessage = errorMessage1.replace(placeholderTariffName, tariff.getTariffName()) + i + errorMessage2 + newLine;
+        }
+
+        if (tariff.getTariffName() == null) {
+            errorMessage += listElementTariffName + newLine;
         }
         if (String.valueOf(tariff.getBasicRate()) == null) {
-            errorMessage += "-) BasicRate\n";
+            errorMessage += listElementBasicRate + newLine;
         }
         if (tariff.getContractType() == null) {
-            errorMessage += "-) ContractType\n";
+            errorMessage += listElementContractType + newLine;
         }
         if (tariff.getPriceModel() == null) {
-            errorMessage += "-) PriceModel\n";
+            errorMessage += listElementPriceModel + newLine;
         }
-        errorMessage = errorMessage.replace("  ", " <TariffName missing> ");
-        return errorMessage + "\n";
+        errorMessage = errorMessage.replace("  ", missingTariffName);
+        return errorMessage + newLine;
     }
 
 
@@ -120,6 +176,7 @@ public class TariffService {
             var list = provider.getTariffs();
             list.add(tariff);
             providerRepository.save(provider);
+            //send notification mails to subscribers
         }
 
         if (unverifiedAccountRepository.findById(id).isPresent()) {
