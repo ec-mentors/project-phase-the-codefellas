@@ -49,9 +49,14 @@ public class User {
     private int loginAttempts;
     private boolean accountNonLocked;
 
+    @ElementCollection(targetClass = Long.class)
+    private List<Long> subscriptions = new ArrayList<>();
+
 
     public User() {
     }
+
+
     public User(String email, String password) {
         this.email = email;
         this.password = password;
@@ -116,6 +121,14 @@ public class User {
         this.notificationsEnabled = notificationsEnabled;
     }
 
+
+    public List<Long> getSubscriptions() {
+        return subscriptions;
+    }
+
+    public void setSubscriptions(List<Long> subscriptions) {
+        this.subscriptions = subscriptions;
+    }
 
     public int getLoginAttempts() {
         return loginAttempts;

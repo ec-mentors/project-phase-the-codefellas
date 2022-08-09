@@ -2,6 +2,8 @@ package io.everyonecodes.anber.usermanagement.service;
 
 
 import io.everyonecodes.anber.email.service.EmailService;
+import io.everyonecodes.anber.providermanagement.data.VerifiedAccount;
+import io.everyonecodes.anber.providermanagement.repository.VerifiedAccountRepository;
 import io.everyonecodes.anber.usermanagement.authentication.AuthenticationService;
 import io.everyonecodes.anber.usermanagement.data.User;
 import io.everyonecodes.anber.usermanagement.data.UserPrivateDTO;
@@ -24,15 +26,25 @@ public class UserService {
     private final EmailService emailService;
     private final UserDTO mapper;
     private final String roleUser;
+    private final VerifiedAccountRepository verifiedAccountRepository;
+    private final String verificationMark;
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, AuthenticationService authenticationService, EmailService emailService, UserDTO mapper,
-                       @Value("${data.roles.user}") String roleUser) {
+    public UserService(UserRepository userRepository,
+                       PasswordEncoder passwordEncoder,
+                       AuthenticationService authenticationService,
+                       EmailService emailService,
+                       UserDTO mapper,
+                       @Value("${data.roles.user}") String roleUser,
+                       VerifiedAccountRepository verifiedAccountRepository,
+                       @Value("${messages.provider-account.verified}") String verificationMark) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.authenticationService = authenticationService;
         this.emailService = emailService;
         this.mapper = mapper;
         this.roleUser = roleUser;
+        this.verifiedAccountRepository = verifiedAccountRepository;
+        this.verificationMark = verificationMark;
     }
 
     public User saveUser(User user) throws IllegalArgumentException {
@@ -111,5 +123,72 @@ public class UserService {
             user.setAccountNonLocked(true);
             userRepository.save(user);
         }
+    }
+
+    public String subscribeToProvider(String username, Long id) {
+
+        Optional<User> oUser = userRepository.findOneByEmail(username);
+        Optional<VerifiedAccount> oVProvider = verifiedAccountRepository.findById(id);
+
+        if (oUser.isPresent() && oVProvider.isPresent()) {
+            var vProv = oVProvider.get();
+            var user = oUser.get();
+
+            var listOfSubscriptions = user.getSubscriptions();
+            if (!listOfSubscriptions.contains(vProv.getId())) {
+                listOfSubscriptions.add(vProv.getId());
+                user.setSubscriptions(listOfSubscriptions);
+                userRepository.save(user);
+                return "Subscription to provider " + vProv.getProviderName().replace(verificationMark, "") + " (id " + vProv.getId() + ") was added.";
+            }
+            else {
+                return "You are already subscribed to " + vProv.getProviderName().replace(verificationMark, "") + " (id " + vProv.getId() + ")!";
+            }
+        }
+        return "Could not subscribe to provider.";
+    }
+
+    public String unsubscribeToProvider(String username, Long id) {
+
+        Optional<User> oUser = userRepository.findOneByEmail(username);
+        Optional<VerifiedAccount> oVProvider = verifiedAccountRepository.findById(id);
+
+        if (oUser.isPresent() && oVProvider.isPresent()) {
+            var vProv = oVProvider.get();
+            var user = oUser.get();
+
+            var listOfSubscriptions = user.getSubscriptions();
+            if (listOfSubscriptions.contains(vProv.getId())) {
+                listOfSubscriptions.remove(vProv.getId());
+                user.setSubscriptions(listOfSubscriptions);
+                userRepository.save(user);
+                return "Subscription to provider " + vProv.getProviderName().replace(verificationMark, "") + " (id " + vProv.getId() + ") was added.";
+            }
+            else {
+                return "You can't remove a subscription to a provider you are not subscribed to!";
+            }
+        }
+        return "Could not unsubscribe to provider.";
+    }
+
+
+
+    public String toggleNotificationStatus(String username) {
+        var oUser = userRepository.findOneByEmail(username);
+        if (oUser.isPresent()) {
+            var user = oUser.get();
+
+            if (user.isNotificationsEnabled()) {
+                user.setNotificationsEnabled(false);
+                userRepository.save(user);
+                return "User " + username + " will not receive any notifications.";
+            }
+            else {
+                user.setNotificationsEnabled(true);
+                userRepository.save(user);
+                return "User " + username + " will receive notifications.";
+            }
+        }
+        return "No changes were made";
     }
 }

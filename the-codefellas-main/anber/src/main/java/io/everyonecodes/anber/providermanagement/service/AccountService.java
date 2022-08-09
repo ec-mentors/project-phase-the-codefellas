@@ -258,9 +258,9 @@ public class AccountService {
         Optional<ProviderDTO> oProvider = providerRepository.findById(id);
         if (oProvider.isPresent()) {
             var dto = oProvider.get();
-                if (dto.getRating() == null) {
-                    dto.setRating(new Rating(dto.getId(), new HashSet<>(), noRatings));
-                }
+            if (dto.getRating() == null) {
+                dto.setRating(new Rating(dto.getId(), new HashSet<>(), noRatings));
+            }
 
             ProviderPublic provider = translator.dtoToPublic(dto);
 
@@ -270,11 +270,24 @@ public class AccountService {
     }
 
 
-
     public List<ProviderDTO> fillInDtoData() {
 
-        if ((providerRepository.findById(1L).get().getTariffs().isEmpty() && providerRepository.findById(1L).get().getRating() == null)
-                && (providerRepository.findById(500L).get().getTariffs().isEmpty() && providerRepository.findById(500L).get().getRating() == null) ) {
+        Random random = new Random();
+        int maxValue = providerRepository.findAll().size();
+        int minValue = 1;
+        var randomId1 = random.nextInt(maxValue - minValue) + minValue;
+        var randomId2 = random.nextInt(maxValue - minValue) + minValue;
+        var randomId3 = random.nextInt(maxValue - minValue) + minValue;
+
+        var dto1 = providerRepository.findById((long) randomId1).get();
+        var dto2 = providerRepository.findById((long) randomId2).get();
+        var dto3 = providerRepository.findById((long) randomId3).get();
+
+        if (
+                ((dto1.getTariffs().isEmpty() && dto1.getRating() == null) && (dto2.getTariffs().isEmpty() && dto2.getRating() == null)) ||
+                        ((dto1.getTariffs().isEmpty() && dto1.getRating() == null) && (dto3.getTariffs().isEmpty() && dto3.getRating() == null)) ||
+                        ((dto2.getTariffs().isEmpty() && dto2.getRating() == null) && (dto3.getTariffs().isEmpty() && dto3.getRating() == null))
+        ) {
 
             for (int i = 0; i < providerRepository.findAll().size(); i++) {
 
