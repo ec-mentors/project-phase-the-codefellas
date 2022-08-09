@@ -1,6 +1,7 @@
 package io.everyonecodes.anber.providermanagement.service;
 
 import io.everyonecodes.anber.providermanagement.data.ProviderPublic;
+import io.everyonecodes.anber.providermanagement.data.ProviderType;
 import io.everyonecodes.anber.tariffmanagement.data.Tariff;
 import io.everyonecodes.anber.providermanagement.data.UnverifiedAccount;
 import io.everyonecodes.anber.providermanagement.data.VerifiedAccount;
@@ -294,6 +295,7 @@ public class AccountService {
                 var dto = providerRepository.findAll().get(i);
                 var tariffs = tariffRepository.findAllByProviderId(dto.getId());
                 dto.setTariffs(tariffs);
+                updateInternetPrices(dto);
                 tariffRepository.saveAll(tariffs);
                 providerRepository.save(dto);
 
@@ -306,5 +308,20 @@ public class AccountService {
         }
         return providerRepository.findAll();
     }
+
+    private void updateInternetPrices(ProviderDTO dto) {
+
+        if (dto.getProviderType().equals(ProviderType.INTERNET)) {
+            Random random = new Random();
+
+            var tariff = dto.getTariffs().get(0);
+            int priceNew = random.nextInt(30 - 20) + 20;
+
+            tariff.setBasicRate( Math.round(priceNew * 100.00)/100.00 );
+
+            dto.setTariffs(new ArrayList<>(List.of(tariff)));
+        }
+    }
+
 
 }
