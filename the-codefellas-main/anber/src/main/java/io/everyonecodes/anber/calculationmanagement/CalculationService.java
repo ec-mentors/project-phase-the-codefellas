@@ -12,9 +12,7 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class CalculationService {
@@ -107,4 +105,60 @@ public class CalculationService {
         }
         return Optional.empty();
     }
+
+    public List<Map<String, Double>> getAverageConsumptionForAllHomes(String username) {
+        Optional<User> oUser = userRepository.findOneByEmail(username);
+        List<String> data = read("the-codefellas-main/anber/src/main/resources/files/Tabelle.csv");
+        List<AverageConsumption> consumptions = parseData(data);
+        List<Map<String, Double>> homesConsumptionList = new ArrayList<>();
+        if (oUser.isPresent()) {
+            User user = oUser.get();
+            List<Home> homes = user.getSavedHomes();
+
+            if (!homes.isEmpty()) {
+                for (int i = 0; i < homes.size(); i++) {
+                    Home home = homes.get(i);
+                    double sizeInSquareMeters = home.getSizeInSquareMeters();
+                    String country = home.getCountry();
+                    var oConsumptionOfCountry = consumptions.stream()
+                            .filter(x -> x.getCountry().equals(country))
+                            .map(AverageConsumption::getAverageConsumption)
+                            .findFirst();
+
+                    if (oConsumptionOfCountry.isPresent()) {
+                        double consumptionOfCountry = oConsumptionOfCountry.get();
+                        double averageConsumption = sizeInSquareMeters * consumptionOfCountry;
+                        Map<String, Double> homeCalculatedConsumption = new HashMap<>();
+                        homeCalculatedConsumption.put(home.getHomeName(), averageConsumption);
+                        homesConsumptionList.add(homeCalculatedConsumption);
+
+
+                    }
+                }
+                return homesConsumptionList;
+            }
+        }
+        return homesConsumptionList;
+    }
+
+
+    public Optional<Double> getAverageConsumptionForData(String username, Long id, String squareMeter) {
+        Optional<User> oUser = userRepository.findOneByEmail(username);
+        if (oUser.isPresent()) {
+            User user = oUser.get();
+            Optional<Tariff> oTariff = tariffRepository.findById(id);
+            if (oTariff.isPresent()) {
+                Tariff tariff = oTariff.get();
+                double basicRate = tariff.getBasicRate();
+                try {
+                    double squareMeterDouble = Double.parseDouble(squareMeter);
+                    return Optional.of(squareMeterDouble * basicRate);
+                } catch (NumberFormatException e) {
+                    return Optional.empty();
+                }
+            }
+        }
+        return Optional.empty();
+    }
+
 }

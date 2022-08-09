@@ -1,10 +1,10 @@
 package io.everyonecodes.anber.calculationmanagement;
 
 import org.springframework.security.access.annotation.Secured;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/calculate")
@@ -26,5 +26,17 @@ public class CalculationEndpoint {
     @Secured("ROLE_USER")
     Double getAverageConsumptionForTariff (@PathVariable String username, @PathVariable Long homeID, @PathVariable Long tariffID){
         return calculationService.getAverageConsumptionForTariff(username,homeID,tariffID).orElse(null);
+    }
+
+    @GetMapping("/{username}/getAll")
+    @Secured("ROLE_USER")
+    List<Map<String, Double>> getAverageForAllHomes(@PathVariable String username) {
+        return calculationService.getAverageConsumptionForAllHomes(username);
+    }
+
+    @PostMapping("/data/{username}/{id}")
+    @Secured("ROLE_USER")
+    Double getAverageConsumptionForGivenData(@PathVariable String username, @PathVariable Long id, @RequestBody String squareMeter) {
+        return calculationService.getAverageConsumptionForData(username, id, squareMeter).orElse(null);
     }
 }
