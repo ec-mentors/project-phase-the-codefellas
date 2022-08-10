@@ -1,7 +1,5 @@
 package io.everyonecodes.anber.email.service;
 
-import io.everyonecodes.anber.email.repository.UProviderRepository;
-import io.everyonecodes.anber.email.repository.VProviderRepository;
 import io.everyonecodes.anber.providermanagement.data.ProviderType;
 import io.everyonecodes.anber.providermanagement.data.UnverifiedAccount;
 import io.everyonecodes.anber.providermanagement.data.VerifiedAccount;
@@ -32,12 +30,13 @@ import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
 import javax.mail.internet.MimeMessage;
 import java.io.File;
+import java.nio.file.Path;
 import java.util.*;
 
 @Service
 @EnableScheduling
 @ConfigurationProperties
-public class EmailServiceN {
+public class EmailService {
 
     private final JavaMailSender javaMailSender;
     private final UserRepository userRepository;
@@ -50,16 +49,15 @@ public class EmailServiceN {
     private final UnverifiedAccountRepository unverifiedAccountRepository;
     private final VerifiedAccountRepository verifiedAccountRepository;
     private final TariffRepository tariffRepository;
-    private final UProviderRepository uProviderRepository;
-    private final VProviderRepository vProviderRepository;
+    private List<VerifiedAccount> verifiedList = new ArrayList<>();
+    private List<UnverifiedAccount> unverifiedList = new ArrayList<>();
 
-    public EmailServiceN(JavaMailSender javaMailSender, UserRepository userRepository, PasswordEncoder passwordEncoder,
-                         UserDTO userDTO,
-                         @Value("${spring.mail.username}") String setUsernameValue,
-                         @Value("${spring.mail.password}") String setPasswordValue,
-                         ProviderRepository providerRepository, UnverifiedAccountRepository unverifiedAccountRepository,
-                         VerifiedAccountRepository verifiedAccountRepository, TariffRepository tariffRepository,
-                         UProviderRepository uProviderRepository, VProviderRepository vProviderRepository) {
+    public EmailService(JavaMailSender javaMailSender, UserRepository userRepository, PasswordEncoder passwordEncoder,
+                        UserDTO userDTO,
+                        @Value("${spring.mail.username}") String setUsernameValue,
+                        @Value("${spring.mail.password}") String setPasswordValue,
+                        ProviderRepository providerRepository, UnverifiedAccountRepository unverifiedAccountRepository,
+                        VerifiedAccountRepository verifiedAccountRepository, TariffRepository tariffRepository) {
         this.javaMailSender = javaMailSender;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
@@ -70,8 +68,6 @@ public class EmailServiceN {
         this.unverifiedAccountRepository = unverifiedAccountRepository;
         this.verifiedAccountRepository = verifiedAccountRepository;
         this.tariffRepository = tariffRepository;
-        this.uProviderRepository = uProviderRepository;
-        this.vProviderRepository = vProviderRepository;
     }
 
     // send email with link that allows password change
@@ -128,7 +124,7 @@ public class EmailServiceN {
         allowedUsers.put(key, value);
     }
 
-    //every day at 10am
+    //every 6 months
     @Scheduled(cron = "0 0/1 * * * ?")
     public void sendEmailNotificationForNewProviders() {
         sendNewProvidersNotificationHTMLEmail(); // Send Notification email for new provider
@@ -136,47 +132,79 @@ public class EmailServiceN {
 
     // Send new provider email
     public void sendNewProvidersNotificationHTMLEmail() {
+
         var notificationUserList = userRepository.findAllByNotificationsEnabled(true);
 
+        FileReaderNewProvider fileReaderNewProvider = new FileReaderNewProvider();
+        FileWriterNewProvider fileWriterNewProvider = new FileWriterNewProvider();
+
+        String unverifiedListOldLocation = "project-phase/the-codefellas-main/anber/src/main/resources/files/unverifiedListOld.txt";
+        Path unverifiedListOldPath = Path.of(unverifiedListOldLocation);
+        var unverifiedListOldFileStrings = fileReaderNewProvider.read(unverifiedListOldLocation);
+
+        String verifiedListOldLocation = "project-phase/the-codefellas-main/anber/src/main/resources/files/verifiedListOld.txt";
+        Path verifiedListOldPath = Path.of(verifiedListOldLocation);
+        var verifiedListOldFileStrings = fileReaderNewProvider.read(verifiedListOldLocation);
+
         // Data Fill for the first Run
-        var unverifiedList = uProviderRepository.findAll();
-        var verifiedList = vProviderRepository.findAll();
-
-        if (unverifiedList.isEmpty()) {
-            var updateU = unverifiedAccountRepository.findAll();
-            unverifiedList.addAll(updateU);
-            for (UnverifiedAccount unverifiedAccount : unverifiedList) {
-                uProviderRepository.save(unverifiedAccount);
+        if (unverifiedListOldFileStrings.isEmpty()) {
+            var update = unverifiedAccountRepository.findAll();
+            List<String> extractedNames = new ArrayList<>();
+            for (UnverifiedAccount unverifiedAccount : update) {
+                var providerName = unverifiedAccount.getProviderName();
+                extractedNames.add(providerName);
             }
+            fileWriterNewProvider.append(unverifiedListOldLocation, extractedNames);
         }
 
-        if (verifiedList.isEmpty()) {
-            var updateV = verifiedAccountRepository.findAll();
-            verifiedList.addAll(updateV);
-            for (VerifiedAccount verifiedAccount : verifiedList) {
-                vProviderRepository.save(verifiedAccount);
+        if (verifiedListOldFileStrings.isEmpty()) {
+            var update = verifiedAccountRepository.findAll();
+            List<String> extractedNames = new ArrayList<>();
+            for (VerifiedAccount verifiedAccount : update) {
+                var providerName = verifiedAccount.getProviderName();
+                extractedNames.add(providerName);
             }
+            fileWriterNewProvider.append(verifiedListOldLocation, extractedNames);
         }
 
+        // Lists that got read from the .txt files
+        var unverifiedNameList = fileReaderNewProvider.read(unverifiedListOldLocation);
+        var verifiedNameList = fileReaderNewProvider.read(verifiedListOldLocation);
 
         // Up-to-date Providers
         var up2DateProvidersListUnverified = unverifiedAccountRepository.findAll();
         var up2DateProvidersListVerified = verifiedAccountRepository.findAll();
 
+        // StringList of the new up-to-date Providers unverified
+        List<String> up2DateProvidersListUnverifiedString = new ArrayList<>();
+
+        for (UnverifiedAccount unverifiedAccount : up2DateProvidersListUnverified) {
+            var providerName = unverifiedAccount.getProviderName();
+            up2DateProvidersListUnverifiedString.add(providerName);
+        }
+
+        // StringList of the new up-to-date Providers verified
+        List<String> up2DateProvidersListVerifiedString = new ArrayList<>();
+
+        for (VerifiedAccount verifiedAccount : up2DateProvidersListVerified) {
+            var providerName = verifiedAccount.getProviderName();
+            up2DateProvidersListVerifiedString.add(providerName);
+        }
+
         // Lists for new added Provider Entries
-        List<UnverifiedAccount> newProvidersAddedUnverified = new ArrayList<>();
-        List<VerifiedAccount> newProvidersAddedVerified = new ArrayList<>();
+        List<String> newProvidersAddedUnverified = new ArrayList<>();
+        List<String> newProvidersAddedVerified = new ArrayList<>();
 
         // New Entries check
-        for (UnverifiedAccount unverifiedAccount : up2DateProvidersListUnverified) {
-            if (!unverifiedList.contains(unverifiedAccount)) {
-                newProvidersAddedUnverified.add(unverifiedAccount);
+        for (String provNameU : up2DateProvidersListUnverifiedString) {
+            if (!unverifiedNameList.contains(provNameU)) {
+                newProvidersAddedUnverified.add(provNameU);
             }
         }
 
-        for (VerifiedAccount verifiedAccount : up2DateProvidersListVerified) {
-            if (!verifiedList.contains(verifiedAccount)) {
-                newProvidersAddedVerified.add(verifiedAccount);
+        for (String provNameV : up2DateProvidersListVerifiedString) {
+            if (!verifiedNameList.contains(provNameV)) {
+                newProvidersAddedVerified.add(provNameV);
             }
         }
 
@@ -184,34 +212,22 @@ public class EmailServiceN {
         StringBuilder uAccountNames = new StringBuilder();
         StringBuilder vAccountNames = new StringBuilder();
 
-        for (UnverifiedAccount unverifiedAccount : newProvidersAddedUnverified) {
-            var uAccountName = unverifiedAccount.getProviderName();
-            uAccountNames.append(uAccountName).append("<br>");
+        for (String newEntry : newProvidersAddedUnverified) {
+            uAccountNames.append(newEntry).append("<br>");
         }
 
-        for (VerifiedAccount verifiedAccount : newProvidersAddedVerified) {
-            var vAccountName = verifiedAccount.getProviderName();
-            vAccountNames.append(vAccountName).append("<br>");
+        for (String newEntry : newProvidersAddedVerified) {
+            vAccountNames.append(newEntry).append("<br>");
         }
+
+        fileWriterNewProvider.write(unverifiedListOldLocation, up2DateProvidersListUnverifiedString);
+        fileWriterNewProvider.write(verifiedListOldLocation, up2DateProvidersListVerifiedString);
 
         // Sending the actual email to enabled users
         for (User user : notificationUserList) {
             var mailAddress = user.getEmail();
             mailingNewProviders(mailAddress, uAccountNames.toString(), vAccountNames.toString());
         }
-
-        // List save and update
-        unverifiedList.addAll(newProvidersAddedUnverified);
-        verifiedList.addAll(newProvidersAddedVerified);
-
-        for (UnverifiedAccount uAccount : newProvidersAddedUnverified) {
-            uProviderRepository.save(uAccount);
-        }
-
-        for (VerifiedAccount vAccount : newProvidersAddedVerified) {
-            vProviderRepository.save(vAccount);
-        }
-
     }
 
     private void mailingNewProviders(String mailAddress, String uAccountNames, String vAccountNames) {
