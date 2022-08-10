@@ -3,6 +3,9 @@ package io.everyonecodes.anber.calculationmanagement;
 
 import io.everyonecodes.anber.calculationmanagement.data.AverageConsumption;
 import io.everyonecodes.anber.homemanagement.data.Home;
+import io.everyonecodes.anber.providermanagement.data.ProviderType;
+import io.everyonecodes.anber.searchmanagement.data.ProviderDTO;
+import io.everyonecodes.anber.searchmanagement.repository.ProviderRepository;
 import io.everyonecodes.anber.tariffmanagement.data.Tariff;
 import io.everyonecodes.anber.tariffmanagement.repository.TariffRepository;
 import io.everyonecodes.anber.usermanagement.data.User;
@@ -19,17 +22,17 @@ public class CalculationService {
 
     private final UserRepository userRepository;
     private final TariffRepository tariffRepository;
+    private final ProviderRepository providerRepository;
 
-    public CalculationService(UserRepository userRepository, TariffRepository tariffRepository) {
+    public CalculationService(UserRepository userRepository, TariffRepository tariffRepository, ProviderRepository providerRepository) {
         this.userRepository = userRepository;
         this.tariffRepository = tariffRepository;
+        this.providerRepository = providerRepository;
     }
 
     public Optional<Double> getAverageConsumption(String userName, Long homeID) {
         Optional<User> oUser = userRepository.findOneByEmail(userName);
         List<String> data = read("the-codefellas-main/anber/src/main/resources/files/Tabelle.csv");
-
-
         List<AverageConsumption> consumptions = parseData(data);
 
         if (oUser.isPresent()) {
@@ -92,12 +95,20 @@ public class CalculationService {
 
             if (oHome.isPresent()) {
                 Home home = oHome.get();
-
                 double sizeInSquareMeters = home.getSizeInSquareMeters();
 
                 Optional<Tariff> oTariff = tariffRepository.findById(tariffID);
                 if (oTariff.isPresent()) {
                     Tariff tariff = oTariff.get();
+
+                    var oDto = providerRepository.findById(tariff.getProviderId());
+                    if (oDto.isPresent()){
+                        ProviderDTO providerDTO = oDto.get();
+                        var providerTape = providerDTO.getProviderType();
+                        if (providerTape.equals(ProviderType.INTERNET)){
+                            return Optional.of(tariff.getBasicRate());
+                        }
+                    }
                     double basicRate = tariff.getBasicRate();
                     return Optional.of(sizeInSquareMeters * basicRate);
                 }
@@ -131,8 +142,6 @@ public class CalculationService {
                         Map<String, Double> homeCalculatedConsumption = new HashMap<>();
                         homeCalculatedConsumption.put(home.getHomeName(), averageConsumption);
                         homesConsumptionList.add(homeCalculatedConsumption);
-
-
                     }
                 }
                 return homesConsumptionList;
@@ -151,6 +160,14 @@ public class CalculationService {
                 Tariff tariff = oTariff.get();
                 double basicRate = tariff.getBasicRate();
                 try {
+                    var oDto = providerRepository.findById(tariff.getProviderId());
+                    if (oDto.isPresent()){
+                        ProviderDTO providerDTO = oDto.get();
+                        var providerTape = providerDTO.getProviderType();
+                        if (providerTape.equals(ProviderType.INTERNET)){
+                            return Optional.of(tariff.getBasicRate());
+                        }
+                    }
                     double squareMeterDouble = Double.parseDouble(squareMeter);
                     return Optional.of(squareMeterDouble * basicRate);
                 } catch (NumberFormatException e) {
