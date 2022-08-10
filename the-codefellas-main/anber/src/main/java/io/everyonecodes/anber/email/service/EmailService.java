@@ -1,5 +1,7 @@
 package io.everyonecodes.anber.email.service;
 
+import io.everyonecodes.anber.email.repository.UProviderRepository;
+import io.everyonecodes.anber.email.repository.VProviderRepository;
 import io.everyonecodes.anber.providermanagement.data.ProviderType;
 import io.everyonecodes.anber.providermanagement.data.UnverifiedAccount;
 import io.everyonecodes.anber.providermanagement.data.VerifiedAccount;
@@ -35,13 +37,12 @@ import java.util.*;
 @Service
 @EnableScheduling
 @ConfigurationProperties
-public class EmailService {
+public class EmailServiceN {
 
     private final JavaMailSender javaMailSender;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final UserDTO userDTO;
-    private final NotificationService notificationService;
     private final Map<String, String> allowedUsers = new HashMap<>();
     private final String setUsernameValue;
     private final String setPasswordValue;
@@ -49,26 +50,28 @@ public class EmailService {
     private final UnverifiedAccountRepository unverifiedAccountRepository;
     private final VerifiedAccountRepository verifiedAccountRepository;
     private final TariffRepository tariffRepository;
-    private List<VerifiedAccount> verifiedList = new ArrayList<>();
-    private List<UnverifiedAccount> unverifiedList = new ArrayList<>();
+    private final UProviderRepository uProviderRepository;
+    private final VProviderRepository vProviderRepository;
 
-    public EmailService(JavaMailSender javaMailSender, UserRepository userRepository, PasswordEncoder passwordEncoder,
-                        UserDTO userDTO, NotificationService notificationService,
-                        @Value("${spring.mail.username}") String setUsernameValue,
-                        @Value("${spring.mail.password}") String setPasswordValue,
-                        ProviderRepository providerRepository, UnverifiedAccountRepository unverifiedAccountRepository,
-                        VerifiedAccountRepository verifiedAccountRepository, TariffRepository tariffRepository) {
+    public EmailServiceN(JavaMailSender javaMailSender, UserRepository userRepository, PasswordEncoder passwordEncoder,
+                         UserDTO userDTO,
+                         @Value("${spring.mail.username}") String setUsernameValue,
+                         @Value("${spring.mail.password}") String setPasswordValue,
+                         ProviderRepository providerRepository, UnverifiedAccountRepository unverifiedAccountRepository,
+                         VerifiedAccountRepository verifiedAccountRepository, TariffRepository tariffRepository,
+                         UProviderRepository uProviderRepository, VProviderRepository vProviderRepository) {
         this.javaMailSender = javaMailSender;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.userDTO = userDTO;
-        this.notificationService = notificationService;
         this.setUsernameValue = setUsernameValue;
         this.setPasswordValue = setPasswordValue;
         this.providerRepository = providerRepository;
         this.unverifiedAccountRepository = unverifiedAccountRepository;
         this.verifiedAccountRepository = verifiedAccountRepository;
         this.tariffRepository = tariffRepository;
+        this.uProviderRepository = uProviderRepository;
+        this.vProviderRepository = vProviderRepository;
     }
 
     // send email with link that allows password change
@@ -128,31 +131,31 @@ public class EmailService {
     //every day at 10am
     @Scheduled(cron = "0 0/1 * * * ?")
     public void sendEmailNotificationForNewProviders() {
-
-
-        sendNewProvidersNotificationHTMLEmail(unverifiedList, verifiedList); // Send Notification email for new provider
-
+        sendNewProvidersNotificationHTMLEmail(); // Send Notification email for new provider
     }
 
     // Send new provider email
-    public void sendNewProvidersNotificationHTMLEmail(List<UnverifiedAccount> ProvidersAddedUnverified,
-                                                      List<VerifiedAccount> ProvidersAddedVerified) {
+    public void sendNewProvidersNotificationHTMLEmail() {
         var notificationUserList = userRepository.findAllByNotificationsEnabled(true);
 
-
-        System.out.println(unverifiedList.stream().toList());
-
         // Data Fill for the first Run
+        var unverifiedList = uProviderRepository.findAll();
+        var verifiedList = vProviderRepository.findAll();
+
         if (unverifiedList.isEmpty()) {
-            var update = unverifiedAccountRepository.findAll();
-            unverifiedList.addAll(update);
+            var updateU = unverifiedAccountRepository.findAll();
+            unverifiedList.addAll(updateU);
+            for (UnverifiedAccount unverifiedAccount : unverifiedList) {
+                uProviderRepository.save(unverifiedAccount);
+            }
         }
 
-        System.out.println(verifiedList.stream().toList());
-
         if (verifiedList.isEmpty()) {
-            var update = verifiedAccountRepository.findAll();
-            verifiedList.addAll(update);
+            var updateV = verifiedAccountRepository.findAll();
+            verifiedList.addAll(updateV);
+            for (VerifiedAccount verifiedAccount : verifiedList) {
+                vProviderRepository.save(verifiedAccount);
+            }
         }
 
 
@@ -197,13 +200,18 @@ public class EmailService {
             mailingNewProviders(mailAddress, uAccountNames.toString(), vAccountNames.toString());
         }
 
-        saveListValues(newProvidersAddedUnverified, newProvidersAddedVerified);
-    }
+        // List save and update
+        unverifiedList.addAll(newProvidersAddedUnverified);
+        verifiedList.addAll(newProvidersAddedVerified);
 
-    // Adding the new entries to the persistent List
-    private void saveListValues(List<UnverifiedAccount> newProvidersAddedUnverified, List<VerifiedAccount> newProvidersAddedVerified) {
-        unverifiedList = unverifiedAccountRepository.findAll();
-        verifiedList = verifiedAccountRepository.findAll();
+        for (UnverifiedAccount uAccount : newProvidersAddedUnverified) {
+            uProviderRepository.save(uAccount);
+        }
+
+        for (VerifiedAccount vAccount : newProvidersAddedVerified) {
+            vProviderRepository.save(vAccount);
+        }
+
     }
 
     private void mailingNewProviders(String mailAddress, String uAccountNames, String vAccountNames) {
