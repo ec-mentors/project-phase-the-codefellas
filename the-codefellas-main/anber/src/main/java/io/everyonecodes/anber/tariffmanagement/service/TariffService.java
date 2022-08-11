@@ -123,8 +123,6 @@ public class TariffService {
                     }
                     updateMessage += updateTariff(tariff, i, id, maxIterations);
 
-                    //providerId for identifying which tariff belongs to what provider
-                    tariff.setProviderId(id);
                     tariffRepository.save(tariff);
 
                 } else {
@@ -201,6 +199,7 @@ public class TariffService {
                 provTariff.setBasicRate(tariff.getBasicRate());
                 provTariff.setContractType(tariff.getContractType());
                 provTariff.setPriceModel(tariff.getPriceModel());
+                provTariff.setProviderId(id);
 
             } else {
                 var list = prov.getTariffs();
@@ -220,6 +219,7 @@ public class TariffService {
                 dtoTariff.setBasicRate(tariff.getBasicRate());
                 dtoTariff.setContractType(tariff.getContractType());
                 dtoTariff.setPriceModel(tariff.getPriceModel());
+                dtoTariff.setProviderId(id);
             } else {
                 var list = dto.getTariffs();
                 list.add(tariff);
