@@ -1,4 +1,4 @@
-package io.everyonecodes.anber.calculationmanagement;
+package io.everyonecodes.anber.calculationmanagement.service;
 
 
 import io.everyonecodes.anber.calculationmanagement.data.AverageConsumption;

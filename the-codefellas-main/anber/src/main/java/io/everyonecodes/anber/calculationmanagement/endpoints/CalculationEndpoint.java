@@ -1,5 +1,6 @@
-package io.everyonecodes.anber.calculationmanagement;
+package io.everyonecodes.anber.calculationmanagement.endpoints;
 
+import io.everyonecodes.anber.calculationmanagement.service.CalculationService;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,14 +19,16 @@ public class CalculationEndpoint {
 
     @GetMapping("/{username}/{id}")
     @Secured("ROLE_USER")
-    Double getAverageConsumption(@PathVariable String username, @PathVariable Long id){
-        return calculationService.getAverageConsumption(username,id).orElse(null);
+    String getAverageConsumption(@PathVariable String username, @PathVariable Long id){
+        var calculationAverageForHomeID = calculationService.getAverageConsumption(username,id).orElse(null);
+        return "The average Consumption for Home ID " + id + " in it's Country is " + calculationAverageForHomeID;
     }
 
     @GetMapping("/{username}/{homeID}/{tariffID}")
     @Secured("ROLE_USER")
-    Double getAverageConsumptionForTariff (@PathVariable String username, @PathVariable Long homeID, @PathVariable Long tariffID){
-        return calculationService.getAverageConsumptionForTariff(username,homeID,tariffID).orElse(null);
+    String getAverageConsumptionForTariff (@PathVariable String username, @PathVariable Long homeID, @PathVariable Long tariffID){
+        var calculationForHomeAndTariff = calculationService.getAverageConsumptionForTariff(username,homeID,tariffID).orElse(null);
+        return "The average Consumption for Home ID " + homeID + " with Tariff ID " + tariffID + " is " + calculationForHomeAndTariff;
     }
 
     @GetMapping("/{username}/getAll")
@@ -36,7 +39,8 @@ public class CalculationEndpoint {
 
     @PostMapping("/data/{username}/{id}")
     @Secured("ROLE_USER")
-    Double getAverageConsumptionForGivenData(@PathVariable String username, @PathVariable Long id, @RequestBody String squareMeter) {
-        return calculationService.getAverageConsumptionForData(username, id, squareMeter).orElse(null);
+    String getAverageConsumptionForGivenData(@PathVariable String username, @PathVariable Long id, @RequestBody String squareMeter) {
+        var calculationForGivenData = calculationService.getAverageConsumptionForData(username, id, squareMeter).orElse(null);
+        return "The average Consumption for the Tariff with ID " + id + " with your Input of " + squareMeter + " is " + calculationForGivenData;
     }
 }
