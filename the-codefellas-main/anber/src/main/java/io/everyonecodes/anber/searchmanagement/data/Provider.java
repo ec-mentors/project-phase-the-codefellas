@@ -7,6 +7,7 @@ import java.util.Objects;
 
 public class Provider {
 
+    private Long id;
     private String providerName;
     private String rating;
     private String tariffName;
@@ -37,7 +38,24 @@ public class Provider {
         this.priceModel = priceModel;
     }
 
+    public Provider(Long id, String providerName, String rating, String tariffName, double basicRate, ContractType contractType, PriceModelType priceModel) {
+        this.id = id;
+        this.providerName = providerName;
+        this.rating = rating;
+        this.tariffName = tariffName;
+        this.basicRate = basicRate;
+        this.contractType = contractType;
+        this.priceModel = priceModel;
+    }
 
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public String getRating() {
         return rating;

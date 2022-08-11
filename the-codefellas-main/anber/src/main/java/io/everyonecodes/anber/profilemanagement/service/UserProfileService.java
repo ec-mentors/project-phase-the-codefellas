@@ -71,9 +71,13 @@ public class UserProfileService {
 
             User profile = oProfile.get();
 
-            overwriteData(option, profile, input);
+            if (profile.getEmail().equals(userService.loggedInUser())) {
 
-            return Optional.of(input);
+
+                overwriteData(option, profile, input);
+
+                return Optional.of(input);
+            }
         }
         return Optional.empty();
     }

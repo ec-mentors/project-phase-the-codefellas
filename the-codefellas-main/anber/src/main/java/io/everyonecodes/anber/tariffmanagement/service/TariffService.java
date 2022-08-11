@@ -1,16 +1,19 @@
 package io.everyonecodes.anber.tariffmanagement.service;
 
-import io.everyonecodes.anber.providermanagement.repository.UnverifiedAccountRepository;
 import io.everyonecodes.anber.providermanagement.repository.VerifiedAccountRepository;
 import io.everyonecodes.anber.searchmanagement.repository.ProviderRepository;
 import io.everyonecodes.anber.tariffmanagement.data.Tariff;
 import io.everyonecodes.anber.tariffmanagement.email.TariffErrorEmailService;
+import io.everyonecodes.anber.tariffmanagement.email.UpdatedVTariffEmailService;
 import io.everyonecodes.anber.tariffmanagement.repository.TariffRepository;
+import io.everyonecodes.anber.usermanagement.data.User;
+import io.everyonecodes.anber.usermanagement.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class TariffService {
@@ -18,7 +21,6 @@ public class TariffService {
     private final TariffRepository tariffRepository;
     private final ProviderRepository providerRepository;
     private final VerifiedAccountRepository verifiedAccountRepository;
-    private final UnverifiedAccountRepository unverifiedAccountRepository;
     private final String tariffFilePath;
     private final String placeholderId;
     private final String updateFailure;
@@ -33,12 +35,14 @@ public class TariffService {
     private final String missingTariffName;
     private final String placeholderTariffName;
     private final TariffErrorEmailService tariffErrorEmailService;
+    private final UpdatedVTariffEmailService updatedVTariffEmailService;
+    private final UserRepository userRepository;
+    private final String verificationMark;
 
 
     public TariffService(TariffRepository tariffRepository,
                          ProviderRepository providerRepository,
                          VerifiedAccountRepository verifiedAccountRepository,
-                         UnverifiedAccountRepository unverifiedAccountRepository,
                          @Value("${paths.tariff-file}") String tariffFilePath,
                          @Value("${data.placeholders.id}") String placeholderId,
                          @Value("${messages.tariff.failure}") String updateFailure,
@@ -52,11 +56,13 @@ public class TariffService {
                          @Value("${messages.tariff.priceModel}") String listElementPriceModel,
                          @Value("${messages.tariff.missing}") String missingTariffName,
                          @Value("${data.placeholders.tariffName}") String placeholderTariffName,
-                         TariffErrorEmailService tariffErrorEmailService) {
+                         TariffErrorEmailService tariffErrorEmailService,
+                         UpdatedVTariffEmailService updatedVTariffEmailService,
+                         UserRepository userRepository,
+                         @Value("${messages.provider-account.verified}") String verificationMark) {
         this.tariffRepository = tariffRepository;
         this.providerRepository = providerRepository;
         this.verifiedAccountRepository = verifiedAccountRepository;
-        this.unverifiedAccountRepository = unverifiedAccountRepository;
         this.tariffFilePath = tariffFilePath;
         this.placeholderId = placeholderId;
         this.updateFailure = updateFailure;
@@ -71,6 +77,9 @@ public class TariffService {
         this.missingTariffName = missingTariffName;
         this.placeholderTariffName = placeholderTariffName;
         this.tariffErrorEmailService = tariffErrorEmailService;
+        this.updatedVTariffEmailService = updatedVTariffEmailService;
+        this.userRepository = userRepository;
+        this.verificationMark = verificationMark;
     }
 
     private final String newLine = "\n";
@@ -95,28 +104,26 @@ public class TariffService {
             List<Tariff> tariffs = tariffFileReader(tariffFilePath.replace(placeholderId, String.valueOf(id)));
 
             var totalResult = "";
-            int i = 1;
+            int i = 0;
 
             var dto = providerRepository.findById(id).get();
-            dto.removeTariffs();
-            if (verifiedAccountRepository.findById(id).isPresent()) {
-                var vProv = verifiedAccountRepository.findById(id).get();
-                vProv.removeTariffs();
-            }
-            if (unverifiedAccountRepository.findById(id).isPresent()) {
-                var uProv = unverifiedAccountRepository.findById(id).get();
-                uProv.removeTariffs();
-            }
+            int maxIterations = dto.getTariffs().size();
 
 
+            String updateMessage = "";
             for (Tariff tariff : tariffs) {
 
                 var result = checkTariffForErrors(tariff, i);
 
                 if (result.isBlank()) {
-                    tariff.setProviderId(id);
+
+                    if (i < maxIterations) {
+                        Long existingId = dto.getTariffs().get(i).getId();
+                        tariff.setId(existingId);
+                    }
+                    updateMessage += updateTariff(tariff, i, id, maxIterations);
+
                     tariffRepository.save(tariff);
-                    saveProviderAccount(id, tariff);
 
                 } else {
                     totalResult += result;
@@ -128,6 +135,8 @@ public class TariffService {
                 tariffErrorEmailService.sendEmailTariffError(dto, totalResult);
                 return (totalResult + newLine + updateFailure);
             } else {
+
+                sendUpdatesPerEmail(id, updateMessage);
                 return updateSuccess;
             }
 
@@ -149,10 +158,9 @@ public class TariffService {
         String errorMessage = "";
 
         if (tariff.getTariffName() == null) {
-            errorMessage = errorMessage1.replace(placeholderTariffName, "") + i + errorMessage2 + newLine;
-        }
-        else {
-            errorMessage = errorMessage1.replace(placeholderTariffName, tariff.getTariffName()) + i + errorMessage2 + newLine;
+            errorMessage = errorMessage1.replace(placeholderTariffName, "") + (i+1) + errorMessage2 + newLine;
+        } else {
+            errorMessage = errorMessage1.replace(placeholderTariffName, tariff.getTariffName()) + (i+1) + errorMessage2 + newLine;
         }
 
         if (tariff.getTariffName() == null) {
@@ -172,31 +180,75 @@ public class TariffService {
     }
 
 
-    private void saveProviderAccount(Long id, Tariff tariff) {
+    private String updateTariff(Tariff tariff, int i, Long id, int maxIterations) {
 
-        if (providerRepository.findById(id).isPresent()) {
-            var provider = providerRepository.findById(id).get();
+        var oProv = verifiedAccountRepository.findById(id);
+        var oDto = providerRepository.findById(id);
 
-            var list = provider.getTariffs();
-            list.add(tariff);
-            providerRepository.save(provider);
-            //send notification mails to subscribers
+        String message = "";
+        if (oProv.isPresent()) {
+            var prov = oProv.get();
+
+            if (i < maxIterations) {
+                var provTariff = prov.getTariffs().get(i);
+
+                message = collectUpdateMessages(prov.getProviderName(), prov.getTariffs().get(i).getTariffName(),
+                        provTariff.getBasicRate(), tariff.getBasicRate());
+
+                provTariff.setTariffName(tariff.getTariffName());
+                provTariff.setBasicRate(tariff.getBasicRate());
+                provTariff.setContractType(tariff.getContractType());
+                provTariff.setPriceModel(tariff.getPriceModel());
+                provTariff.setProviderId(id);
+
+            } else {
+                var list = prov.getTariffs();
+                list.add(tariff);
+                prov.setTariffs(list);
+            }
+            verifiedAccountRepository.save(prov);
+
         }
+        if (oDto.isPresent()) {
+            var dto = oDto.get();
 
-        if (unverifiedAccountRepository.findById(id).isPresent()) {
-            var uProvider = unverifiedAccountRepository.findById(id).get();
-            var list = uProvider.getTariffs();
-            list.add(tariff);
-            unverifiedAccountRepository.save(uProvider);
+            if (i < maxIterations) {
+                var dtoTariff = dto.getTariffs().get(i);
+
+                dtoTariff.setTariffName(tariff.getTariffName());
+                dtoTariff.setBasicRate(tariff.getBasicRate());
+                dtoTariff.setContractType(tariff.getContractType());
+                dtoTariff.setPriceModel(tariff.getPriceModel());
+                dtoTariff.setProviderId(id);
+            } else {
+                var list = dto.getTariffs();
+                list.add(tariff);
+                dto.setTariffs(list);
+            }
+            providerRepository.save(dto);
         }
-
-        if (verifiedAccountRepository.findById(id).isPresent()) {
-            var vProvider = verifiedAccountRepository.findById(id).get();
-            var list = vProvider.getTariffs();
-            list.add(tariff);
-            verifiedAccountRepository.save(vProvider);
-        }
-
+        return message;
     }
+
+
+    private String collectUpdateMessages(String providerName, String tariffName, double brOld, double brNew) {
+        return "Provider " + providerName.replace(verificationMark, "") + " changed price of tariff " + tariffName
+                + " from " + brOld + " to " + brNew + "\n";
+    }
+
+
+    private void sendUpdatesPerEmail(Long id, String message) {
+
+        var userList = userRepository.findAll();
+
+        List<User> subscribedUsers = userList.stream()
+                .filter(user -> user.getSubscriptions().contains(id))
+                .collect(Collectors.toList());
+
+        for (User user : subscribedUsers) {
+            updatedVTariffEmailService.sendEmailUpdatedTariffs(user, message);
+        }
+    }
+
 
 }
