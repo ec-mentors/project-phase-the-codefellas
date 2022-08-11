@@ -54,7 +54,7 @@ public class CalculationService {
                 if (oConsumptionOfCountry.isPresent()){
                     double consumptionOfCountry = oConsumptionOfCountry.get();
                     double averageConsumption = sizeInSquareMeters * consumptionOfCountry;
-                    return Optional.of(averageConsumption);
+                    return Optional.of(consumptionOfCountry);
                 }
             }
         }
