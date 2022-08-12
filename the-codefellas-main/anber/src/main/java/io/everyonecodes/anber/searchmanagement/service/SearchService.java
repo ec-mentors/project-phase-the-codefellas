@@ -160,6 +160,14 @@ public class SearchService {
             }
             //price model
             if (i == 6) {
+                var providerListCt = providerRepository.findAll().stream()
+                        .filter(prov -> prov.getTariffs().stream()
+                                .anyMatch(br -> br.getContractType().equals(ContractType.valueOf(filter.toUpperCase())))).collect(Collectors.toCollection(ArrayList::new));
+
+                providerList.retainAll(providerListCt);
+            }
+            //price model
+            if (i == 7) {
                 var providerListPm = providerRepository.findAll().stream()
                         .filter(prov -> prov.getTariffs().stream()
                                 .anyMatch(br -> br.getPriceModel().equals(PriceModelType.valueOf(filter.toUpperCase())))).collect(Collectors.toCollection(ArrayList::new));
