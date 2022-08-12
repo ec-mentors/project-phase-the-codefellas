@@ -41,6 +41,6 @@ public class CalculationEndpoint {
     @Secured("ROLE_USER")
     String getAverageConsumptionForGivenData(@PathVariable String username, @PathVariable Long id, @RequestBody String squareMeter) {
         var calculationForGivenData = calculationService.getAverageConsumptionForData(username, id, squareMeter).orElse(null);
-        return "The average Consumption for the Tariff with ID " + id + " with your Input of " + squareMeter + " is " + calculationForGivenData;
+        return "The average Consumption for the Tariff with ID " + id + " with your Input of " + squareMeter + "sqm is " + calculationForGivenData;
     }
 }

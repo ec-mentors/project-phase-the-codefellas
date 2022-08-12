@@ -16,7 +16,8 @@ public class UserDTO {
                 user.getLastName(),
                 user.getSavedHomes(),
                 user.getRole(),
-                user.getEmail()
+                user.getEmail(),
+                user.getSubscriptions()
         );
     }
 

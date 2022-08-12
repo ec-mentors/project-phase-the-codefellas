@@ -104,7 +104,7 @@ public class UserService {
 
     public Optional<UserPrivateDTO> viewIndividualProfileDataUser(User user) {
         if(authenticationService.onAuthentication(user)) {
-            return getUserByUsername(user.getUsername()).map(mapper::toUserPrivateDTO);
+            return getUserByUsername(user.getEmail()).map(mapper::toUserPrivateDTO);
         }
         return Optional.empty();
     }

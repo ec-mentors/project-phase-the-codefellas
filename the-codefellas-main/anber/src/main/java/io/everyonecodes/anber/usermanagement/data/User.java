@@ -62,21 +62,21 @@ public class User {
         this.password = password;
     }
 
-    public User(String firstName, String lastName, String email, String password, String role) {
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.email = email;
-        this.password = password;
-        this.role = role;
-    }
+//    public User(String firstName, String lastName, String email, String password, String role) {
+//        this.firstName = firstName;
+//        this.lastName = lastName;
+//        this.email = email;
+//        this.password = password;
+//        this.role = role;
+//    }
 
-    public User(String firstName, String lastName, String email, boolean accountNonLocked, String password) {
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.email = email;
-        this.accountNonLocked = accountNonLocked;
-        this.password = password;
-    }
+//    public User(String firstName, String lastName, String email, boolean accountNonLocked, String password) {
+//        this.firstName = firstName;
+//        this.lastName = lastName;
+//        this.email = email;
+//        this.accountNonLocked = accountNonLocked;
+//        this.password = password;
+//    }
 
     public User(String email, String password, String role, String username, String country, List<Home> savedHomes, boolean notificationsEnabled) {
         this.email = email;
@@ -121,6 +121,21 @@ public class User {
         this.notificationsEnabled = notificationsEnabled;
     }
 
+    public User(Long id, String firstName, String lastName, String email, String password, String role, String username, String country, List<Home> savedHomes, boolean notificationsEnabled, int loginAttempts, boolean accountNonLocked, List<Long> subscriptions) {
+        this.id = id;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.password = password;
+        this.role = role;
+        this.username = username;
+        this.country = country;
+        this.savedHomes = savedHomes;
+        this.notificationsEnabled = notificationsEnabled;
+        this.loginAttempts = loginAttempts;
+        this.accountNonLocked = accountNonLocked;
+        this.subscriptions = subscriptions;
+    }
 
     public List<Long> getSubscriptions() {
         return subscriptions;
@@ -226,17 +241,19 @@ public class User {
         this.notificationsEnabled = notificationsEnabled;
     }
 
+
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         User user = (User) o;
-        return notificationsEnabled == user.notificationsEnabled && loginAttempts == user.loginAttempts && accountNonLocked == user.accountNonLocked && Objects.equals(id, user.id) && Objects.equals(firstName, user.firstName) && Objects.equals(lastName, user.lastName) && Objects.equals(email, user.email) && Objects.equals(password, user.password) && Objects.equals(role, user.role) && Objects.equals(username, user.username) && Objects.equals(country, user.country) && Objects.equals(savedHomes, user.savedHomes);
+        return notificationsEnabled == user.notificationsEnabled && loginAttempts == user.loginAttempts && accountNonLocked == user.accountNonLocked && Objects.equals(id, user.id) && Objects.equals(firstName, user.firstName) && Objects.equals(lastName, user.lastName) && Objects.equals(email, user.email) && Objects.equals(password, user.password) && Objects.equals(role, user.role) && Objects.equals(username, user.username) && Objects.equals(country, user.country) && Objects.equals(savedHomes, user.savedHomes) && Objects.equals(subscriptions, user.subscriptions);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, firstName, lastName, email, password, role, username, country, savedHomes, notificationsEnabled, loginAttempts, accountNonLocked);
+        return Objects.hash(id, firstName, lastName, email, password, role, username, country, savedHomes, notificationsEnabled, loginAttempts, accountNonLocked, subscriptions);
     }
 
     @Override
@@ -254,6 +271,7 @@ public class User {
                 ", notificationsEnabled=" + notificationsEnabled +
                 ", loginAttempts=" + loginAttempts +
                 ", accountNonLocked=" + accountNonLocked +
+                ", subscriptions=" + subscriptions +
                 '}';
     }
 }

@@ -68,7 +68,7 @@ public class EmailService {
                         ProviderRepository providerRepository, UnverifiedAccountRepository unverifiedAccountRepository,
                         VerifiedAccountRepository verifiedAccountRepository,
                         @Value("${paths.unverifiedListOld-File}") String unverifiedListOldLocation,
-                        @Value("${paths.verifiedListOld-File}") String verifiedListOldLocation) {
+                        @Value("${paths.verifiedListOld-File}") String verifiedListOldLocation,
                         DataToPDFService dataToPDFService,
                         ConfirmationTokenService confirmationTokenService1, ConfirmationTokenRepository confirmationTokenRepository1) {
         this.javaMailSender = javaMailSender;
@@ -306,7 +306,7 @@ public class EmailService {
                     "</h3></p></font>"
                     + "<html><body><img src='cid:identifier1234'></body></html>";
             helper.setText(body, true);
-            File f = new File("project-phase/the-codefellas-main/anber/src/main/resources/images/AnberLogoEmail.png");
+            File f = new File("the-codefellas-main/anber/src/main/resources/images/AnberLogoEmail.png");
             String absolutePath = f.getAbsolutePath();
             Resource res = new FileSystemResource(new File(absolutePath));
             helper.addInline("identifier1234", res);
@@ -402,7 +402,7 @@ public class EmailService {
                     "</h3></p></font>"
                     + "<html><body><img src='cid:identifier1234'></body></html>";
             helper.setText(body, true);
-            File f = new File("project-phase/the-codefellas-main/anber/src/main/resources/images/AnberLogoEmail.png");
+            File f = new File("the-codefellas-main/anber/src/main/resources/images/AnberLogoEmail.png");
             String absolutePath = f.getAbsolutePath();
             Resource res = new FileSystemResource(new File(absolutePath));
             helper.addInline("identifier1234", res);
@@ -447,7 +447,7 @@ public class EmailService {
             body += "<h3>" + "https://localhost:8080/pwreset/passwordreset/" + oUser.get().getEmail() + "/" + token.getToken() + "</h3></p></font>"
                     + "<html><body><img src='cid:identifier1234'></body></html>";
             helper.setText(body, true);
-            File f = new File("C:\\Users\\Admin\\IdeaProjects\\project-phase\\the-codefellas-main\\anber\\src\\main\\resources\\images\\AnberLogoEmail.png");
+            File f = new File("the-codefellas-main/anber/src/main/resources/images/AnberLogoEmail.png");
             String absolutePath = f.getAbsolutePath();
             Resource res = new FileSystemResource(new File(absolutePath));
             helper.addInline("identifier1234", res);
@@ -488,7 +488,7 @@ public class EmailService {
             body += "<font color=black><p><i></i>";
                     body+= "<html><body><img src='cid:identifier1234'></body></html>";
             helper.setText(body, true);
-            File f = new File("C:\\Users\\Admin\\IdeaProjects\\project-phase\\the-codefellas-main\\anber\\src\\main\\resources\\images\\AnberLogoEmail.png");
+            File f = new File("the-codefellas-main/anber/src/main/resources/images/AnberLogoEmail.png");
             String absolutePath = f.getAbsolutePath();
             Resource res = new FileSystemResource(new File(absolutePath));
             helper.addInline("identifier1234", res);
@@ -531,7 +531,7 @@ public class EmailService {
             body += "<h3>" + "Your Account has been deleted!" + "</h3></p></font>"
                     + "<html><body><img src='cid:identifier1234'></body></html>";
             helper.setText(body, true);
-            File f = new File("C:\\Users\\Manuel\\Documents\\project-phase-the-codefellas\\the-codefellas-main\\anber\\src\\main\\resources\\images\\AnberLogoEmail.png");
+            File f = new File("the-codefellas-main/anber/src/main/resources/images/AnberLogoEmail.png");
             String absolutePath = f.getAbsolutePath();
             Resource res = new FileSystemResource(new File(absolutePath));
             helper.addInline("identifier1234", res);
@@ -575,7 +575,7 @@ public class EmailService {
             body += "<h3>" + "Thank you for using our Service!" + "</h3></p></font>"
                     + "<html><body><img src='cid:identifier1234'></body></html>";
             helper.setText(body, true);
-            File f = new File("C:\\Users\\Admin\\IdeaProjects\\project-phase\\the-codefellas-main\\anber\\src\\main\\resources\\images\\AnberLogoEmail.png");
+            File f = new File("the-codefellas-main/anber/src/main/resources/images/AnberLogoEmail.png");
             String absolutePath = f.getAbsolutePath();
             Resource res = new FileSystemResource(new File(absolutePath));
             helper.addInline("identifier1234", res);
@@ -617,7 +617,7 @@ public class EmailService {
             body += "<font color=black><p><i></i>";
             body+= "<html><body><img src='cid:identifier1234'></body></html>";
             helper.setText(body, true);
-            File f = new File("C:\\Users\\Admin\\IdeaProjects\\project-phase\\the-codefellas-main\\anber\\src\\main\\resources\\images\\AnberLogoEmail.png");
+            File f = new File("the-codefellas-main/anber/src/main/resources/images/AnberLogoEmail.png");
             String absolutePath = f.getAbsolutePath();
             Resource res = new FileSystemResource(new File(absolutePath));
             helper.addInline("identifier1234", res);
