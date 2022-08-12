@@ -1,5 +1,6 @@
 package io.everyonecodes.anber.email.service;
 
+
 import io.everyonecodes.anber.providermanagement.data.ProviderType;
 import io.everyonecodes.anber.providermanagement.data.UnverifiedAccount;
 import io.everyonecodes.anber.providermanagement.data.VerifiedAccount;
@@ -8,12 +9,17 @@ import io.everyonecodes.anber.providermanagement.repository.VerifiedAccountRepos
 import io.everyonecodes.anber.searchmanagement.data.ProviderDTO;
 import io.everyonecodes.anber.searchmanagement.repository.ProviderRepository;
 import io.everyonecodes.anber.tariffmanagement.data.Tariff;
+import com.itextpdf.text.DocumentException;
+import io.everyonecodes.anber.email.data.ConfirmationToken;
+import io.everyonecodes.anber.email.repository.ConfirmationTokenRepository;
+import io.everyonecodes.anber.searchmanagement.service.DataToPDFService;
 import io.everyonecodes.anber.usermanagement.data.User;
 import io.everyonecodes.anber.usermanagement.data.UserPrivateDTO;
 import io.everyonecodes.anber.usermanagement.repository.UserRepository;
 import io.everyonecodes.anber.usermanagement.service.UserDTO;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.mail.SimpleMailMessage;
@@ -28,8 +34,10 @@ import javax.mail.MessagingException;
 import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
 import javax.mail.internet.MimeMessage;
+import javax.transaction.Transactional;
 import java.io.File;
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
@@ -40,6 +48,7 @@ public class EmailService {
     private final JavaMailSender javaMailSender;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final DataToPDFService dataToPDFService;
     private final UserDTO userDTO;
     private final Map<String, String> allowedUsers = new HashMap<>();
     private final String setUsernameValue;
@@ -49,6 +58,8 @@ public class EmailService {
     private final VerifiedAccountRepository verifiedAccountRepository;
     private final String unverifiedListOldLocation;
     private final String verifiedListOldLocation;
+    private final ConfirmationTokenService confirmationTokenService;
+    private final ConfirmationTokenRepository confirmationTokenRepository;
 
     public EmailService(JavaMailSender javaMailSender, UserRepository userRepository, PasswordEncoder passwordEncoder,
                         UserDTO userDTO,
@@ -58,9 +69,14 @@ public class EmailService {
                         VerifiedAccountRepository verifiedAccountRepository,
                         @Value("${paths.unverifiedListOld-File}") String unverifiedListOldLocation,
                         @Value("${paths.verifiedListOld-File}") String verifiedListOldLocation) {
+                        DataToPDFService dataToPDFService,
+                        ConfirmationTokenService confirmationTokenService1, ConfirmationTokenRepository confirmationTokenRepository1) {
         this.javaMailSender = javaMailSender;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.confirmationTokenService = confirmationTokenService1;
+        this.confirmationTokenRepository = confirmationTokenRepository1;
+        this.dataToPDFService = dataToPDFService;
         this.userDTO = userDTO;
         this.setUsernameValue = setUsernameValue;
         this.setPasswordValue = setPasswordValue;
@@ -98,9 +114,27 @@ public class EmailService {
 
         // check if user with that email exists
         var oUser = userRepository.findOneByEmail(email);
-        if (oUser.isEmpty()) throw new IllegalArgumentException();
+        var confirmationToken = confirmationTokenService.getToken(uuid)
+                .orElseThrow(() ->
+                        new IllegalStateException("token not found"));
+
+        if (oUser.isEmpty()) {
+            throw new IllegalArgumentException();
+        }
+
         var userTemp = oUser.get();
 
+        if (confirmationToken.getConfirmedAt() != null) {
+            throw  new IllegalStateException("token already confirmed");
+        }
+
+        LocalDateTime expiredAt = confirmationToken.getExpiresAt();
+
+        if (expiredAt.isBefore(LocalDateTime.now())) {
+            confirmationTokenRepository.delete(confirmationToken);
+            userRepository.delete(confirmationToken.getUser());
+            throw new IllegalStateException("token expired");
+        }
 
         // check if these values have been added to map by sendMail() method
         if (!allowedUsers.containsKey(userTemp.getUsername()) || !allowedUsers.get(userTemp.getUsername()).equals(uuid))
@@ -110,6 +144,10 @@ public class EmailService {
         if (!newPassword.matches("(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[!?@#$^&+=/_-])(?=\\S+$).{6,100}"))
             throw new IllegalArgumentException();
         userTemp.setPassword(passwordEncoder.encode(newPassword));
+        confirmationToken.setConfirmedAt(LocalDateTime.now());
+        userTemp.setAccountNonLocked(true);
+        userTemp.setLoginAttempts(0);
+        confirmationTokenRepository.save(confirmationToken);
         userRepository.save(userTemp);
 
         var userDto = userDTO.toUserPrivateDTO(userTemp);
@@ -379,7 +417,8 @@ public class EmailService {
     public void sendPwResetHTMLEmail(String usernameInput) {
         Optional<User> oUser = userRepository.findOneByEmail(usernameInput);
         if (oUser.isEmpty()) throw new IllegalArgumentException();
-        var uuid = UUID.randomUUID().toString();
+        ConfirmationToken token = confirmationTokenService.createToken(oUser.get());
+        var uuid = token.getToken();
         // add the user and the uuid to map that allows password change
         allowedUsers.put(oUser.get().getUsername(), uuid);
         String to = oUser.get().getEmail();
@@ -405,10 +444,10 @@ public class EmailService {
             String body = "<h3><font color=black>Dear " + oUser.get().getEmail() + ",\n" +
                     "<br><br><br><br>Click here to reset your password:\n</font></h3><br>";
             body += "<font color=black><p><i></i>";
-            body += "<h3>" + "https://localhost:8080/pwreset/passwordreset/" + uuid + "</h3></p></font>"
+            body += "<h3>" + "https://localhost:8080/pwreset/passwordreset/" + oUser.get().getEmail() + "/" + token.getToken() + "</h3></p></font>"
                     + "<html><body><img src='cid:identifier1234'></body></html>";
             helper.setText(body, true);
-            File f = new File("project-phase/the-codefellas-main/anber/src/main/resources/images/AnberLogoEmail.png");
+            File f = new File("C:\\Users\\Admin\\IdeaProjects\\project-phase\\the-codefellas-main\\anber\\src\\main\\resources\\images\\AnberLogoEmail.png");
             String absolutePath = f.getAbsolutePath();
             Resource res = new FileSystemResource(new File(absolutePath));
             helper.addInline("identifier1234", res);
@@ -419,4 +458,178 @@ public class EmailService {
             e.printStackTrace();
         }
     }
+
+    public void sendSearchResultAsPdf(String usernameInput, String filters) throws DocumentException, IOException {
+        Optional<User> oUser = userRepository.findOneByEmail(usernameInput);
+        var document = dataToPDFService.sendPDFWithFilters(filters);
+        if (oUser.isEmpty()) throw new IllegalArgumentException();
+        String to = oUser.get().getEmail();
+        String from = setUsernameValue;
+        final String username = from;
+        final String password = setPasswordValue;
+        String host = "smtp.gmail.com";
+        Properties props = new Properties();
+        props.put("mail.smtp.auth", "true");
+        props.put("mail.smtp.starttls.enable", "true");
+        props.put("mail.smtp.host", host);
+        props.put("mail.smtp.port", "587");
+        Session session = Session.getInstance(props,
+                new javax.mail.Authenticator() {
+                    protected PasswordAuthentication getPasswordAuthentication() {
+                        return new PasswordAuthentication(username, password);
+                    }
+                });
+        try {
+            MimeMessage message = new MimeMessage(session);
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "utf-8");
+            helper.setTo(to);
+            String body = "<h3><font color=black>Dear " + oUser.get().getFirstName() + " " + oUser.get().getLastName() + ",\n" +
+                    "<br><br><br><br>Here are your Search Results in PDF-Form as Attachment\n</font></h3><br>";
+            body += "<font color=black><p><i></i>";
+                    body+= "<html><body><img src='cid:identifier1234'></body></html>";
+            helper.setText(body, true);
+            File f = new File("C:\\Users\\Admin\\IdeaProjects\\project-phase\\the-codefellas-main\\anber\\src\\main\\resources\\images\\AnberLogoEmail.png");
+            String absolutePath = f.getAbsolutePath();
+            Resource res = new FileSystemResource(new File(absolutePath));
+            helper.addInline("identifier1234", res);
+            helper.setSubject("Search Results from AnBer-Project");
+            helper.setFrom(from);
+            File file = new File(absolutePath);
+            helper.addAttachment("SearchResult.pdf", new ByteArrayResource(document)); // - leave this here in case we need it for other attachments
+            javaMailSender.send(message);
+        } catch (MessagingException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void sendDeleteMail(String usernameInput) {
+        Optional<User> oUser = userRepository.findOneByEmail(usernameInput);
+        if (oUser.isEmpty()) throw new IllegalArgumentException();
+        String to = oUser.get().getEmail();
+        String from = setUsernameValue;
+        final String username = from;
+        final String password = setPasswordValue;
+        String host = "smtp.gmail.com";
+        Properties props = new Properties();
+        props.put("mail.smtp.auth", "true");
+        props.put("mail.smtp.starttls.enable", "true");
+        props.put("mail.smtp.host", host);
+        props.put("mail.smtp.port", "587");
+        Session session = Session.getInstance(props,
+                new javax.mail.Authenticator() {
+                    protected PasswordAuthentication getPasswordAuthentication() {
+                        return new PasswordAuthentication(username, password);
+                    }
+                });
+        try {
+            MimeMessage message = new MimeMessage(session);
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "utf-8");
+            helper.setTo(to);
+            String body = "<h3><font color=black>Dear " + oUser.get().getFirstName() + " " + oUser.get().getLastName() + ",\n" +
+                    "<br><br><br><br>Thank you for using our AnBer-Service!\n</font></h3><br>";
+            body += "<font color=black><p><i></i>";
+            body += "<h3>" + "Your Account has been deleted!" + "</h3></p></font>"
+                    + "<html><body><img src='cid:identifier1234'></body></html>";
+            helper.setText(body, true);
+            File f = new File("C:\\Users\\Manuel\\Documents\\project-phase-the-codefellas\\the-codefellas-main\\anber\\src\\main\\resources\\images\\AnberLogoEmail.png");
+            String absolutePath = f.getAbsolutePath();
+            Resource res = new FileSystemResource(new File(absolutePath));
+            helper.addInline("identifier1234", res);
+            helper.setSubject("Account Delete Confirmation from Anber-project");
+            helper.setFrom(from);
+            File file = new File(absolutePath);
+            javaMailSender.send(message);
+        } catch (MessagingException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Transactional
+    public void deleteConfirmationTokenAndSendDeleteMail(String usernameInput) {
+        Optional<User> oUser = userRepository.findOneByEmail(usernameInput);
+        if (oUser.isEmpty()) throw new IllegalArgumentException();
+        confirmationTokenRepository.deleteByUser(oUser.get());
+        String to = oUser.get().getEmail();
+        String from = setUsernameValue;
+        final String username = from;
+        final String password = setPasswordValue;
+        String host = "smtp.gmail.com";
+        Properties props = new Properties();
+        props.put("mail.smtp.auth", "true");
+        props.put("mail.smtp.starttls.enable", "true");
+        props.put("mail.smtp.host", host);
+        props.put("mail.smtp.port", "587");
+        Session session = Session.getInstance(props,
+                new javax.mail.Authenticator() {
+                    protected PasswordAuthentication getPasswordAuthentication() {
+                        return new PasswordAuthentication(username, password);
+                    }
+                });
+        try {
+            MimeMessage message = new MimeMessage(session);
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "utf-8");
+            helper.setTo(to);
+            String body = "<h3><font color=black>Dear " + oUser.get().getEmail() + ",\n" +
+                    "<br><br><br><br>Your Account has been successfully deleted!\n</font></h3><br>";
+            body += "<font color=black><p><i></i>";
+            body += "<h3>" + "Thank you for using our Service!" + "</h3></p></font>"
+                    + "<html><body><img src='cid:identifier1234'></body></html>";
+            helper.setText(body, true);
+            File f = new File("C:\\Users\\Admin\\IdeaProjects\\project-phase\\the-codefellas-main\\anber\\src\\main\\resources\\images\\AnberLogoEmail.png");
+            String absolutePath = f.getAbsolutePath();
+            Resource res = new FileSystemResource(new File(absolutePath));
+            helper.addInline("identifier1234", res);
+            helper.setSubject("Delete Account Confirmation");
+            helper.setFrom(from);
+            File file = new File(absolutePath);
+            javaMailSender.send(message);
+        } catch (MessagingException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void sendSearchResultAsPdfSorted(String usernameInput, String operator, String filters) throws DocumentException {
+        Optional<User> oUser = userRepository.findOneByEmail(usernameInput);
+        var document = dataToPDFService.sendPDFWithSortByBasicRating(filters, operator);
+        if (oUser.isEmpty()) throw new IllegalArgumentException();
+        String to = oUser.get().getEmail();
+        String from = setUsernameValue;
+        final String username = from;
+        final String password = setPasswordValue;
+        String host = "smtp.gmail.com";
+        Properties props = new Properties();
+        props.put("mail.smtp.auth", "true");
+        props.put("mail.smtp.starttls.enable", "true");
+        props.put("mail.smtp.host", host);
+        props.put("mail.smtp.port", "587");
+        Session session = Session.getInstance(props,
+                new javax.mail.Authenticator() {
+                    protected PasswordAuthentication getPasswordAuthentication() {
+                        return new PasswordAuthentication(username, password);
+                    }
+                });
+        try {
+            MimeMessage message = new MimeMessage(session);
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "utf-8");
+            helper.setTo(to);
+            String body = "<h3><font color=black>Dear " + oUser.get().getFirstName() + " " + oUser.get().getLastName() + ",\n" +
+                    "<br><br><br><br>Here are your Search Results in PDF-Form as Attachment\n</font></h3><br>";
+            body += "<font color=black><p><i></i>";
+            body+= "<html><body><img src='cid:identifier1234'></body></html>";
+            helper.setText(body, true);
+            File f = new File("C:\\Users\\Admin\\IdeaProjects\\project-phase\\the-codefellas-main\\anber\\src\\main\\resources\\images\\AnberLogoEmail.png");
+            String absolutePath = f.getAbsolutePath();
+            Resource res = new FileSystemResource(new File(absolutePath));
+            helper.addInline("identifier1234", res);
+            helper.setSubject("Search Results from AnBer-Project");
+            helper.setFrom(from);
+            File file = new File(absolutePath);
+            helper.addAttachment("SearchResult.pdf", new ByteArrayResource(document)); // - leave this here in case we need it for other attachments
+            javaMailSender.send(message);
+        } catch (MessagingException e) {
+            e.printStackTrace();
+        }
+    }
+    
 }
+

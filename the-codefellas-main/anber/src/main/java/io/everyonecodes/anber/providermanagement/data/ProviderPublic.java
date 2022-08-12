@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.Objects;
 
 public class ProviderPublic {
+
+    private Long id;
     private String providerName, website;
     private Rating rating;
     @OneToMany(fetch = FetchType.EAGER)
@@ -20,6 +22,22 @@ public class ProviderPublic {
         this.website = website;
         this.rating = rating;
         this.tariffs = tariffs;
+    }
+
+    public ProviderPublic(Long id, String providerName, String website, Rating rating, List<Tariff> tariffs) {
+        this.id = id;
+        this.providerName = providerName;
+        this.website = website;
+        this.rating = rating;
+        this.tariffs = tariffs;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getProviderName() {

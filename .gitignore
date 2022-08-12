@@ -316,8 +316,6 @@ buildNumber.properties
 mvnw
 mvnw.cmd
 .mvn
-config.yml
-test-config.yml
 
 # Eclipse m2e generated files
 # Eclipse Core

@@ -3,7 +3,9 @@ package io.everyonecodes.anber.email.service;
 import io.everyonecodes.anber.email.data.ConfirmationToken;
 import io.everyonecodes.anber.email.repository.ConfirmationTokenRepository;
 import io.everyonecodes.anber.usermanagement.data.User;
+import io.everyonecodes.anber.usermanagement.data.UserPrivateDTO;
 import io.everyonecodes.anber.usermanagement.repository.UserRepository;
+import io.everyonecodes.anber.usermanagement.service.UserDTO;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.ModelAndView;
@@ -17,15 +19,17 @@ import java.util.UUID;
 public class ConfirmationTokenService {
     private final ConfirmationTokenRepository confirmationTokenRepository;
     private final UserRepository userRepository;
-    
+    private final UserDTO userDTO;
+
     private final String tokenNotFound;
     private final String alreadyConfirmed;
     private final String expired;
     private final String confirmed;
 
-    public ConfirmationTokenService(ConfirmationTokenRepository confirmationTokenRepository, UserRepository userRepository, @Value("${messages.token.nf}") String tokenNotFound, @Value("${messages.token.ac}") String alreadyConfirmed, @Value("${messages.token.ex}") String expired, @Value("${messages.token.co}") String confirmed) {
+    public ConfirmationTokenService(ConfirmationTokenRepository confirmationTokenRepository, UserRepository userRepository, UserDTO userDTO, @Value("${messages.token.nf}") String tokenNotFound, @Value("${messages.token.ac}") String alreadyConfirmed, @Value("${messages.token.ex}") String expired, @Value("${messages.token.co}") String confirmed) {
         this.confirmationTokenRepository = confirmationTokenRepository;
         this.userRepository = userRepository;
+        this.userDTO = userDTO;
         this.tokenNotFound = tokenNotFound;
         this.alreadyConfirmed = alreadyConfirmed;
         this.expired = expired;
@@ -38,21 +42,19 @@ public class ConfirmationTokenService {
 
     public ConfirmationToken createToken(User user) {
         String token = UUID.randomUUID().toString();
-        ConfirmationToken confirmationToken = new ConfirmationToken(token, user, LocalDateTime.now(), LocalDateTime.now().plusMinutes(15));
+        ConfirmationToken confirmationToken = new ConfirmationToken(token, user, LocalDateTime.now(), LocalDateTime.now().plusHours(24));
         confirmationTokenRepository.save(confirmationToken);
         return confirmationToken;
     }
 
     @Transactional
-    public ModelAndView confirmToken(String token) {
-        ModelAndView modelAndView = new ModelAndView();
+    public UserPrivateDTO confirmToken(String token) {
         ConfirmationToken confirmationToken = getToken(token)
                 .orElseThrow(() ->
-                        new IllegalStateException(tokenNotFound));
+                        new IllegalStateException("token not found"));
 
         if (confirmationToken.getConfirmedAt() != null) {
-            modelAndView.setViewName(alreadyConfirmed);
-            return modelAndView;
+            new IllegalStateException(alreadyConfirmed);
         }
 
         LocalDateTime expiredAt = confirmationToken.getExpiresAt();
@@ -61,8 +63,7 @@ public class ConfirmationTokenService {
 
             confirmationTokenRepository.delete(confirmationToken);
             userRepository.delete(confirmationToken.getUser());
-            modelAndView.setViewName(expired);
-            return modelAndView;
+            new IllegalStateException(expired);
         }
 
         confirmationToken.setConfirmedAt(LocalDateTime.now());
@@ -70,7 +71,7 @@ public class ConfirmationTokenService {
         User user = confirmationToken.getUser();
         // user.setVerified(true);  <-- Method not created
         userRepository.save(user);
-        modelAndView.setViewName(confirmed);
-        return modelAndView;
+        return userDTO.toUserPrivateDTO(user);
+
     }
 }

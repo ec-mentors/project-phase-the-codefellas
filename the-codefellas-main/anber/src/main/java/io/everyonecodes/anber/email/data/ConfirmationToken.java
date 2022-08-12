@@ -19,7 +19,7 @@ public class ConfirmationToken {
     private String token;
 
     @ManyToOne(targetEntity = User.class, fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    @JoinColumn(nullable = false, name = "auth_user_id")
+//    @JoinColumn(nullable = false, name = "auth_user_id")
     private User user;
 
     @Column(nullable = false)
