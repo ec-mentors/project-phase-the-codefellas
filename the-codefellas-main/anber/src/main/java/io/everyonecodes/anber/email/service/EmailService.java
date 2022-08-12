@@ -8,7 +8,6 @@ import io.everyonecodes.anber.providermanagement.repository.VerifiedAccountRepos
 import io.everyonecodes.anber.searchmanagement.data.ProviderDTO;
 import io.everyonecodes.anber.searchmanagement.repository.ProviderRepository;
 import io.everyonecodes.anber.tariffmanagement.data.Tariff;
-import io.everyonecodes.anber.tariffmanagement.repository.TariffRepository;
 import io.everyonecodes.anber.usermanagement.data.User;
 import io.everyonecodes.anber.usermanagement.data.UserPrivateDTO;
 import io.everyonecodes.anber.usermanagement.repository.UserRepository;
@@ -30,7 +29,7 @@ import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
 import javax.mail.internet.MimeMessage;
 import java.io.File;
-import java.nio.file.Path;
+import java.io.IOException;
 import java.util.*;
 
 @Service
@@ -48,16 +47,17 @@ public class EmailService {
     private final ProviderRepository providerRepository;
     private final UnverifiedAccountRepository unverifiedAccountRepository;
     private final VerifiedAccountRepository verifiedAccountRepository;
-    private final TariffRepository tariffRepository;
-    private List<VerifiedAccount> verifiedList = new ArrayList<>();
-    private List<UnverifiedAccount> unverifiedList = new ArrayList<>();
+    private final String unverifiedListOldLocation;
+    private final String verifiedListOldLocation;
 
     public EmailService(JavaMailSender javaMailSender, UserRepository userRepository, PasswordEncoder passwordEncoder,
                         UserDTO userDTO,
                         @Value("${spring.mail.username}") String setUsernameValue,
                         @Value("${spring.mail.password}") String setPasswordValue,
                         ProviderRepository providerRepository, UnverifiedAccountRepository unverifiedAccountRepository,
-                        VerifiedAccountRepository verifiedAccountRepository, TariffRepository tariffRepository) {
+                        VerifiedAccountRepository verifiedAccountRepository,
+                        @Value("${paths.unverifiedListOld-File}") String unverifiedListOldLocation,
+                        @Value("${paths.verifiedListOld-File}") String verifiedListOldLocation) {
         this.javaMailSender = javaMailSender;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
@@ -67,7 +67,8 @@ public class EmailService {
         this.providerRepository = providerRepository;
         this.unverifiedAccountRepository = unverifiedAccountRepository;
         this.verifiedAccountRepository = verifiedAccountRepository;
-        this.tariffRepository = tariffRepository;
+        this.unverifiedListOldLocation = unverifiedListOldLocation;
+        this.verifiedListOldLocation = verifiedListOldLocation;
     }
 
     // send email with link that allows password change
@@ -124,29 +125,33 @@ public class EmailService {
         allowedUsers.put(key, value);
     }
 
-    //every 6 months
+    //every 6 months (for testing and review it's still 1 minute! // 0 0 12 1 1/6 ? * )
     @Scheduled(cron = "0 0/1 * * * ?")
-    public void sendEmailNotificationForNewProviders() {
+    public void sendEmailNotificationForNewProviders() throws IOException {
         sendNewProvidersNotificationHTMLEmail(); // Send Notification email for new provider
     }
 
-    // Send new provider email
-    public void sendNewProvidersNotificationHTMLEmail() {
+    // Send email for new providers unverified & verified
+    public void sendNewProvidersNotificationHTMLEmail() throws IOException {
 
+        // File handling from YAML
+        File unverifiedFile = new File(unverifiedListOldLocation);
+        File verifiedFile = new File(verifiedListOldLocation);
+        String absolutePathUnverifiedFile = unverifiedFile.getCanonicalPath();
+        String absolutePathVerifiedFile = verifiedFile.getCanonicalPath();
+
+        // Find all users that have notifications enabled
         var notificationUserList = userRepository.findAllByNotificationsEnabled(true);
 
+        // Initialize the writer and reader classes
         FileReaderNewProvider fileReaderNewProvider = new FileReaderNewProvider();
         FileWriterNewProvider fileWriterNewProvider = new FileWriterNewProvider();
 
-        String unverifiedListOldLocation = "project-phase/the-codefellas-main/anber/src/main/resources/files/unverifiedListOld.txt";
-        Path unverifiedListOldPath = Path.of(unverifiedListOldLocation);
-        var unverifiedListOldFileStrings = fileReaderNewProvider.read(unverifiedListOldLocation);
+        // Reading in the results from the file
+        var unverifiedListOldFileStrings = fileReaderNewProvider.read(absolutePathUnverifiedFile);
+        var verifiedListOldFileStrings = fileReaderNewProvider.read(absolutePathVerifiedFile);
 
-        String verifiedListOldLocation = "project-phase/the-codefellas-main/anber/src/main/resources/files/verifiedListOld.txt";
-        Path verifiedListOldPath = Path.of(verifiedListOldLocation);
-        var verifiedListOldFileStrings = fileReaderNewProvider.read(verifiedListOldLocation);
-
-        // Data Fill for the first Run
+        // Data Fill for the first Run if empty
         if (unverifiedListOldFileStrings.isEmpty()) {
             var update = unverifiedAccountRepository.findAll();
             List<String> extractedNames = new ArrayList<>();
@@ -154,7 +159,7 @@ public class EmailService {
                 var providerName = unverifiedAccount.getProviderName();
                 extractedNames.add(providerName);
             }
-            fileWriterNewProvider.append(unverifiedListOldLocation, extractedNames);
+            fileWriterNewProvider.append(absolutePathUnverifiedFile, extractedNames);
         }
 
         if (verifiedListOldFileStrings.isEmpty()) {
@@ -164,14 +169,14 @@ public class EmailService {
                 var providerName = verifiedAccount.getProviderName();
                 extractedNames.add(providerName);
             }
-            fileWriterNewProvider.append(verifiedListOldLocation, extractedNames);
+            fileWriterNewProvider.append(absolutePathVerifiedFile, extractedNames);
         }
 
-        // Lists that got read from the .txt files
-        var unverifiedNameList = fileReaderNewProvider.read(unverifiedListOldLocation);
-        var verifiedNameList = fileReaderNewProvider.read(verifiedListOldLocation);
+        // Lists that got read from the .txt files in case if() above gets triggered
+        var unverifiedNameList = fileReaderNewProvider.read(absolutePathUnverifiedFile);
+        var verifiedNameList = fileReaderNewProvider.read(absolutePathVerifiedFile);
 
-        // Up-to-date Providers
+        // Up-to-date Providers from Repository
         var up2DateProvidersListUnverified = unverifiedAccountRepository.findAll();
         var up2DateProvidersListVerified = verifiedAccountRepository.findAll();
 
@@ -191,7 +196,7 @@ public class EmailService {
             up2DateProvidersListVerifiedString.add(providerName);
         }
 
-        // Lists for new added Provider Entries
+        // Lists for newly added provider entries
         List<String> newProvidersAddedUnverified = new ArrayList<>();
         List<String> newProvidersAddedVerified = new ArrayList<>();
 
@@ -220,8 +225,9 @@ public class EmailService {
             vAccountNames.append(newEntry).append("<br>");
         }
 
-        fileWriterNewProvider.write(unverifiedListOldLocation, up2DateProvidersListUnverifiedString);
-        fileWriterNewProvider.write(verifiedListOldLocation, up2DateProvidersListVerifiedString);
+        // Update of files with new entries
+        fileWriterNewProvider.write(absolutePathUnverifiedFile, up2DateProvidersListUnverifiedString);
+        fileWriterNewProvider.write(absolutePathVerifiedFile, up2DateProvidersListVerifiedString);
 
         // Sending the actual email to enabled users
         for (User user : notificationUserList) {
@@ -413,5 +419,4 @@ public class EmailService {
             e.printStackTrace();
         }
     }
-
 }
